@@ -1,0 +1,8 @@
+# Local/editor output
+.vscode/
+*.log
+*.tmp
+
+# Never commit local PZ profile, save, or Workshop cache data.
+Zomboid/
+LocalTest/

@@ -1,0 +1,8 @@
+{
+  "UI_RVVFX_VFXQuality_tooltip": "Full uses 100 percent intended visual quality with automatic culling, caching, pooling, and extreme-crowd protection. Performance targets about half the normal workload. Potato targets about one quarter or less. Off disables RVV effects and tire marks on this client.",
+  "UI_CWCompat_OptionsTitle": "Chaosworld Compatibility",
+  "UI_CWCompat_LifestyleTitle": "Lifestyle: Hobbies",
+  "UI_CWCompat_LifestyleDescription": "Compatibility and presentation options for Lifestyle: Hobbies.",
+  "UI_CWCompat_ShowHiddenSkills": "Show hidden Lifestyle skills",
+  "UI_CWCompat_ShowHiddenSkills_tooltip": "Shows Lifestyle's hidden Yoga, Inventing, Ping Pong, Pool, and Arcade progression under the Lifestyle category. This only changes the display; Lifestyle remains the owner of progression data."
+}

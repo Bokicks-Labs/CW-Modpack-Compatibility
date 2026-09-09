@@ -1,0 +1,6 @@
+version=1
+id=3797782198
+title=Chaosworld B42 Modpack Compatibility
+description=Build 42 compatibility fixes for Gael weapon-part completion, Fast Forward and Exact Minute Clock layout, Quartermaster runtime categories, Nature's Call washing and soap labels, and English sandbox tooltips.  NOTE: THIS WAS VIBE CODED with codex. Its just some patches to fix a mod pack im maintaining for friends.
+tags=Build 42;Multiplayer;QoL;WIP
+visibility=public
