@@ -12,6 +12,42 @@ local function log(message)
     print("[CWModpackCompatibility] " .. tostring(message))
 end
 
+-- KI5MiniFixes replaces DAMN's semi-attachment helper without restoring its
+-- registration API. Seed that API during compatibility-mod load so 82 Oshkosh
+-- can register its vehicle scripts even when KI5MiniFixes wins the file
+-- override. The full helper shim also installs the safe trailer hook when its
+-- module is required by the vehicle mod.
+local function seedDamnSemiAttachmentRegistration()
+    DAMN = DAMN or {}
+    DAMN.SemiAttachmentHelper = DAMN.SemiAttachmentHelper or {}
+    local helper = DAMN.SemiAttachmentHelper
+    helper.byScriptName = helper.byScriptName or {}
+
+    if not helper.registerVehicleScript then
+        function helper:registerVehicleScript(semiVehicleScriptName, allowedTrailersVehicleScriptNames)
+            local allowed = self.byScriptName[semiVehicleScriptName]
+            if not allowed then
+                allowed = {}
+                self.byScriptName[semiVehicleScriptName] = allowed
+            end
+            for _, trailerScriptName in ipairs(allowedTrailersVehicleScriptNames or {}) do
+                local found = false
+                for _, existing in ipairs(allowed) do
+                    if existing == trailerScriptName then
+                        found = true
+                        break
+                    end
+                end
+                if not found then
+                    table.insert(allowed, trailerScriptName)
+                end
+            end
+        end
+    end
+end
+
+seedDamnSemiAttachmentRegistration()
+
 local function applyFastForwardExactMinuteClockFix()
     if not isActive("FastForward") then return end
     if not isActive("ExactMinuteClock") then return end
