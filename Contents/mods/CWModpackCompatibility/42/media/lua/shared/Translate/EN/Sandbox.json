@@ -1,4 +1,13 @@
 {
+  "Sandbox_CWModpackCompatibility_Bandits": "Chaosworld Compatibility - Bandits",
+  "Sandbox_CWModpackCompatibility.BanditPlayerHitReactions": "Player reactions to Bandit NPC hits",
+  "Sandbox_CWModpackCompatibility.BanditPlayerHitReactions_tooltip": "Players visibly react when damaged by a Bandit NPC firearm, melee weapon, or bare-hand attack. Disable this if hit reactions interfere with another combat or animation mod. This does not change damage or wounds.",
+  "Sandbox_CWModpackCompatibility.BanditPlayerHitReactionCooldownMs": "Hit-reaction cooldown in milliseconds",
+  "Sandbox_CWModpackCompatibility.BanditPlayerHitReactionCooldownMs_tooltip": "Minimum time between visible reactions. Increase this to reduce repeated interruption from rapid attacks, or use 0 for no cooldown. The default is 750 milliseconds.",
+  "Sandbox_CWModpackCompatibility.BanditPlayerFirearmReactionChance": "Firearm hit-reaction chance, percentage",
+  "Sandbox_CWModpackCompatibility.BanditPlayerFirearmReactionChance_tooltip": "Chance that confirmed damage from a Bandit NPC firearm produces a visible player reaction. This does not change firearm accuracy or damage.",
+  "Sandbox_CWModpackCompatibility.BanditPlayerMeleeReactionChance": "Melee hit-reaction chance, percentage",
+  "Sandbox_CWModpackCompatibility.BanditPlayerMeleeReactionChance_tooltip": "Chance that confirmed damage from a Bandit NPC melee weapon or bare-hand attack produces a visible player reaction. This does not change melee damage.",
   "Sandbox_UsefulBarrelsFunnelSpeedUpFillModifier_tooltip": "Speeds up canister filling when a funnel is nearby.<br>For example, 1.25 means a 25 percent bonus, or 1.25 times faster.<br>Set to 1 to disable the speed bonus.<br>Does not work if 'Require Funnel' is disabled.",
   "Sandbox_TAWBaseHallucinationChanceMin_tooltip": "The minimum likelihood of a hallucination triggering, expressed as a percentage.",
   "Sandbox_TAWBaseHallucinationChanceMax_tooltip": "The maximum likelihood of a hallucination triggering, expressed as a percentage.",

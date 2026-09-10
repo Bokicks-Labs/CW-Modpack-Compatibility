@@ -72,3 +72,19 @@ the original Bandits command unchanged. Lua mock coverage also confirms that
 the Week One client wrappers, state repair, server state repair, and removal
 wrapper make no target-state changes when `BanditsWeekOne` is absent. The
 general Bandits container-loot fix remains correctly gated on `Bandits2` alone.
+
+## Bandits player hit reactions
+
+The installed Bandits 42.20 damage model applies firearm, melee, and bare-hand
+damage to players without consistently entering a player hit-reaction state.
+The compatibility boundary now preserves the original damage call, then sends
+a targeted server confirmation to the damaged player's client. Single-player
+uses the same presentation behavior locally. No additional `Hit` call is made,
+so the patch does not duplicate health loss, wounds, holes, or embedded bullets.
+
+The server-controlled `CWModpackCompatibility` sandbox page provides a master
+toggle, cooldown from 0 to 3000 milliseconds, and separate 0–100 percent
+firearm and melee/bare-hand reaction chances. Defaults are enabled, 750 ms,
+100 percent firearm, and 100 percent melee. Reactions skip dead, floored,
+vehicle-seated, and non-local player representations. A cooldown prevents
+rapid attacks from repeatedly restarting the reaction animation.
