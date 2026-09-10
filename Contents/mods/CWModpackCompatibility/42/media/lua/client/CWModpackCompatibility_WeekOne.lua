@@ -14,6 +14,56 @@ local function isWeekOneActive()
     return activeMods and activeMods:contains("BanditsWeekOne")
 end
 
+local function resolveWeekOneVariant(value)
+    if not BWOVariants then return nil end
+    if value ~= nil and BWOVariants[value] then return value end
+
+    local numeric = tonumber(value)
+    if numeric and BWOVariants[numeric] then return numeric end
+
+    local requested = value and string.lower(tostring(value)) or "original"
+    local fallback = nil
+    for id, variant in pairs(BWOVariants) do
+        if type(variant) == "table" then
+            fallback = fallback or id
+            local name = variant.name and string.lower(tostring(variant.name)) or ""
+            if name == requested or (requested == "original" and name == "original") then
+                return id
+            end
+        end
+    end
+    return fallback
+end
+
+local function ensureWeekOneVariant(key, receivedData)
+    if not isWeekOneActive() then return end
+    if key and key ~= "BanditWeekOne" then return end
+
+    local gmd = receivedData or (GetBWOModData and GetBWOModData())
+    if type(gmd) ~= "table" then return end
+
+    local previous = gmd.Variant
+    local resolved = resolveWeekOneVariant(previous)
+    if resolved == nil then return end
+
+    if previous ~= resolved or not BWOVariants[previous] then
+        gmd.Variant = resolved
+        Compat.weekOneVariantNeedsServerSync = true
+        if BWOScheduler then BWOScheduler.Schedule = nil end
+        print("[CWModpackCompatibility][WeekOne] Repaired invalid variant "
+            .. tostring(previous) .. " -> " .. tostring(resolved) .. ".")
+    end
+
+    if Compat.weekOneVariantNeedsServerSync and sendClientCommand and getSpecificPlayer then
+        local player = getSpecificPlayer(0)
+        if player then
+            sendClientCommand(player, "Commands", "SetVariant", {variant = resolved})
+            Compat.weekOneVariantNeedsServerSync = false
+            print("[CWModpackCompatibility][WeekOne] Synchronized repaired variant with server.")
+        end
+    end
+end
+
 local function installChatStartupGuard()
     if not isWeekOneActive() or not BWOChatPanel or not BWOChatPanel.new then return end
     if BWOChatPanel.__cwStartupGuard then return end
@@ -77,6 +127,10 @@ end
 installChatStartupGuard()
 installEmergencyEventDiagnostics()
 installInhabitantSpawnBoundary()
+ensureWeekOneVariant()
 Events.OnGameStart.Add(installChatStartupGuard)
 Events.OnGameStart.Add(installEmergencyEventDiagnostics)
 Events.OnGameStart.Add(installInhabitantSpawnBoundary)
+Events.OnGameStart.Add(ensureWeekOneVariant)
+Events.OnInitGlobalModData.Add(function() ensureWeekOneVariant() end)
+Events.OnReceiveGlobalModData.Add(ensureWeekOneVariant)

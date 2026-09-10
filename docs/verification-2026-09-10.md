@@ -22,9 +22,20 @@ mods are enabled.
 ## Verification
 
 - `git diff --check` passes.
-- Lua runtime execution was not available in this checkout (`lupa` is absent),
-  so Java bridge behavior and event ordering remain runtime validation items.
+- `dev-scripts/test-week-one-boundaries.py` exercises invalid/named/numeric
+  variant repair, server synchronization, idempotence, and inhabitant command
+  forwarding with Lua mocks.
 - Run the M2 and M7 two-client protocol in
   `docs/incidents/week-one-mp-2026-09-10/TEST-MATRIX.md`, preserving server and
   client logs. Confirm one inhabitant request produces one server spawn and that
   a removed Bandit does not reappear on either client.
+
+## Rejoin evidence and variant-state repair
+
+The 15:01 client session produced 518 failures each at
+`BWOScheduler.lua:42` and `BWOPopControl.lua:102`. Both dereferenced
+`BWOVariants[gmd.Variant]` after the dedicated-server path supplied no valid
+numeric variant key. The compatibility hooks now resolve numeric strings and
+variant names, default missing state to the registered `Original` variant,
+invalidate the cached schedule, and synchronize the repaired key with the
+server. The server performs the same repair before transmitting Week One data.
