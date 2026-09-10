@@ -1,0 +1,8 @@
+name=Chaosworld Bandits MP Diagnostic Trace
+id=CWBanditsPerfTest
+author=chaosworld
+description=Temporary opt-in lifecycle tracing for Bandits Week One multiplayer investigation. Does not implement compatibility fixes.
+versionMin=42.20.0
+modversion=0.1.0
+require=\Bandits2,\BanditsWeekOne
+category=debug
