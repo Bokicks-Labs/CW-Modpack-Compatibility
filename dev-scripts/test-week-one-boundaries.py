@@ -7,6 +7,7 @@ from lupa import LuaRuntime
 ROOT = Path(__file__).resolve().parents[1]
 CLIENT = ROOT / "Contents/mods/CWModpackCompatibility/42/media/lua/client/CWModpackCompatibility_WeekOne.lua"
 SERVER = ROOT / "Contents/mods/CWModpackCompatibility/42/media/lua/server/CWModpackCompatibility_WeekOneServer.lua"
+BANDITS_SERVER = ROOT / "Contents/mods/CWModpackCompatibility/42/media/lua/server/CWModpackCompatibility_BanditsServer.lua"
 
 
 client = LuaRuntime()
@@ -19,6 +20,9 @@ Events = {
     OnReceiveGlobalModData = {Add = function(fn) callbacks.receive = fn end},
 }
 getActivatedMods = function() return {contains = function(_, id) return id == "BanditsWeekOne" end} end
+SandboxVars = setmetatable({ZombieConfig = {PopulationMultiplier = 0.75}}, {
+    __index = function() return 1 end,
+})
 gmd = {Variant = "original"}
 GetBWOModData = function() return gmd end
 BWOVariants = {
@@ -37,6 +41,8 @@ client.execute(CLIENT.read_text(encoding="utf-8-sig"))
 client.execute(
     """
 assert(gmd.Variant == 1, "string variant must resolve to Original's numeric key")
+assert(gmd.Sandbox.FoodLootNew == 1 and gmd.Sandbox["ZombieConfig.PopulationMultiplier"] == 0.75,
+    "client must restore scalar and nested sandbox baselines")
 assert(BWOScheduler.Schedule == nil, "variant repair must invalidate cached schedule")
 gmd = {}
 callbacks.init()
@@ -63,6 +69,9 @@ Events = {
     OnServerStarted = {Add = function(fn) callbacks.started = fn end},
 }
 getActivatedMods = function() return {contains = function(_, id) return id == "BanditsWeekOne" end} end
+SandboxVars = setmetatable({ZombieConfig = {PopulationMultiplier = 0.75}}, {
+    __index = function() return 1 end,
+})
 BWOVariants = {
     [1] = {name = "Original", schedule = {}},
     [2] = {name = "Bandits", schedule = {}},
@@ -77,6 +86,8 @@ server.execute(SERVER.read_text(encoding="utf-8-sig"))
 server.execute(
     """
 assert(gmd.Variant == 1, "dedicated server must default to Original")
+assert(gmd.Sandbox.FoodLootNew == 1 and gmd.Sandbox["ZombieConfig.PopulationMultiplier"] == 0.75,
+    "server must restore scalar and nested sandbox baselines")
 assert(transmits == 1, "server must transmit repaired state")
 callbacks.started()
 assert(transmits == 1, "valid state must remain idempotent")
@@ -86,4 +97,40 @@ assert(gmd.Variant == 2 and transmits == 2, "named server variant must resolve a
 """
 )
 
-print("PASS: Week One variant repair, server synchronization, and inhabitant command boundary.")
+bandits_server = LuaRuntime()
+bandits_server.execute(
+    """
+callbacks = {}
+Events = {OnServerStarted = {Add = function(fn) callbacks.started = fn end}}
+getActivatedMods = function() return {contains = function(_, id) return id == "Bandits2" end} end
+brains = {[100] = {program = {name = "Walker"}}}
+transmits = 0
+GetBanditClusterData = function() return brains end
+TransmitBanditCluster = function() transmits = transmits + 1 end
+zombie = {
+    getPersistentOutfitID = function() return 100 end,
+    getVariableBoolean = function() return false end,
+    removeFromWorld = function(self) self.removedWorld = true end,
+    removeFromSquare = function(self) self.removedSquare = true end,
+}
+zombies = {size = function() return 1 end, get = function(_, index) return zombie end}
+getCell = function() return {getZombieList = function() return zombies end} end
+BanditUtils = {GetZombieID = function() return 84 end}
+BanditServer = {Commands = {BanditRemove = function(_, args)
+    brains[args.id] = nil
+    transmits = transmits + 1
+end}}
+"""
+)
+bandits_server.execute(BANDITS_SERVER.read_text(encoding="utf-8-sig"))
+bandits_server.execute(
+    """
+BanditServer.Commands.BanditRemove({}, {id = 84})
+assert(zombie.removedWorld and zombie.removedSquare,
+    "server entity must be removed even when its client-only Bandit flag is false")
+assert(brains[100] == nil, "raw-keyed alternate brain must be cleared")
+assert(transmits == 2, "requested and alternate brain clusters must be transmitted")
+"""
+)
+
+print("PASS: Week One state repair, spawn routing, and authoritative Bandit removal boundaries.")

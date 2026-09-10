@@ -3,5 +3,5 @@ id=CWModpackCompatibility
 author=chaosworld
 description=Targeted compatibility fixes for the Chaosworld Build 42 modpack. Each runtime patch activates only when its affected mods are enabled. Covers Week One multiplayer state and NPC boundaries, Lifestyle animation loading and compatibility skill view, shower networking, safe timed-action completion, clock and fast-forward layout, skill-media sorting, moved Build 42 UI modules, and malformed English format strings.
 versionMin=42.20.0
-modversion=1.1.7
+modversion=1.1.8
 category=fixes

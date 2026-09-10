@@ -39,3 +39,21 @@ numeric variant key. The compatibility hooks now resolve numeric strings and
 variant names, default missing state to the registered `Original` variant,
 invalidate the cached schedule, and synchronize the repaired key with the
 server. The server performs the same repair before transmitting Week One data.
+
+## Server-result follow-up: sandbox baseline and removal lookup
+
+The 15:46 client log confirms the earlier `schedule` and `playerIsHostile`
+failures are gone. It exposes the next blocked initialization step instead: 49
+`__sub not defined for operands in adjustSandboxVars` failures at
+`BWOScheduler.lua:240`. Week One's dedicated-server Global ModData contained an
+empty `Sandbox` baseline, so its interpolation attempted to subtract nil from a
+number. Version 1.1.8 restores only missing values from the authoritative
+`SandboxVars`, including the nested zombie-population value, on both server and
+client.
+
+The server report also recorded 263 Bandit removal requests with zero entity
+matches. Bandits' server spawner registers a brain but does not set the
+client-side `Bandit` animation variable. The compatibility lookup incorrectly
+required that variable. Version 1.1.8 instead requires a matching Bandits brain,
+accepts raw or normalized persistent-outfit IDs, removes the authoritative
+entity, and clears any alternate raw/normalized brain key.

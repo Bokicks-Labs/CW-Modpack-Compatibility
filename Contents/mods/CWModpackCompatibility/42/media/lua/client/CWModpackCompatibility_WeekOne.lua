@@ -35,12 +35,54 @@ local function resolveWeekOneVariant(value)
     return fallback
 end
 
+local weekOneSandboxKeys = {
+    "KeyLootNew", "MaximumLooted", "FoodLootNew", "CannedFoodLootNew",
+    "LiteratureLootNew", "SurvivalGearsLootNew", "MedicalLootNew",
+    "WeaponLootNew", "RangedWeaponLootNew", "AmmoLootNew",
+    "MechanicsLootNew", "OtherLootNew", "ClothingLootNew",
+    "ContainerLootNew", "MementoLootNew", "MediaLootNew",
+    "CookwareLootNew", "MaterialLootNew", "FarmingLootNew", "ToolLootNew",
+    "MaximumRatIndex", "SurvivorHouseChance", "VehicleStoryChance",
+    "MetaEvent", "LockedHouses", "ZoneStoryChance", "AnnotatedMapChance",
+    "MaxFogIntensity", "TrafficJam", "CarSpawnRate", "Helicopter",
+    "FireSpread", "ZombieConfig.PopulationMultiplier",
+}
+
+local function getSandboxValue(path)
+    local value = SandboxVars
+    for part in string.gmatch(path, "[^.]+") do
+        if type(value) ~= "table" then return nil end
+        value = value[part]
+    end
+    return value
+end
+
+local function ensureWeekOneSandbox(gmd)
+    gmd.Sandbox = type(gmd.Sandbox) == "table" and gmd.Sandbox or {}
+    local repaired = 0
+    for _, key in ipairs(weekOneSandboxKeys) do
+        if gmd.Sandbox[key] == nil then
+            local value = getSandboxValue(key)
+            if value ~= nil then
+                gmd.Sandbox[key] = value
+                repaired = repaired + 1
+            end
+        end
+    end
+    if repaired > 0 then
+        print("[CWModpackCompatibility][WeekOne] Restored " .. tostring(repaired)
+            .. " missing sandbox baseline values.")
+    end
+end
+
 local function ensureWeekOneVariant(key, receivedData)
     if not isWeekOneActive() then return end
     if key and key ~= "BanditWeekOne" then return end
 
     local gmd = receivedData or (GetBWOModData and GetBWOModData())
     if type(gmd) ~= "table" then return end
+
+    ensureWeekOneSandbox(gmd)
 
     local previous = gmd.Variant
     local resolved = resolveWeekOneVariant(previous)
