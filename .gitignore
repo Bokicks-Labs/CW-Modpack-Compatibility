@@ -3,6 +3,9 @@
 *.log
 *.tmp
 
+# Python stuff
+**/__pycache__/
+
 # Never commit local PZ profile, save, or Workshop cache data.
 Zomboid/
 LocalTest/
