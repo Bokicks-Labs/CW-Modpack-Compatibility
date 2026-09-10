@@ -15,6 +15,14 @@ local hiddenPerks = {
     { hidden = "Arcade",   perk = "CWHiddenArcade" },
 }
 
+local nativeLifestylePerks = {
+    "Art",
+    "Cleaning",
+    "Dancing",
+    "Meditation",
+    "Music",
+}
+
 local function log(message)
     print("[CWModpackCompatibility][LifestyleSkills] " .. tostring(message))
 end
@@ -48,6 +56,17 @@ local function findHiddenEntry(perk)
         end
     end
     return nil
+end
+
+local function isNativeLifestylePerk(perk)
+    if not perk then return false end
+    local perkType = perk:getType()
+    for _, perkName in ipairs(nativeLifestylePerks) do
+        if Perks[perkName] and perkType == Perks[perkName] then
+            return true
+        end
+    end
+    return false
 end
 
 local function getHiddenSkill(character, skillName)
@@ -84,11 +103,16 @@ end
 local originalLoadPerk = ISCharacterInfo.loadPerk
 ISCharacterInfo.loadPerk = function(self)
     local perks = originalLoadPerk(self)
-    if showOption:getValue() then return perks end
+    local lifestyleActive = isLifestyleActive()
+    local compatibilityView = lifestyleActive and showOption:getValue()
 
     for _, perkList in pairs(perks) do
         for index = #perkList, 1, -1 do
-            if findHiddenEntry(perkList[index]) then
+            local perk = perkList[index]
+            local remove = (compatibilityView and isNativeLifestylePerk(perk))
+                or (not compatibilityView and findHiddenEntry(perk))
+                or (not lifestyleActive and isNativeLifestylePerk(perk))
+            if remove then
                 table.remove(perkList, index)
             end
         end
@@ -113,7 +137,7 @@ options.apply = function(self)
         syncVisibleLevels(getSpecificPlayer(playerNum))
     end
     refreshSkillPanels()
-    log("Hidden Lifestyle skill display " .. (showOption:getValue() and "enabled." or "disabled."))
+    log("Compatibility Lifestyle skill view " .. (showOption:getValue() and "enabled." or "disabled."))
 end
 
 local function installHiddenSkillBridge()
@@ -135,8 +159,33 @@ local function installHiddenSkillBridge()
     log("Installed hidden-skill display bridge.")
 end
 
+local function installBeyondTenProgressBridge()
+    if not BeyondTen or not BeyondTen.GetLevelProgress then return end
+    if BeyondTen.__cwLifestyleHiddenSkillProgressBridge then return end
+
+    local originalGetLevelProgress = BeyondTen.GetLevelProgress
+    BeyondTen.GetLevelProgress = function(character, thePerk)
+        local resolvedPerk = BeyondTen.ResolvePerk and BeyondTen.ResolvePerk(thePerk) or thePerk
+        local entry = resolvedPerk and resolvedPerk.getType and findHiddenEntry(resolvedPerk) or nil
+        if entry then
+            local skill = getHiddenSkill(character, entry.hidden)
+            if skill then
+                local level = math.max(0, math.min(10, math.floor(tonumber(skill[1]) or 0)))
+                local xp = math.max(0, tonumber(skill[2]) or 0)
+                local required = math.max(0, tonumber(skill[3]) or 0)
+                return level, math.min(xp, required), required
+            end
+        end
+        return originalGetLevelProgress(character, thePerk)
+    end
+
+    BeyondTen.__cwLifestyleHiddenSkillProgressBridge = true
+    log("Installed Beyond Ten hidden-skill progress bridge.")
+end
+
 local function initialiseLifestyleSkillDisplay()
     installHiddenSkillBridge()
+    installBeyondTenProgressBridge()
     for playerNum = 0, getNumActivePlayers() - 1 do
         syncVisibleLevels(getSpecificPlayer(playerNum))
     end
@@ -146,5 +195,6 @@ end
 Events.OnGameStart.Add(initialiseLifestyleSkillDisplay)
 Events.OnCreatePlayer.Add(function(_, player)
     installHiddenSkillBridge()
+    installBeyondTenProgressBridge()
     syncVisibleLevels(player)
 end)

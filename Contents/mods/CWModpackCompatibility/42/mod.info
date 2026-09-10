@@ -1,7 +1,7 @@
 name=Chaosworld B42 Modpack Compatibility
 id=CWModpackCompatibility
 author=chaosworld
-description=Targeted compatibility fixes for the Chaosworld Build 42 modpack. Each runtime patch activates only when its affected mods are enabled. Covers Lifestyle animation loading and hidden-skill display, shower networking, safe timed-action completion, clock and fast-forward layout, skill-media sorting, moved Build 42 UI modules, and malformed English format strings.
+description=Targeted compatibility fixes for the Chaosworld Build 42 modpack. Each runtime patch activates only when its affected mods are enabled. Covers Lifestyle animation loading and compatibility skill view, shower networking, safe timed-action completion, clock and fast-forward layout, skill-media sorting, moved Build 42 UI modules, and malformed English format strings.
 versionMin=42.20.0
-modversion=1.1.1
+modversion=1.1.5
 category=fixes

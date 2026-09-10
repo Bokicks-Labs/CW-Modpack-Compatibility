@@ -3,6 +3,6 @@
   "UI_CWCompat_OptionsTitle": "Chaosworld Compatibility",
   "UI_CWCompat_LifestyleTitle": "Lifestyle: Hobbies",
   "UI_CWCompat_LifestyleDescription": "Compatibility and presentation options for Lifestyle: Hobbies.",
-  "UI_CWCompat_ShowHiddenSkills": "Show hidden Lifestyle skills",
-  "UI_CWCompat_ShowHiddenSkills_tooltip": "Shows Lifestyle's hidden Yoga, Inventing, Ping Pong, Pool, and Arcade progression under the Lifestyle category. This only changes the display; Lifestyle remains the owner of progression data."
+  "UI_CWCompat_ShowHiddenSkills": "Use compatibility Lifestyle skill view",
+  "UI_CWCompat_ShowHiddenSkills_tooltip": "Shows Lifestyle's hidden Yoga, Inventing, Ping Pong, Pool, and Arcade progression and hides the standard Lifestyle skill rows. Turning this off restores the standard rows. This only changes the display; Lifestyle remains the owner of progression data."
 }

@@ -1,7 +1,5 @@
 VERSION = 1,
 
-// Lifestyle's original definitions are included because PZ treats perks.txt
-// as a replacement file rather than merging same-path mod contributions.
 perk Lifestyle
 {
 	parent = None,
@@ -103,9 +101,6 @@ perk Music
 	xp9 = 5000,
 	xp10 = 6000,
 }
-
-// Display-only mirrors for Lifestyle's mod-data-backed hidden skills.
-// Lifestyle remains the authoritative owner of levels and XP.
 
 perk CWHiddenYoga
 {

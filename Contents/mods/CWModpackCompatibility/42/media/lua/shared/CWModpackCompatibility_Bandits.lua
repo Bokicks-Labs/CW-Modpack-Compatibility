@@ -4,7 +4,13 @@
 
 local function isBanditsActive()
     local activeMods = getActivatedMods and getActivatedMods() or nil
-    return activeMods and activeMods:contains("Bandits")
+    return activeMods and activeMods:contains("Bandits2")
+end
+
+-- BanditPrograms.lua's predicate is local to that file, so this replacement
+-- needs its own callback for the container's Java/Lua predicate overload.
+local function predicateAll(item)
+    return true
 end
 
 local function installBanditsContainerLootFix()
