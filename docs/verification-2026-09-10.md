@@ -57,3 +57,18 @@ client-side `Bandit` animation variable. The compatibility lookup incorrectly
 required that variable. Version 1.1.8 instead requires a matching Bandits brain,
 accepts raw or normalized persistent-outfit IDs, removes the authoritative
 entity, and clears any alternate raw/normalized brain key.
+
+## Week One removal guard
+
+The rejoin after version 1.1.8 still showed large numbers of flickering,
+non-interactable zombie-like entities that Bandits NPCs detected and attacked.
+`BanditsWeekOne` and its direct companions are therefore being removed from the
+multiplayer profile pending a future redesign or upstream multiplayer support.
+The attempted compatibility fixes remain available for later testing.
+
+Version 1.1.9 narrows the authoritative `BanditRemove` wrapper to the exact
+`Bandits2 + BanditsWeekOne` stack. With only `Bandits2` enabled, it preserves
+the original Bandits command unchanged. Lua mock coverage also confirms that
+the Week One client wrappers, state repair, server state repair, and removal
+wrapper make no target-state changes when `BanditsWeekOne` is absent. The
+general Bandits container-loot fix remains correctly gated on `Bandits2` alone.

@@ -102,7 +102,9 @@ bandits_server.execute(
     """
 callbacks = {}
 Events = {OnServerStarted = {Add = function(fn) callbacks.started = fn end}}
-getActivatedMods = function() return {contains = function(_, id) return id == "Bandits2" end} end
+getActivatedMods = function() return {contains = function(_, id)
+    return id == "Bandits2" or id == "BanditsWeekOne"
+end} end
 brains = {[100] = {program = {name = "Walker"}}}
 transmits = 0
 GetBanditClusterData = function() return brains end
@@ -133,4 +135,82 @@ assert(transmits == 2, "requested and alternate brain clusters must be transmitt
 """
 )
 
-print("PASS: Week One state repair, spawn routing, and authoritative Bandit removal boundaries.")
+bandits_without_week_one = LuaRuntime()
+bandits_without_week_one.execute(
+    """
+callbacks = {}
+Events = {OnServerStarted = {Add = function(fn) callbacks.started = fn end}}
+getActivatedMods = function() return {contains = function(_, id) return id == "Bandits2" end} end
+originalRemove = function() end
+BanditServer = {Commands = {BanditRemove = originalRemove}}
+"""
+)
+bandits_without_week_one.execute(BANDITS_SERVER.read_text(encoding="utf-8-sig"))
+bandits_without_week_one.execute(
+    """
+assert(BanditServer.Commands.BanditRemove == originalRemove,
+    "Week One removal boundary must stay disabled when BanditsWeekOne is absent")
+callbacks.started()
+assert(BanditServer.Commands.BanditRemove == originalRemove,
+    "Week One removal boundary must remain disabled after server start")
+"""
+)
+
+week_one_absent_client = LuaRuntime()
+week_one_absent_client.execute(
+    """
+callbacks = {}
+Events = {
+    OnGameStart = {Add = function(fn) callbacks.start = fn end},
+    OnInitGlobalModData = {Add = function(fn) callbacks.init = fn end},
+    OnReceiveGlobalModData = {Add = function(fn) callbacks.receive = fn end},
+}
+getActivatedMods = function() return {contains = function() return false end} end
+originalNew = function() return "chat" end
+originalAdd = function() return "scheduler" end
+BWOChatPanel = {new = originalNew}
+BWOScheduler = {Add = originalAdd}
+BanditServer = {Spawner = {}}
+gmd = {Variant = "unchanged"}
+GetBWOModData = function() return gmd end
+"""
+)
+week_one_absent_client.execute(CLIENT.read_text(encoding="utf-8-sig"))
+week_one_absent_client.execute(
+    """
+callbacks.start()
+callbacks.init()
+callbacks.receive("BanditWeekOne", gmd)
+assert(BWOChatPanel.new == originalNew and BWOScheduler.Add == originalAdd,
+    "Week One client wrappers must stay disabled when BanditsWeekOne is absent")
+assert(BanditServer.Spawner.Clan == nil and gmd.Variant == "unchanged",
+    "Week One client boundary and state repair must stay inactive")
+"""
+)
+
+week_one_absent_server = LuaRuntime()
+week_one_absent_server.execute(
+    """
+callbacks = {}
+Events = {
+    OnInitGlobalModData = {Add = function(fn) callbacks.init = fn end},
+    OnServerStarted = {Add = function(fn) callbacks.started = fn end},
+}
+getActivatedMods = function() return {contains = function() return false end} end
+gmd = {Variant = "unchanged"}
+GetBWOModData = function() return gmd end
+transmits = 0
+TransmitBWOModData = function() transmits = transmits + 1 end
+"""
+)
+week_one_absent_server.execute(SERVER.read_text(encoding="utf-8-sig"))
+week_one_absent_server.execute(
+    """
+callbacks.init()
+callbacks.started()
+assert(gmd.Variant == "unchanged" and transmits == 0,
+    "Week One server repair must stay disabled when BanditsWeekOne is absent")
+"""
+)
+
+print("PASS: Week One state repair, spawn routing, authoritative removal, and absent-mod guards.")

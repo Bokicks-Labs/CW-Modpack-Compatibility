@@ -3,9 +3,11 @@
 
 CWModpackCompatibility = CWModpackCompatibility or {}
 
-local function isBanditsActive()
+local function isWeekOneStackActive()
     local activeMods = getActivatedMods and getActivatedMods() or nil
-    return activeMods and activeMods:contains("Bandits2")
+    return activeMods
+        and activeMods:contains("Bandits2")
+        and activeMods:contains("BanditsWeekOne")
 end
 
 local function idsEqual(left, right)
@@ -50,7 +52,7 @@ local function clearAlternateBrain(id, requestedId)
 end
 
 local function installBanditRemovalBoundary()
-    if not isBanditsActive() or not BanditServer or not BanditServer.Commands then return end
+    if not isWeekOneStackActive() or not BanditServer or not BanditServer.Commands then return end
     if BanditServer.Commands.__cwAuthoritativeBanditRemove then return end
 
     local originalRemove = BanditServer.Commands.BanditRemove
