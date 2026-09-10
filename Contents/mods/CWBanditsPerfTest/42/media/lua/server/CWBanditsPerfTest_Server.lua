@@ -81,7 +81,7 @@ local function scanAuthoritativeState()
         end
     end
 
-    trace("SUMMARY", "authoritativeBandits=" .. banditCount .. " rawNormalizedMismatches=" .. mismatchCount)
+    trace("SUMMARY", "authoritativeCellBandits=" .. banditCount .. " rawNormalizedMismatches=" .. mismatchCount)
 end
 
 local function install()

@@ -9,7 +9,7 @@
 - A later `OnZombieUpdate` for the same normalized ID after a local-removal function returned, including whether the Java object string is unchanged.
 - Whether `BanditServer.Spawner.Clan` is present when the client invokes the inhabitant spawn path.
 - Server spawn requests/returns and Bandit brain removal requests/returns.
-- Once-per-minute authoritative server Bandit counts and raw/normalized ID mismatch counts.
+- Once-per-minute authoritative **loaded-cell** Bandit counts and raw/normalized ID mismatch counts.
 
 It uses these prefixes:
 
