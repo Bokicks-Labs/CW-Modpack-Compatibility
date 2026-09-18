@@ -5,3 +5,5 @@ description=Targeted compatibility fixes for the Chaosworld Build 42 modpack. Ea
 versionMin=42.20.0
 modversion=1.1.10
 category=fixes
+poster=poster.png
+icon=icon.png

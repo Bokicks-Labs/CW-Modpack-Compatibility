@@ -26,9 +26,11 @@ local function applyLifestyleYogaDiagnostics()
     local originalStop = LSYogaAction.stop
     local originalPerform = LSYogaAction.perform
 
-    LSYogaAction.new = function(self, character, skillLevel, args)
-        local action = originalNew(self, character, skillLevel, args)
-        local group = args and args[1] or "unknown"
+    -- NetTimedAction reads fields using the constructor's parameter names.
+    -- Lifestyle stores this table as action.Args, so case must be preserved.
+    LSYogaAction.new = function(self, character, skillLevel, Args)
+        local action = originalNew(self, character, skillLevel, Args)
+        local group = Args and Args[1] or "unknown"
         log("Yoga action queued (skill=" .. tostring(skillLevel) .. ", group=" .. tostring(group) .. ").")
         return action
     end
@@ -62,4 +64,3 @@ local function applyLifestyleYogaDiagnostics()
 end
 
 Events.OnGameStart.Add(applyLifestyleYogaDiagnostics)
-
