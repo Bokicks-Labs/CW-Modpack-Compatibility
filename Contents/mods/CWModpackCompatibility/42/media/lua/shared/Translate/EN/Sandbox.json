@@ -1,4 +1,11 @@
 {
+  "Sandbox_CWModpackCompatibility_Lifestyle": "Chaosworld Compatibility - Lifestyle Ownership",
+  "Sandbox_CWModpackCompatibility.NaturesCallOwnsBathroomNeeds": "Nature's Call owns bathroom needs",
+  "Sandbox_CWModpackCompatibility.NaturesCallOwnsBathroomNeeds_tooltip": "Enabled by default when both mods are active. Disables Lifestyle's bladder progression and relief actions so Nature's Call exclusively handles urination and bowel needs. Lifestyle's cleaning, grooming, bathing integration, and other hobbies remain available.",
+  "Sandbox_CWModpackCompatibility.RestoreLifestyleBathroomNeedsWhenUnowned": "Restore Lifestyle bathroom needs when unowned",
+  "Sandbox_CWModpackCompatibility.RestoreLifestyleBathroomNeedsWhenUnowned_tooltip": "Enabled by default. If Nature's Call ownership is inactive and an older preset left Lifestyle's bladder multiplier at zero, restores Lifestyle's default multiplier of 1. Disable this before intentionally turning off Lifestyle's bathroom need while Nature's Call is absent.",
+  "Sandbox_CWModpackCompatibility.BrushYourDamnTeethOwnsDentalHygiene": "Brush Your Damn Teeth owns dental hygiene",
+  "Sandbox_CWModpackCompatibility.BrushYourDamnTeethOwnsDentalHygiene_tooltip": "Enabled by default when both mods are active. Removes Lifestyle's brushing actions so Brush Your Damn Teeth exclusively controls brushing, item wear, dental hygiene, and dental consequences. Other Lifestyle mirror, cabinet, grooming, and hygiene actions remain available.",
   "Sandbox_CWModpackCompatibility_Bandits": "Chaosworld Compatibility - Bandits",
   "Sandbox_CWModpackCompatibility.BanditPlayerHitReactions": "Player reactions to Bandit NPC hits",
   "Sandbox_CWModpackCompatibility.BanditPlayerHitReactions_tooltip": "Players visibly react when damaged by a Bandit NPC firearm, melee weapon, or bare-hand attack. Disable this if hit reactions interfere with another combat or animation mod. This does not change damage or wounds.",

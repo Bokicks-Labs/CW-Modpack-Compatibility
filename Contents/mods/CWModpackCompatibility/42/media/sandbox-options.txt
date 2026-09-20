@@ -1,5 +1,23 @@
 VERSION = 1,
 
+option CWModpackCompatibility.NaturesCallOwnsBathroomNeeds = {
+    type = boolean, default = true,
+    page = CWModpackCompatibility_Lifestyle,
+    translation = CWModpackCompatibility.NaturesCallOwnsBathroomNeeds,
+}
+
+option CWModpackCompatibility.RestoreLifestyleBathroomNeedsWhenUnowned = {
+    type = boolean, default = true,
+    page = CWModpackCompatibility_Lifestyle,
+    translation = CWModpackCompatibility.RestoreLifestyleBathroomNeedsWhenUnowned,
+}
+
+option CWModpackCompatibility.BrushYourDamnTeethOwnsDentalHygiene = {
+    type = boolean, default = true,
+    page = CWModpackCompatibility_Lifestyle,
+    translation = CWModpackCompatibility.BrushYourDamnTeethOwnsDentalHygiene,
+}
+
 option CWModpackCompatibility.BanditPlayerHitReactions = {
     type = boolean, default = true,
     page = CWModpackCompatibility_Bandits,

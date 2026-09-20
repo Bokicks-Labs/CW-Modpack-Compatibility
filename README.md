@@ -2,12 +2,13 @@
 
 Private source repository for the Chaosworld Project Zomboid Build 42 compatibility mod.
 
-The Workshop payload is kept under `Contents/mods/CWModpackCompatibility`. The repository currently contains targeted compatibility fixes for the Chaosworld modpack, including the Lifestyle hidden-skill display bridge.
+The Workshop payload is kept under `Contents/mods/CWModpackCompatibility`. The repository currently contains targeted compatibility fixes for the Chaosworld modpack, including the Lifestyle hidden-skill display bridge and automatic feature ownership for Nature's Call and Brush Your Damn Teeth.
 
 ## Workshop copy
 
 - [Current Workshop description](docs/workshop-description.md)
-- [Version 1.1.11 changelog](docs/workshop-changelog-1.1.11.md)
+- [Version 1.1.13 changelog](docs/workshop-changelog-1.1.13.md)
+- [Lifestyle feature ownership](docs/lifestyle-feature-ownership.md)
 
 ## Local testing
 

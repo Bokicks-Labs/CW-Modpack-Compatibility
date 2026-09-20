@@ -22,8 +22,9 @@ For multiplayer, clients and the server should use the same mod list, order, and
 [h2]Current compatibility features[/h2]
 
 [list]
-[*][b]Lifestyle: Hobbies:[/b] Optional hidden-skill view for Yoga, Inventing, Ping Pong, Pool, and Arcade; Beyond Ten progress bridging; focused recovery and diagnostic controls; and a 400-file animation mirror restored to prevent missing-animation regressions. The mirrored FBX files were verified byte-for-byte against the compatible upstream release. Lifestyle continues to own the current yoga action and animation mappings; CW's obsolete yoga wrapper and stale animation-set XML overrides remain removed.
-[*][b]Nature's Call:[/b] Prevents a fresh character's startup clock transition from being mistaken for hours of needs progression and causing an immediate accident. Also retains multiplayer clothing-wash recovery. Existing characters and legitimate accumulated needs are left unchanged.
+[*][b]Lifestyle: Hobbies:[/b] Optional hidden-skill view for Yoga, Inventing, Ping Pong, Pool, and Arcade; Beyond Ten progress bridging; focused recovery and diagnostic controls; automatic feature ownership; and a 400-file animation mirror restored to prevent missing-animation regressions. When the corresponding owner mods are active, Nature's Call handles bathroom needs and Brush Your Damn Teeth handles dental hygiene by default. Lifestyle continues to own its other hygiene, grooming, cleaning, hobby, yoga, and animation features.
+[*][b]Nature's Call:[/b] Owns bladder and bowel needs when used with Lifestyle by default. Also prevents a fresh character's startup clock transition from being mistaken for hours of needs progression, retains multiplayer clothing-wash recovery, and leaves legitimate Nature's Call needs untouched.
+[*][b]Brush Your Damn Teeth:[/b] Owns dental hygiene when used with Lifestyle by default. Lifestyle's duplicate brushing actions are suppressed without removing its other mirror, cabinet, grooming, or hygiene actions.
 [*][b]CleanUI + Equipment UI:[/b] Guards transient missing inventory context menus during UI initialization and teardown, preventing the repeated tooltip exception and console flood.
 [*][b]Every Texture Optimized — Well Balanced:[/b] Supplies a narrowly scoped vanilla-safe rain texture after ETO_B to prevent a null weather-particle texture from crashing an existing save during world loading.
 [*][b]Bandits NPC:[/b] Safe companion container-loot targeting and configurable client hit reactions after confirmed firearm or melee damage.
@@ -37,15 +38,16 @@ For multiplayer, clients and the server should use the same mod list, order, and
 
 [list]
 [*]Bandits hit reactions can be enabled and tuned in Sandbox Options.
+[*]Lifestyle ownership defaults require no setup and can be overridden independently under Chaosworld Compatibility - Lifestyle Ownership in Sandbox Options. Restart after changing them. Removing an owner mod automatically returns that feature to Lifestyle; CW also restores Lifestyle's default bladder multiplier if an older preset left it at zero, unless that fallback is disabled.
 [*]The Lifestyle compatibility skill view can be toggled in Mod Options.
 [/list]
 
-CW 1.1.12 does not add a save migration. Back up important saves before changing mod lists.
+CW 1.1.13 performs a narrow cleanup of obsolete Lifestyle bladder state when Nature's Call ownership is enabled. Back up important saves before changing mod lists.
 
 [h2]Verification[/h2]
 
 [list]
-[*]All five compatibility regression suites pass.
+[*]All compatibility regression suites pass.
 [*]The Lifestyle animation mirror matches the installed compatible upstream files by filename, size, and SHA-256.
 [*]The affected local save was runtime-tested successfully with ETO_B enabled and the CW weather-texture override active.
 [*]The Nature's Call and CleanUI/Equipment UI fixes behaved correctly during runtime testing.
@@ -62,6 +64,7 @@ All original mods and assets remain the work of their respective authors. This c
 [*]Dynamic Trading (w/ NPC) and Dynamic Trading Common Library by Psychopatz.
 [*]GaelGunStore-Firearms by Pen-Pen Pirulin.
 [*]Nature's Call by RedChili.
+[*]Brush Your Damn Teeth by Cam3.
 [*]Take A Bath And Shower (SP/MP) by si-cafe.
 [*]Fast Forward (MP) by Maumau.
 [*]EXACT MINUTE CLOCK (B42) by PorrisV99.
@@ -71,4 +74,4 @@ All original mods and assets remain the work of their respective authors. This c
 
 If an original mod author asks for support for their mod or redistributed material to be removed, it will be removed.
 
-[i]WIP: created and maintained with Codex for a private friend-group modpack. Current compatibility release: 1.1.12.[/i]
+[i]WIP: created and maintained with Codex for a private friend-group modpack. Current compatibility release: 1.1.13.[/i]
