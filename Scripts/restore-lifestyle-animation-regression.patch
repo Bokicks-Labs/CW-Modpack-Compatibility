@@ -1,0 +1,41 @@
+diff --git a/Scripts/test-server-log-fixes.py b/Scripts/test-server-log-fixes.py
+--- a/Scripts/test-server-log-fixes.py
++++ b/Scripts/test-server-log-fixes.py
+@@ -1,5 +1,6 @@
+ """Checks fixes from the supplied server logs using installed Lua under Lua 5.1."""
+ import argparse
++import hashlib
+ import re
+ from pathlib import Path
+ from lupa.lua51 import LuaRuntime
+@@ -29,9 +30,21 @@ function ISBaseTimedAction.new(class,character)
+ '''
+ 
+ yoga = args.workshop_root / '3403870858/mods/Lifestyle/common/media/lua/shared/TimedActions/LSYogaAction.lua'
++upstream_anims = args.workshop_root / '3403870858/mods/Lifestyle/common/media/anims_X'
++compat_anims = payload_root / 'media/anims_X'
+ assert not (payload / 'client/CWModpackCompatibility_LifestyleYoga.lua').exists()
+-assert not (payload_root / 'media/anims_X').exists()
+ assert not (payload_root / 'media/AnimSets/player/actions').exists()
++compat_files = sorted(path.name for path in compat_anims.glob('*.fbx'))
++upstream_files = sorted(path.name for path in upstream_anims.glob('*.fbx'))
++assert len(compat_files) == 400, f'expected 400 mirrored Lifestyle animations, found {len(compat_files)}'
++assert compat_files == upstream_files, 'CW Lifestyle animation mirror no longer matches upstream filenames'
++for name in compat_files:
++    compat_path = compat_anims / name
++    upstream_path = upstream_anims / name
++    assert compat_path.stat().st_size == upstream_path.stat().st_size, f'animation size drift: {name}'
++    assert hashlib.sha256(compat_path.read_bytes()).digest() == hashlib.sha256(upstream_path.read_bytes()).digest(), (
++        f'animation content drift: {name}'
++    )
+ lua = LuaRuntime()
+ lua.execute(base)
+ lua.execute('''
+@@ -55,6 +68,6 @@ assert(roundtrip.Args==yogaArgs and roundtrip.maxTime==-1)
+ assert(roundtrip:complete()==true)
+ ''')
+-print('PASS: upstream yoga named-field roundtrip preserves all arguments; obsolete CW wrapper and animation copies are absent')
++print('PASS: upstream yoga roundtrip is current; obsolete CW wrapper/XML overrides are absent; 400-file animation mirror matches Lifestyle')
+ 
+ lua = LuaRuntime()
+ lua.execute(base)
