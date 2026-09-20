@@ -2,7 +2,7 @@
 import argparse
 import re
 from pathlib import Path
-from lupa.lua51 import LuaRuntime, LuaError
+from lupa.lua51 import LuaRuntime
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--workshop-root', type=Path, required=True)
@@ -10,6 +10,7 @@ parser.add_argument('--game-root', type=Path, required=True)
 args = parser.parse_args()
 root = Path(__file__).resolve().parents[1]
 payload = root / 'Contents/mods/CWModpackCompatibility/42/media/lua'
+payload_root = root / 'Contents/mods/CWModpackCompatibility/42'
 base = '''
 logs={}; print=function(s) logs[#logs+1]=s end
 callbacks={}
@@ -28,45 +29,35 @@ end
 '''
 
 yoga = args.workshop_root / '3403870858/mods/Lifestyle/common/media/lua/shared/TimedActions/LSYogaAction.lua'
-diagnostic = (payload / 'client/CWModpackCompatibility_LifestyleYoga.lua').read_text()
-
-def check_yoga(source, should_succeed):
-    lua = LuaRuntime()
-    lua.execute(base)
-    lua.execute('''
+assert not (payload / 'client/CWModpackCompatibility_LifestyleYoga.lua').exists()
+assert not (payload_root / 'media/anims_X').exists()
+assert not (payload_root / 'media/AnimSets/player/actions').exists()
+lua = LuaRuntime()
+lua.execute(base)
+lua.execute('''
 enabled.LifestyleHobbies=true
 Perks={Fitness=1}; SandboxVars={Yoga={}}
 character={getModData=function() return {} end,
  isTimedActionInstant=function() return false end,getPerkLevel=function() return 5 end}
 yogaArgs={'Beginner',0.2,1.25,8}
 ''')
-    lua.execute(yoga.read_text(encoding='utf-8-sig'))
-    lua.execute('serverNew=LSYogaAction.new')
-    lua.execute(source)
-    lua.execute('callbacks.start(); local f=LSYogaAction.new; callbacks.start(); assert(f==LSYogaAction.new)')
-    params = [p.strip() for p in re.search(r'LSYogaAction.new\s*=\s*function\(([^)]+)\)', source)[1].split(',')]
-    action = lua.eval('LSYogaAction:new(character,2,yogaArgs)')
-    # NetTimedAction.set reads action fields by parameter name; parse invokes
-    # the server constructor in its own parameter order.
-    serialized = {name: lua.eval('rawget')(action, name) for name in params[1:]}
-    server_params = [p.strip() for p in re.search(r'function LSYogaAction:new\(([^)]+)\)', yoga.read_text())[1].split(',')]
-    try:
-        result = lua.globals().serverNew(lua.globals().LSYogaAction, *[serialized.get(name) for name in server_params])
-    except LuaError:
-        assert not should_succeed, 'fixed yoga must survive named-field reconstruction'
-    else:
-        assert should_succeed, 'old lowercase wrapper must reproduce server failure'
-        lua.globals().roundtrip = result
-        lua.execute('''
+source = yoga.read_text(encoding='utf-8-sig')
+params = [p.strip() for p in re.search(r'function LSYogaAction:new\(([^)]+)\)', source)[1].split(',')]
+assert params == ['character', 'skillLevel', 'Args'], 'upstream yoga constructor field contract changed'
+lua.execute(source)
+lua.execute('serverNew=LSYogaAction.new')
+action = lua.eval('LSYogaAction:new(character,2,yogaArgs)')
+# NetTimedAction serializes fields using the constructor parameter names.
+serialized = {name: lua.eval('rawget')(action, name) for name in params}
+result = lua.globals().serverNew(lua.globals().LSYogaAction, *[serialized.get(name) for name in params])
+lua.globals().roundtrip = result
+lua.execute('''
 assert(roundtrip.skillLevel==2 and roundtrip.skillGroup=='Beginner')
 assert(roundtrip.baseFailChance==0.2 and roundtrip.efficiency==1.25 and roundtrip.poseLimit==8)
 assert(roundtrip.Args==yogaArgs and roundtrip.maxTime==-1)
 assert(roundtrip:complete()==true)
 ''')
-
-check_yoga(diagnostic.replace('skillLevel, Args)', 'skillLevel, args)').replace('originalNew(self, character, skillLevel, Args)', 'originalNew(self, character, skillLevel, args)').replace('local group = Args and Args[1]', 'local group = args and args[1]'), False)
-check_yoga(diagnostic, True)
-print('PASS: yoga case mismatch reproduces failure; fixed named-field roundtrip preserves all arguments')
+print('PASS: upstream yoga named-field roundtrip preserves all arguments; obsolete CW wrapper and animation copies are absent')
 
 lua = LuaRuntime()
 lua.execute(base)

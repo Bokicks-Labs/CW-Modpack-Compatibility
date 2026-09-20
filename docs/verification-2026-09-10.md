@@ -22,7 +22,7 @@ mods are enabled.
 ## Verification
 
 - `git diff --check` passes.
-- `dev-scripts/test-week-one-boundaries.py` exercises invalid/named/numeric
+- `Scripts/test-week-one-boundaries.py` exercises invalid/named/numeric
   variant repair, server synchronization, idempotence, and inhabitant command
   forwarding with Lua mocks.
 - Run the M2 and M7 two-client protocol in

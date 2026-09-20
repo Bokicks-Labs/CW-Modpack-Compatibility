@@ -91,12 +91,13 @@ require=function() return {} end
 CharacterTrait={}; CharacterStat={}
 SandboxVars={Text={}, LSComfort={ComfortNoImpact=true}}
 LSUtil={getValidCharacter=function(p) return p end}
-data={LSMoodles={}, ComfortNeed=0.5, IsOnBed=true}
+data={LSMoodles={}, Ambitions={}, LSClothes={}, ComfortNeed=0.5, IsOnBed=true}
 player={getModData=function() return data end, hasModData=function() return true end,
  getBodyDamage=function() return {} end, isAsleep=function() return true end,
  hasTrait=function() return false end, isGodMod=function() return false end,
  isSittingOnFurniture=function() return false end, getVariableBoolean=function() return false end}
 getPlayer=function() return player end
+isClient=function() return false end
 worldAge=1
 getGameTime=function() return {getWorldAgeHours=function() return worldAge end} end
 enabled.LifestyleHobbies=true

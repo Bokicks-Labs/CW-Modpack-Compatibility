@@ -22,6 +22,11 @@ September 16 tracker occurrences and existing Week One investigation.
 
 ### Yoga constructor field names
 
+> Superseded September 19: Lifestyle 0.4.0.3 now supplies the correct `Args`
+> constructor contract and repaired animation paths. CW 1.1.11 removes its yoga
+> wrapper and copied animation payload; the original incident analysis below is
+> retained as historical evidence.
+
 At 23:34:29, the server fails in `LSYogaAction:new` at `Args[1]` while parsing a
 network timed action. The existing CW client diagnostics wrapper names that
 parameter `args`; Lifestyle stores it on the action as `Args`.
@@ -98,15 +103,15 @@ so those can still require separate evidence if the missing-item warning recurs.
 
 ## Verification and delivery
 
-`dev-scripts/test-server-log-fixes.py` runs the actual installed Lifestyle,
+`Scripts/test-server-log-fixes.py` runs the actual installed Lifestyle,
 vanilla clothing, Dynamic Trading collector and wardrobe Lua under Lua 5.1 with
-mocked Java/game objects. It reproduces the old yoga named-field failure and
-checks corrected reconstruction; exercises vanilla clothing transformation and
+mocked Java/game objects. It checks Lifestyle's upstream yoga named-field
+reconstruction without a CW wrapper; exercises vanilla clothing transformation and
 preserved properties, missing/duplicate targets and late ID recovery; and checks
 both startup collectors, restored player lookup, absent-mod/single-player guards,
 idempotence and wardrobe script-item existence checks.
 
-`dev-scripts/test-tracker-fixes.py` covers the earlier attachment guard and
+`Scripts/test-tracker-fixes.py` covers the earlier attachment guard and
 embarrassment/motorcycle observations. The three existing Bandits/Week One
 tests and `git diff --check` also pass.
 

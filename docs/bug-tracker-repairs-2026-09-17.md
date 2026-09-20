@@ -23,7 +23,7 @@ dedicated-server log was available at the recorded local server path.
 
 ## Validation
 
-`dev-scripts/test-tracker-fixes.py --workshop-root S:\SteamLibrary\steamapps\workshop\content\108600`
+`Scripts/test-tracker-fixes.py --workshop-root S:\SteamLibrary\steamapps\workshop\content\108600`
 executes installed upstream source under Lua 5.1 with mocked Java/game objects.
 It demonstrates the invalid upstream attachment call, verifies the guard prevents
 it, and covers valid attach/clear, activation, idempotence and different groups

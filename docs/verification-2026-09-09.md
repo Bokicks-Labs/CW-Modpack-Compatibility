@@ -34,7 +34,7 @@ The installed `GetMoveTask` accepts the existing nil endurance value; BanditUpda
 
 ## Validation
 
-`dev-scripts/test-bandits-loot.py` uses Python's optional `lupa` package to execute the patch with Lua mocks. It verifies the callback, loot task fields, distant movement, blocked-tile handling, nil guards, disabled-mod behavior, and repeated event installation. The original 1.1.1 source fails the callback assertion; 1.1.2 passes. Both reviewed Lua files compile in the Lua runtime. These checks do not validate PZ's Java bridge, UI rendering, or NPC behavior.
+`Scripts/test-bandits-loot.py` uses Python's optional `lupa` package to execute the patch with Lua mocks. It verifies the callback, loot task fields, distant movement, blocked-tile handling, nil guards, disabled-mod behavior, and repeated event installation. The original 1.1.1 source fails the callback assertion; 1.1.2 passes. Both reviewed Lua files compile in the Lua runtime. These checks do not validate PZ's Java bridge, UI rendering, or NPC behavior.
 
 For this run, lupa was installed only under `%TEMP%\cw-lua-validation`; set PYTHONPATH to that directory before running the test if using that copy.
 
