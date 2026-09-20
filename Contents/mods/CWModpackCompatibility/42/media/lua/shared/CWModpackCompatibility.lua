@@ -48,6 +48,26 @@ local function applyGaelWeaponPartFix()
     log("Applied Gael Gun Store safe weapon-part completion fix.")
 end
 
+local function applyNaturesCallSessionClockFix()
+    if not isActive("NC_NaturesCall") then return end
+
+    require("NaturesCall/NC_State")
+    if not NaturesCall or not NaturesCall.State then return end
+    if not NaturesCall.State.resetSessionUpdateTimestamps then return end
+
+    local player = getPlayer and getPlayer() or nil
+    if not player then return end
+
+    -- Nature's Call can initialize a fresh SP character while worldAgeHours is
+    -- still 0, then see the real day-one clock (~24h at the affected 07:00
+    -- start) on the first player update. Its fixed-step catch-up treats that
+    -- startup jump as elapsed play time, instantly filling bladder/bowels.
+    -- Re-anchor the session clock from OnGameStart, after the world clock is
+    -- established but before normal player updates begin.
+    NaturesCall.State.resetSessionUpdateTimestamps(player)
+    log("Re-anchored Nature's Call session clock after world start.")
+end
+
 local function applyNaturesCallWashFix()
     if not isActive("NC_NaturesCall") then return end
 
@@ -114,6 +134,7 @@ end
 
 local function applyRuntimeFixes()
     applyGaelWeaponPartFix()
+    applyNaturesCallSessionClockFix()
     applyNaturesCallWashFix()
 end
 
