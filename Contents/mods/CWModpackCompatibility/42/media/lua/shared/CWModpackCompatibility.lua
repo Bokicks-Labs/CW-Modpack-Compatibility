@@ -48,24 +48,55 @@ local function applyGaelWeaponPartFix()
     log("Applied Gael Gun Store safe weapon-part completion fix.")
 end
 
-local function applyNaturesCallSessionClockFix()
+local function installNaturesCallSessionClockFix()
     if not isActive("NC_NaturesCall") then return end
 
     require("NaturesCall/NC_State")
-    if not NaturesCall or not NaturesCall.State then return end
-    if not NaturesCall.State.resetSessionUpdateTimestamps then return end
+    require("NaturesCall/NC_System")
+    if not NaturesCall or not NaturesCall.State or not NaturesCall.System then return end
 
-    local player = getPlayer and getPlayer() or nil
-    if not player then return end
+    local State = NaturesCall.State
+    local System = NaturesCall.System
+    local Utils = NaturesCall.Utils
+    if not State.resetSessionUpdateTimestamps or not System.runCatchUp or not Utils then return end
+    if System.__cwFreshSpawnClockGuard then return end
 
-    -- Nature's Call can initialize a fresh SP character while worldAgeHours is
-    -- still 0, then see the real day-one clock (~24h at the affected 07:00
-    -- start) on the first player update. Its fixed-step catch-up treats that
-    -- startup jump as elapsed play time, instantly filling bladder/bowels.
-    -- Re-anchor the session clock from OnGameStart, after the world clock is
-    -- established but before normal player updates begin.
-    NaturesCall.State.resetSessionUpdateTimestamps(player)
-    log("Re-anchored Nature's Call session clock after world start.")
+    local naturesCallRunCatchUp = System.runCatchUp
+
+    System.runCatchUp = function(player)
+        local nc = player and State.ensurePlayerData(player) or nil
+        local nowHours = Utils.getWorldAgeHours()
+        local previousHours = nc and tonumber(nc.lastUpdateHours) or nil
+        local hoursSurvived = player and tonumber(player:getHoursSurvived()) or nil
+        local activeSessionLimit = tonumber(State.ActiveSessionMaxDeltaHours) or 0.25
+
+        -- Nature's Call can first create a fresh character's timestamps while
+        -- worldAgeHours is still 0. Its first pre-OnGameStart player update then
+        -- sees the real day-one clock (~24h) and treats the startup discontinuity
+        -- as elapsed play time. Intercept that first catch-up before it can fill
+        -- the needs or roll an accident. The fresh-character and pristine-meter
+        -- checks keep saved characters and legitimate needs untouched.
+        local isFreshCharacter = hoursSurvived ~= nil and hoursSurvived <= 0.1
+        local hasPristineNeeds = nc
+            and (tonumber(nc.bladderFill) or 0) <= 0
+            and (tonumber(nc.bowelFill) or 0) <= 0
+        local startupDelta = previousHours and (nowHours - previousHours) or 0
+
+        if isFreshCharacter and hasPristineNeeds and startupDelta > activeSessionLimit then
+            State.resetSessionUpdateTimestamps(player)
+            log(string.format(
+                "Skipped Nature's Call fresh-spawn clock jump (previous=%.3f, now=%.3f, survived=%.3f).",
+                previousHours,
+                nowHours,
+                hoursSurvived
+            ))
+        end
+
+        return naturesCallRunCatchUp(player)
+    end
+
+    System.__cwFreshSpawnClockGuard = true
+    log("Installed Nature's Call fresh-spawn clock guard.")
 end
 
 local function applyNaturesCallWashFix()
@@ -134,9 +165,13 @@ end
 
 local function applyRuntimeFixes()
     applyGaelWeaponPartFix()
-    applyNaturesCallSessionClockFix()
+    installNaturesCallSessionClockFix()
     applyNaturesCallWashFix()
 end
+
+-- Install during shared-Lua loading. OnGameStart is too late: Nature's Call can
+-- run its first player update during the loading-state transition at frame 0.
+installNaturesCallSessionClockFix()
 
 if Events.OnGameStart then
     Events.OnGameStart.Add(applyRuntimeFixes)

@@ -29,6 +29,76 @@ function ISBaseTimedAction.new(class,character)
 end
 '''
 
+lua = LuaRuntime()
+lua.execute(base)
+lua.execute('''
+enabled.NC_NaturesCall=true
+worldHours=24; resetCount=0; originalCalls=0; originalDelta=nil
+NaturesCall={
+ Utils={getWorldAgeHours=function() return worldHours end},
+ State={ActiveSessionMaxDeltaHours=0.25},
+ System={}
+}
+NaturesCall.State.ensurePlayerData=function(player) return player.nc end
+NaturesCall.State.resetSessionUpdateTimestamps=function(player)
+ resetCount=resetCount+1
+ player.nc.lastUpdateHours=worldHours
+ return player.nc
+end
+NaturesCall.System.runCatchUp=function(player)
+ originalCalls=originalCalls+1
+ originalDelta=worldHours-player.nc.lastUpdateHours
+end
+freshPlayer={nc={lastUpdateHours=0,bladderFill=0,bowelFill=0},
+ getHoursSurvived=function() return 0 end}
+existingNeeds={nc={lastUpdateHours=0,bladderFill=0,bowelFill=50},
+ getHoursSurvived=function() return 0 end}
+establishedPlayer={nc={lastUpdateHours=0,bladderFill=0,bowelFill=0},
+ getHoursSurvived=function() return 2 end}
+''')
+lua.execute((payload / 'shared/CWModpackCompatibility.lua').read_text(encoding='utf-8-sig'))
+lua.execute('''
+assert(NaturesCall.System.__cwFreshSpawnClockGuard==true)
+local wrapped=NaturesCall.System.runCatchUp
+NaturesCall.System.runCatchUp(freshPlayer)
+assert(resetCount==1 and originalCalls==1 and originalDelta==0)
+assert(freshPlayer.nc.lastUpdateHours==24)
+NaturesCall.System.runCatchUp(existingNeeds)
+assert(resetCount==1 and originalCalls==2 and originalDelta==24)
+NaturesCall.System.runCatchUp(establishedPlayer)
+assert(resetCount==1 and originalCalls==3 and originalDelta==24)
+callbacks.start()
+assert(NaturesCall.System.runCatchUp==wrapped, 'event retry must not double-wrap')
+assert(logs[1]=="[CWModpackCompatibility] Installed Nature's Call fresh-spawn clock guard.")
+assert(string.find(logs[2], "Skipped Nature's Call fresh-spawn clock jump", 1, true))
+''')
+print("PASS: Nature's Call fresh-spawn clock jump is intercepted before catch-up; existing needs and saves are unchanged")
+
+lua = LuaRuntime()
+lua.execute(base)
+lua.execute('''
+enabled.CleanUI=true; enabled.EquipmentUI_B42=true
+tooltipCalls=0; contextMenu=nil
+ISInventoryPane={updateTooltip=function(self)
+ tooltipCalls=tooltipCalls+1
+ return 'upstream-result'
+end}
+getPlayerContextMenu=function() return contextMenu end
+pane={player=0}
+''')
+lua.execute((payload / 'client/CWModpackCompatibility_CleanUIEquipmentTooltip.lua').read_text(encoding='utf-8-sig'))
+lua.execute('''
+callbacks.start()
+local wrapped=ISInventoryPane.updateTooltip
+assert(ISInventoryPane.__cwCleanUIEquipmentTooltipFix==true)
+assert(ISInventoryPane.updateTooltip(pane)==nil and tooltipCalls==0)
+contextMenu={isAnyVisible=function() return false end}
+assert(ISInventoryPane.updateTooltip(pane)=='upstream-result' and tooltipCalls==1)
+callbacks.start()
+assert(ISInventoryPane.updateTooltip==wrapped, 'event retry must not double-wrap')
+''')
+print('PASS: CleanUI/Equipment UI tooltip skips transient nil context menus and preserves normal delegation')
+
 yoga = args.workshop_root / '3403870858/mods/Lifestyle/common/media/lua/shared/TimedActions/LSYogaAction.lua'
 upstream_anims = args.workshop_root / '3403870858/mods/Lifestyle/common/media/anims_X'
 compat_anims = payload_root / 'media/anims_X'
