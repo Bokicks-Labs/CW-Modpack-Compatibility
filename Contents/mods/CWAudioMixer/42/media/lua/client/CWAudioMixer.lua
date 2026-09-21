@@ -418,16 +418,22 @@ end
 
 local function registerModOptions()
     local ok = pcall(require, "PZAPI/ModOptions")
-    if not ok or not PZAPI or not PZAPI.ModOptions then return end
-    local options = PZAPI.ModOptions:create("CWAudioMixer", "CW Audio Mixer")
+    local api = ok and PZAPI and PZAPI.ModOptions or nil
+    if not api or not api.create then return end
+    local options = api.getOptions and api:getOptions("CWAudioMixer") or nil
+    options = options or api:create("CWAudioMixer", "CW Audio Mixer")
+    if not options or not options.addButton then return end
     options:addButton("OPEN_MIXER", "Open audio mixer", "Discover loaded sounds and adjust their volumes.", Mixer.open)
 end
+
+-- Mod Options builds its menu before OnGameStart. Register while this client
+-- script loads so the entry is present when the player opens Options.
+registerModOptions()
 
 local function initialise()
     ensureAdvancedSoundVolumes()
     loadSettings()
     Mixer.applyAll()
-    registerModOptions()
     log("Loaded optional client audio mixer.")
 end
 

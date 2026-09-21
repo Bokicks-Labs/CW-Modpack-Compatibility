@@ -63,6 +63,18 @@ def runtime_contract(source: str) -> None:
             return { write = function(_) end, close = function(_) end }
         end
         SystemDisabler = { setEnableAdvancedSoundOptions = function(value) TestAdvanced = value end }
+        TestModOptions = { created = 0, buttons = 0 }
+        PZAPI = {
+            ModOptions = {
+                getOptions = function(_) return nil end,
+                create = function(_, _)
+                    TestModOptions.created = TestModOptions.created + 1
+                    return {
+                        addButton = function(_, _, _, _, _) TestModOptions.buttons = TestModOptions.buttons + 1 end,
+                    }
+                end,
+            },
+        }
 
         local function list(values)
             return {
@@ -99,6 +111,8 @@ def runtime_contract(source: str) -> None:
         """
     )
     lua.execute(source)
+    assert lua.eval("TestModOptions.created") == 1
+    assert lua.eval("TestModOptions.buttons") == 1
     lua.execute("TestCallbacks.start()")
     assert lua.eval("TestAdvanced") is True
     assert lua.eval("CWAudioMixer.discovered['RadioTalk'] ~= nil") is True

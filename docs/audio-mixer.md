@@ -2,7 +2,7 @@
 
 `CWAudioMixer` is an optional, client-only submod in the Chaosworld Compatibility Workshop item. Enable it after `CWModpackCompatibility`; it changes neither server state nor save data.
 
-Open it from **Mod Options > CW Audio Mixer**, or by right-clicking the world and selecting **CW Audio Mixer**.
+Open it from **Options > Mod Options > CW Audio Mixer**, or by right-clicking the world and selecting **CW Audio Mixer**. The Mod Options entry is registered while the client loads, so it is available before entering a save.
 
 At game start it discovers every loaded `GameSound` and groups them using the sound's declared category/master plus cautious name matching. Groups include music, radio/TV devices, menu/UI sounds, world ambience, and other discovered sounds. The group sliders range from 0% to 200%. Select a discovered sound to preview it, adjust it independently, or assign it to a different group. Settings are saved locally in `%UserProfile%\Zomboid\CWAudioMixer.ini`.
 
