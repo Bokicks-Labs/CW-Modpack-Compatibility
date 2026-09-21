@@ -7,12 +7,15 @@ local function installCleanUIEquipmentTooltipFix()
     if not isActive("CleanUI") or not isActive("EquipmentUI_B42") then return end
 
     require("ISUI/ISInventoryPane")
-    if not ISInventoryPane or not ISInventoryPane.doButtons then return end
+    if not ISInventoryPane or not ISInventoryPane.updateTooltip then return end
     if ISInventoryPane.__cwCleanUIEquipmentTooltipFix then return end
 
-    local moddedDoButtons = ISInventoryPane.doButtons
+    -- Equipment UI installs its updateTooltip wrapper during OnGameStart. This
+    -- compatibility handler runs later and therefore guards the complete live
+    -- chain while preserving Equipment UI's normal delegation.
+    local moddedUpdateTooltip = ISInventoryPane.updateTooltip
 
-    ISInventoryPane.doButtons = function(self, ...)
+    ISInventoryPane.updateTooltip = function(self, ...)
         -- CleanUI assumes getPlayerContextMenu() always returns a menu. During
         -- initial UI construction and teardown it can legitimately return nil;
         -- Equipment UI delegates into that copied function every few frames,
@@ -24,11 +27,11 @@ local function installCleanUIEquipmentTooltipFix()
             end
         end
 
-        return moddedDoButtons(self, ...)
+        return moddedUpdateTooltip(self, ...)
     end
 
     ISInventoryPane.__cwCleanUIEquipmentTooltipFix = true
-    print("[CWModpackCompatibility] Applied CleanUI/Equipment UI button nil-context fix.")
+    print("[CWModpackCompatibility] Applied CleanUI/Equipment UI tooltip nil-context fix.")
 end
 
 Events.OnGameStart.Add(installCleanUIEquipmentTooltipFix)

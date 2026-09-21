@@ -78,26 +78,30 @@ lua = LuaRuntime()
 lua.execute(base)
 lua.execute('''
 enabled.CleanUI=true; enabled.EquipmentUI_B42=true
-buttonCalls=0; contextMenu=nil
-ISInventoryPane={doButtons=function(self,y)
- buttonCalls=buttonCalls+1
+tooltipCalls=0; contextMenu=nil
+ISInventoryPane={updateTooltip=function(self,y)
+ tooltipCalls=tooltipCalls+1
  return 'upstream-result'
 end}
+local cleanUiUpdateTooltip=ISInventoryPane.updateTooltip
+ISInventoryPane.updateTooltip=function(self,y)
+ return cleanUiUpdateTooltip(self,y)
+end
 getPlayerContextMenu=function() return contextMenu end
 pane={player=0}
 ''')
 lua.execute((payload / 'client/CWModpackCompatibility_CleanUIEquipmentTooltip.lua').read_text(encoding='utf-8-sig'))
 lua.execute('''
 callbacks.start()
-local wrapped=ISInventoryPane.doButtons
+local wrapped=ISInventoryPane.updateTooltip
 assert(ISInventoryPane.__cwCleanUIEquipmentTooltipFix==true)
-assert(ISInventoryPane.doButtons(pane,1)==nil and buttonCalls==0)
+assert(ISInventoryPane.updateTooltip(pane,1)==nil and tooltipCalls==0)
 contextMenu={isAnyVisible=function() return false end}
-assert(ISInventoryPane.doButtons(pane,1)=='upstream-result' and buttonCalls==1)
+assert(ISInventoryPane.updateTooltip(pane,1)=='upstream-result' and tooltipCalls==1)
 callbacks.start()
-assert(ISInventoryPane.doButtons==wrapped, 'event retry must not double-wrap')
+assert(ISInventoryPane.updateTooltip==wrapped, 'event retry must not double-wrap')
 ''')
-print('PASS: CleanUI/Equipment UI button path skips transient nil context menus and preserves normal delegation')
+print('PASS: CleanUI/Equipment UI tooltip path skips transient nil context menus and preserves normal delegation')
 
 yoga = args.workshop_root / '3403870858/mods/Lifestyle/common/media/lua/shared/TimedActions/LSYogaAction.lua'
 upstream_anims = args.workshop_root / '3403870858/mods/Lifestyle/common/media/anims_X'
