@@ -29,6 +29,8 @@ def main() -> None:
     require(lua, "Events.OnFillWorldObjectContextMenu.Add(addContextOption)")
     require(lua, "function Mixer.restoreOriginalVolumes()")
     require(lua, "World ambience (includes vanilla rain)")
+    require(lua, "Menu and UI sounds")
+    require(lua, 'category == "ui"')
     require(lua, "getFileWriter(CONFIG_FILE, true, false)")
     assert "sendClientCommand" not in lua
     assert "sendServerCommand" not in lua
@@ -80,13 +82,15 @@ def runtime_contract(source: str) -> None:
         end
         TestRadio = sound('RadioTalk', 'Object', 'Primary')
         TestMusic = sound('MusicCombined', 'Music', 'Music')
-        local byCategory = { Object = list({ TestRadio }), Music = list({ TestMusic }) }
+        TestMenu = sound('UIToggleComboBox', 'UI', 'Primary')
+        local byCategory = { Object = list({ TestRadio }), Music = list({ TestMusic }), UI = list({ TestMenu }) }
         GameSounds = {
-            getCategories = function() return list({ 'Object', 'Music' }) end,
+            getCategories = function() return list({ 'Object', 'Music', 'UI' }) end,
             getSoundsInCategory = function(category) return byCategory[category] end,
             getSound = function(name)
                 if name == 'RadioTalk' then return TestRadio end
                 if name == 'MusicCombined' then return TestMusic end
+                if name == 'UIToggleComboBox' then return TestMenu end
             end,
             saveINI = function() TestSaved = (TestSaved or 0) + 1 end,
             previewSound = function(_) end,
@@ -98,11 +102,15 @@ def runtime_contract(source: str) -> None:
     lua.execute("TestCallbacks.start()")
     assert lua.eval("TestAdvanced") is True
     assert lua.eval("CWAudioMixer.discovered['RadioTalk'] ~= nil") is True
+    assert lua.eval("CWAudioMixer.discovered['UIToggleComboBox'] ~= nil") is True
     assert lua.eval("CWAudioMixer.settings.baseline['RadioTalk']") == 1
 
     lua.execute("CWAudioMixer.setGroupVolume('Devices', 2.5)")
     assert lua.eval("TestRadio.volume") == 0.5
     assert lua.eval("TestMusic.volume") == 1
+
+    lua.execute("CWAudioMixer.setGroupVolume('Menu', 2.5)")
+    assert lua.eval("TestMenu.volume") == 0.5
 
     lua.execute("CWAudioMixer.assignSound('RadioTalk', 'Music')")
     assert lua.eval("CWAudioMixer.settings.assignments['RadioTalk']") == "Music"

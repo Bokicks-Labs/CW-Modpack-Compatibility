@@ -13,10 +13,11 @@ CWAudioMixer = CWAudioMixer or {}
 local Mixer = CWAudioMixer
 
 local CONFIG_FILE = "CWAudioMixer.ini"
-local GROUPS = { "Music", "Devices", "World", "Other" }
+local GROUPS = { "Music", "Devices", "Menu", "World", "Other" }
 local GROUP_LABELS = {
     Music = "Music and performances",
     Devices = "Radio, TV, and media devices",
+    Menu = "Menu and UI sounds",
     World = "World ambience (includes vanilla rain)",
     Other = "Other discovered sounds",
 }
@@ -102,6 +103,13 @@ local function classify(sound)
     local category = string.lower(sound:getCategory() or "")
     local master = string.lower(sound:getMasterName() or "")
 
+    if category == "ui" or master == "ui"
+        or name:find("menu", 1, true) or name:find("button", 1, true)
+        or name:find("toggle", 1, true) or name:find("hover", 1, true)
+        or name:find("select", 1, true) or name:find("activate", 1, true)
+        or name:find("tab", 1, true) then
+        return "Menu"
+    end
     if category == "music" or master == "music"
         or name:find("music", 1, true) or name:find("song", 1, true)
         or name:find("jukebox", 1, true) or name:find("instrument", 1, true)
