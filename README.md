@@ -4,7 +4,7 @@ Private source repository for the Chaosworld Project Zomboid Build 42 compatibil
 
 The Workshop payloads are kept under `Contents/mods`. The core `CWModpackCompatibility` mod contains targeted compatibility fixes for the Chaosworld modpack, including the Lifestyle hidden-skill display bridge and automatic feature ownership for Nature's Call and Brush Your Damn Teeth.
 
-It also contains the optional client-only `CWAudioMixer` submod. It is separately selectable in Project Zomboid and provides discovered-sound group and per-sound volume controls. See [CW Audio Mixer](docs/audio-mixer.md).
+It also contains two optional client-only submods. `CWAudioMixer` provides discovered-sound group and per-sound volume controls; `CWModOptionsSearch` adds search-and-jump navigation to the Build 42 Mod Options page. See [CW Audio Mixer](docs/audio-mixer.md) and [CW Mod Options Search](docs/mod-options-search.md).
 
 ## Workshop copy
 
@@ -35,6 +35,12 @@ To test only the optional audio submod without changing the core compatibility j
 .\Scripts\toggle-pz-audio-mixer-junction.ps1
 ```
 
+To test only the optional Mod Options Search submod, run:
+
+```powershell
+.\Scripts\toggle-pz-mod-options-search-junction.ps1
+```
+
 ## Workshop staging
 
 After testing a commit, update the local PZ Workshop staging folder with:
@@ -43,7 +49,7 @@ After testing a commit, update the local PZ Workshop staging folder with:
 .\Scripts\publish-to-pz-workshop.ps1
 ```
 
-This mirrors the core compatibility mod, optional Audio Mixer submod, and Workshop metadata to `%UserProfile%\Zomboid\Workshop\CW-Modpack-Compatibility`, removes destination-only files inside each managed staging mod, and verifies each staged file set and SHA-256 hashes. It does not edit the Steam installation, base-game media, launchers, DLLs, saves, or the live Steam Workshop cache.
+This mirrors the core compatibility mod, both optional client submods, and Workshop metadata to `%UserProfile%\Zomboid\Workshop\CW-Modpack-Compatibility`, removes destination-only files inside each managed staging mod, and verifies each staged file set and SHA-256 hashes. It does not edit the Steam installation, base-game media, launchers, DLLs, saves, or the live Steam Workshop cache.
 
 ## Repository boundaries
 

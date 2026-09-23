@@ -4,7 +4,7 @@ param()
 $ErrorActionPreference = 'Stop'
 
 $repoRoot = Split-Path -Parent $PSScriptRoot
-$modNames = @('CWModpackCompatibility', 'CWAudioMixer')
+$modNames = @('CWModpackCompatibility', 'CWAudioMixer', 'CWModOptionsSearch')
 $workshopRoot = Join-Path $env:USERPROFILE 'Zomboid\Workshop\CW-Modpack-Compatibility'
 
 $running = Get-Process -Name 'ProjectZomboid64', 'ProjectZomboid32', 'ProjectZomboid' -ErrorAction SilentlyContinue

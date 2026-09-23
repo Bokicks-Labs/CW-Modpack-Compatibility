@@ -1,0 +1,8 @@
+name=Chaosworld Mod Options Search
+id=CWModOptionsSearch
+author=chaosworld
+description=Optional client-side search and jump navigation for Build 42's Mod Options page.
+versionMin=42.20.0
+modversion=0.1.0
+require=CWModpackCompatibility
+category=interface

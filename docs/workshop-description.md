@@ -16,6 +16,7 @@ Required Lifestyle order:
 Bandits2, BanditsWeekOne, DynamicTradingCommon, DynamicTradingV2, ETO_B, and other supported mods must also appear before CWModpackCompatibility.
 
 CW Audio Mixer is optional and, when enabled, must appear after CWModpackCompatibility.
+CW Mod Options Search is optional and, when enabled, must also appear after CWModpackCompatibility.
 
 For multiplayer, clients and the server should use the same mod list, order, and CW version. Fully restart the client and server after changing the order.
 
@@ -43,6 +44,7 @@ For multiplayer, clients and the server should use the same mod list, order, and
 [*]Lifestyle ownership defaults require no setup and can be overridden independently under Chaosworld Compatibility - Lifestyle Ownership in Sandbox Options. Restart after changing them. Removing an owner mod automatically returns that feature to Lifestyle; CW also restores Lifestyle's default bladder multiplier if an older preset left it at zero, unless that fallback is disabled.
 [*]The Lifestyle compatibility skill view can be toggled in Mod Options.
 [*][b]CW Audio Mixer (optional submod):[/b] Enable [i]CW Audio Mixer[/i] separately after CW Modpack Compatibility. It is client-only and discovers loaded game/mod sounds for local group and per-sound volume controls. Open it in Mod Options or from the world right-click menu. Vanilla rain shares PZ's World Ambience event, so its control also changes other weather ambience.
+[*][b]CW Mod Options Search (optional submod):[/b] Enable it separately after CW Modpack Compatibility. It adds a client-only search button at the top of the Build 42 Mod Options page and jumps to matching registered mod settings without changing their values.
 [/list]
 
 CW 1.1.13 performs a narrow cleanup of obsolete Lifestyle bladder state when Nature's Call ownership is enabled. Back up important saves before changing mod lists.

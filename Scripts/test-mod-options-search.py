@@ -1,0 +1,71 @@
+"""Static contracts for the optional CW Mod Options Search submod."""
+from pathlib import Path
+from lupa import LuaRuntime
+
+ROOT = Path(__file__).resolve().parent.parent
+MOD_ROOT = ROOT / "Contents" / "mods" / "CWModOptionsSearch" / "42"
+INFO = (MOD_ROOT / "mod.info").read_text(encoding="utf-8")
+LUA = (MOD_ROOT / "media" / "lua" / "client" / "CWModOptionsSearch.lua").read_text(encoding="utf-8")
+DOC = (ROOT / "docs" / "mod-options-search.md").read_text(encoding="utf-8")
+
+def require(text: str, fragment: str) -> None:
+    assert fragment in text, f"missing required contract: {fragment}"
+
+def main() -> None:
+    require(INFO, "id=CWModOptionsSearch")
+    require(INFO, "require=CWModpackCompatibility")
+    require(INFO, "versionMin=42.20.0")
+    require(LUA, 'require "OptionScreens/MainOptions"')
+    require(LUA, "MainOptions.addModOptionsPanel = function")
+    require(LUA, "PZAPI.ModOptions.Data")
+    require(LUA, "panel:setYScroll(-wanted)")
+    require(LUA, "string.find(result.searchText, query, 1, true)")
+    require(LUA, "if #query < 2 then")
+    require(LUA, "if MainOptions.__cwModOptionsSearchInstalled then return end")
+    assert "PZAPI.ModOptions:save" not in LUA
+    assert "sendClientCommand" not in LUA
+    assert "sendServerCommand" not in LUA
+    require(DOC, "does not change option values")
+    require(DOC, "does not expose a public hook")
+    compiled = LuaRuntime(unpack_returned_tuples=True).eval("load")(LUA)
+    if isinstance(compiled, tuple):
+        compiled, error = compiled
+        assert compiled is not None, error
+    assert compiled is not None, "Lua source did not compile"
+    runtime_contract(LUA)
+    print("CW Mod Options Search static contracts passed.")
+
+def runtime_contract(source: str) -> None:
+    lua = LuaRuntime(unpack_returned_tuples=True)
+    lua.execute(
+        """
+        function require(_) return true end
+        UIFont = { Small = 1 }
+        function getText(value) return value end
+        function getTextManager() return { getFontHeight = function() return 12 end } end
+        ISCollapsableWindow = {
+            derive = function(_, _) return {} end,
+            new = function() return {} end,
+        }
+        ISButton = { new = function() return {} end }
+        MainOptions = { addModOptionsPanel = function() TestOriginalCalls = (TestOriginalCalls or 0) + 1 end }
+        PZAPI = { ModOptions = { Data = {
+            {
+                name = 'Example Mod',
+                data = {
+                    { type = 'tickbox', name = 'Enable Feature', tooltip = 'Controls feature', element = { y = 123 } },
+                    { type = 'description', text = 'Detailed searchable words' },
+                },
+            },
+        } } }
+        """
+    )
+    lua.execute(source)
+    assert lua.eval("MainOptions.__cwModOptionsSearchInstalled") is True
+    assert lua.eval("#CWModOptionsSearch.buildIndex()") == 2
+    assert lua.eval("CWModOptionsSearch.buildIndex()[1].targetY") == 123
+    assert lua.eval("CWModOptionsSearch.buildIndex()[2].targetY") == 123
+    assert lua.eval("string.find(CWModOptionsSearch.buildIndex()[2].searchText, 'searchable', 1, true) ~= nil") is True
+
+if __name__ == "__main__":
+    main()
