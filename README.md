@@ -14,6 +14,8 @@ It also contains two optional client-only submods. `CWAudioMixer` provides disco
 
 ## Local testing
 
+For a separate Project RV bus-interior backup/import helper, see [Project RV Interior Manager](docs/rv-interior-manager.md). It stores templates and backups under the user Zomboid folder and does not alter Workshop content.
+
 Run PowerShell from the repository root:
 
 ```powershell
