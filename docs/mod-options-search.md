@@ -3,8 +3,8 @@
 `CWModOptionsSearch` is an optional, client-only submod for Project Zomboid
 Build 42. Enable it after `CWModpackCompatibility`.
 
-Open **Options > Mods** and select **Search Mod Options...** at the top of the
-page. Type at least two characters to search registered mod names, option
+Open **Options > Mods** and select **Search Mod Options...** in the first mod
+options section. Type at least two characters to search registered mod names, option
 labels, descriptions, and tooltips. Double-click a result, or select it and use
 **Go to setting**, to scroll the existing page to that option.
 
@@ -15,6 +15,7 @@ registered options and navigates the existing page.
 ## Compatibility boundary
 
 Build 42.20 does not expose a public hook for extending the Mod Options screen.
-The submod conservatively wraps `MainOptions:addModOptionsPanel()` and may need
-an update if Project Zomboid substantially rewrites that function. Options made
-outside `PZAPI.ModOptions` or text drawn by custom controls cannot be indexed.
+The launcher is registered through `PZAPI.ModOptions`. A narrow
+`MainOptions:close()` wrapper closes the separate search window with the Options
+screen. Options made outside `PZAPI.ModOptions` or text drawn only by custom
+controls cannot be indexed.

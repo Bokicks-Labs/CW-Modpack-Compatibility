@@ -11,18 +11,18 @@ require "ISUI/ISTextEntryBox"
 
 CWModOptionsSearch = CWModOptionsSearch or {}
 local Search = CWModOptionsSearch
-local TOP_SPACE = 34
 local FONT_HGT_SMALL = getTextManager():getFontHeight(UIFont.Small)
 
-local function translated(value)
-    if value == nil then return "" end
-    local ok, result = pcall(getText, tostring(value))
-    if ok and result then return tostring(result) end
-    return tostring(value)
+local function optionText(value)
+    -- Options:addDescription() already stores translated text, while names and
+    -- tooltips may be either localization keys or literal strings. Calling
+    -- getText() again is unsafe: several mods have literal '%' characters in
+    -- translations, which Java's formatter treats as missing format arguments.
+    return value == nil and "" or tostring(value)
 end
 
 local function normalized(value)
-    return string.lower(translated(value)):gsub("^%s+", ""):gsub("%s+$", "")
+    return string.lower(optionText(value)):gsub("_", " "):gsub("^%s+", ""):gsub("%s+$", "")
 end
 
 local function elementY(element)
@@ -35,14 +35,14 @@ end
 function Search.buildIndex()
     local results = {}
     for _, options in ipairs(PZAPI.ModOptions.Data or {}) do
-        local modName = translated(options.name)
+        local modName = optionText(options.name)
         local fallbackY = nil
         for _, option in ipairs(options.data or {}) do
             fallbackY = fallbackY or elementY(option.element)
         end
         for _, option in ipairs(options.data or {}) do
-            local optionName = translated(option.name)
-            local description = translated(option.text or option.tooltip)
+            local optionName = optionText(option.name)
+            local description = optionText(option.text or option.tooltip)
             local targetY = elementY(option.element) or fallbackY
             if optionName ~= "" or description ~= "" then
                 table.insert(results, {
@@ -164,9 +164,12 @@ function SearchWindow:new(x, y, width, height)
     return window
 end
 
-function Search.open(mainOptions, panel)
-    Search.mainOptions = mainOptions or Search.mainOptions
-    Search.modPanel = panel or Search.modPanel
+function Search.open()
+    local mainOptions = MainOptions and MainOptions.instance or nil
+    local panel = mainOptions and mainOptions.tabs and mainOptions.tabs:getActiveView() or nil
+    if not panel then return end
+    Search.mainOptions = mainOptions
+    Search.modPanel = panel
     if Search.window then
         Search.window:setVisible(true)
         Search.window:bringToTop()
@@ -191,33 +194,38 @@ function Search.goTo(result)
 end
 
 local function install()
-    if not MainOptions or not MainOptions.addModOptionsPanel then return end
+    if not MainOptions or not MainOptions.close then return end
     if MainOptions.__cwModOptionsSearchInstalled then return end
     MainOptions.__cwModOptionsSearchInstalled = true
-    local original = MainOptions.addModOptionsPanel
-    MainOptions.addModOptionsPanel = function(self, ...)
-        local result = original(self, ...)
-        local panel = self.mainPanel
-        if not panel then return result end
+    local originalClose = MainOptions.close
+    MainOptions.close = function(self, ...)
+        if Search.window then Search.window:close() end
+        Search.mainOptions = nil
+        Search.modPanel = nil
+        return originalClose(self, ...)
+    end
 
-        local existing = {}
-        for _, child in pairs(panel:getChildren()) do
-            table.insert(existing, child)
+    local api = PZAPI and PZAPI.ModOptions or nil
+    if not api or not api.create then return end
+    local options = api.getOptions and api:getOptions("CWModOptionsSearch") or nil
+    if not options then
+        options = api:create("CWModOptionsSearch", "Mod Options Search")
+        -- Put the launcher first so it remains easy to find before it is needed.
+        for index, candidate in ipairs(api.Data) do
+            if candidate == options then
+                table.remove(api.Data, index)
+                break
+            end
         end
-        for _, child in ipairs(existing) do
-            child:setY(child:getY() + TOP_SPACE)
-        end
-        panel:setScrollHeight(panel:getScrollHeight() + TOP_SPACE)
-
-        local button = ISButton:new(10, 4, 170, 26, "Search Mod Options...", self, function(owner)
-            Search.open(owner, panel)
-        end)
-        button:initialise()
-        button:instantiate()
-        panel:addChild(button)
-        Search.mainOptions = self
-        Search.modPanel = panel
-        return result
+        table.insert(api.Data, 1, options)
+    end
+    if options and options.addButton and not options:getOption("OPEN_SEARCH") then
+        options:addButton(
+            "OPEN_SEARCH",
+            "Search Mod Options...",
+            "Search registered mod settings and jump to a result.",
+            Search.open
+        )
     end
     print("[CWModOptionsSearch] Installed Mod Options search navigation.")
 end
