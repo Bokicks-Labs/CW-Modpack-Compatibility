@@ -22,6 +22,16 @@ For multiplayer, clients and the server should use the same mod list, order, and
 
 [hr][/hr]
 
+[h2]Optional Windows setup for Project Viewpoint[/h2]
+
+The CW download includes an inert [b]ZombieBuddy-Setup[/b] folder for the private Chaosworld friend group. It contains Zed's official ZombieBuddy Windows installer v4.2, Antikristianos's temporary Build 42.21 compatibility JAR, licenses, provenance, and a guarded PowerShell installer. Enabling CW never runs these files; a player must deliberately launch the setup tool from the Workshop folder.
+
+The helper verifies pinned SHA-256 hashes, refuses to patch a running PZ installation, backs up the existing JAR, and supports status and restore operations. It does not alter saves, subscriptions, Java-mod approvals, Steam launch options, execution policy, or unrelated mods. The bundled official installer is not Authenticode-signed. Java mods have unrestricted process access, so approve only expected JARs.
+
+Project Viewpoint, ZombieBuddy, and the temporary fix remain third-party projects and are not authored or endorsed by Chaosworld. See the included third-party notices and licenses.
+
+[hr][/hr]
+
 [h2]Current compatibility features[/h2]
 
 [list]
@@ -47,7 +57,7 @@ For multiplayer, clients and the server should use the same mod list, order, and
 [*][b]CW Mod Options Search (optional submod):[/b] Enable it separately after CW Modpack Compatibility. It adds a client-only search launcher to the first section of the Build 42 Mod Options page and jumps to matching registered mod settings without changing their values.
 [/list]
 
-CW 1.1.13 performs a narrow cleanup of obsolete Lifestyle bladder state when Nature's Call ownership is enabled. Back up important saves before changing mod lists.
+CW 1.1.14 adds the optional, user-launched Windows setup bundle. It does not run during gameplay or change save data. Back up important saves before changing mod lists.
 
 [h2]Verification[/h2]
 
@@ -75,8 +85,10 @@ All original mods and assets remain the work of their respective authors. This c
 [*]EXACT MINUTE CLOCK (B42) by PorrisV99.
 [*]Quartermaster - Auto-Sort & Store Loot by deckard.
 [*]Beyond Ten - Level 15 Skills by Patryk, published on Workshop by Silver (Brek).
+[*]ZombieBuddy by Andrey "Zed" Zaikin. CW bundles his unmodified official Windows installer v4.2 under the MIT license.
+[*]Temporary Build 42.21 ZombieBuddy compatibility fix by Antikristianos, based on ZombieBuddy 2.3.3 by Zed and redistributed with its MIT license and provenance.
 [/list]
 
 If an original mod author asks for support for their mod or redistributed material to be removed, it will be removed.
 
-[i]WIP: created and maintained with Codex for a private friend-group modpack. Current compatibility release: 1.1.13.[/i]
+[i]WIP: created and maintained with Codex for a private friend-group modpack. Current compatibility release: 1.1.14.[/i]
