@@ -59,6 +59,12 @@ foreach ($metadata in @('workshop.txt', 'preview.png')) {
     }
 }
 
+$workshopDescription = @(Get-Content -LiteralPath (Join-Path $workshopRoot 'workshop.txt') | Where-Object { $_ -like 'description=*' } | ForEach-Object { $_.Substring(12) }) -join "`n"
+if ($workshopDescription.Length -gt 7900) {
+    throw "Workshop description is $($workshopDescription.Length) characters; shorten it below 7900 before uploading (Steam rejects oversized descriptions as result=8)."
+}
+Write-Output "Verified Workshop description length: $($workshopDescription.Length) characters"
+
 function Get-Hashes([string]$root) {
     $result = @{}
     Get-ChildItem -LiteralPath $root -Recurse -File | ForEach-Object {

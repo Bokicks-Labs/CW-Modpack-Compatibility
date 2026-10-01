@@ -9,6 +9,7 @@ It also contains two optional client-only submods. `CWAudioMixer` provides disco
 ## Workshop copy
 
 - [Current Workshop description](docs/workshop-description.md)
+- [Steam-formatted version 1.1.14 changelog](docs/steam-changelog-1.1.14.txt)
 - [Version 1.1.14 changelog](docs/workshop-changelog-1.1.14.md)
 - [Version 1.1.13 changelog](docs/workshop-changelog-1.1.13.md)
 - [Lifestyle feature ownership](docs/lifestyle-feature-ownership.md)
