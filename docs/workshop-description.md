@@ -24,9 +24,9 @@ For multiplayer, clients and the server should use the same mod list, order, and
 
 [h2]Optional Windows setup for Project Viewpoint[/h2]
 
-The CW download includes an inert [b]ZombieBuddy-Setup[/b] folder for the private Chaosworld friend group. It contains Zed's official ZombieBuddy Windows installer v4.2, Antikristianos's temporary Build 42.21 compatibility JAR, licenses, provenance, and a guarded PowerShell installer. Enabling CW never runs these files; a player must deliberately launch the setup tool from the Workshop folder.
+The CW download includes an inert [b]ZombieBuddy-Setup[/b] folder for the private Chaosworld friend group. It contains Antikristianos's temporary Build 42.21 compatibility JAR, licenses, provenance, and a guarded PowerShell installer. If the base agent is missing, the helper can download Zed's official ZombieBuddy Windows installer v4.2 from GitHub on explicit request. Enabling CW never runs these files; a player must deliberately launch the setup tool from the Workshop folder.
 
-The helper verifies pinned SHA-256 hashes, refuses to patch a running PZ installation, backs up the existing JAR, and supports status and restore operations. It does not alter saves, subscriptions, Java-mod approvals, Steam launch options, execution policy, or unrelated mods. The bundled official installer is not Authenticode-signed. Java mods have unrestricted process access, so approve only expected JARs.
+The helper verifies pinned SHA-256 hashes, refuses to patch a running PZ installation, backs up the existing JAR, and supports status and restore operations. It does not alter saves, subscriptions, Java-mod approvals, Steam launch options, execution policy, or unrelated mods. The official installer is not included because the PZ Workshop uploader forbids EXE files; a verified temporary download is deleted after use. The upstream installer is not Authenticode-signed. Java mods have unrestricted process access, so approve only expected JARs.
 
 Project Viewpoint, ZombieBuddy, and the temporary fix remain third-party projects and are not authored or endorsed by Chaosworld. See the included third-party notices and licenses.
 
@@ -85,7 +85,7 @@ All original mods and assets remain the work of their respective authors. This c
 [*]EXACT MINUTE CLOCK (B42) by PorrisV99.
 [*]Quartermaster - Auto-Sort & Store Loot by deckard.
 [*]Beyond Ten - Level 15 Skills by Patryk, published on Workshop by Silver (Brek).
-[*]ZombieBuddy by Andrey "Zed" Zaikin. CW bundles his unmodified official Windows installer v4.2 under the MIT license.
+[*]ZombieBuddy by Andrey "Zed" Zaikin. When explicitly requested, the helper downloads his unmodified official Windows installer v4.2 from GitHub and verifies its pinned SHA-256 before running it.
 [*]Temporary Build 42.21 ZombieBuddy compatibility fix by Antikristianos, based on ZombieBuddy 2.3.3 by Zed and redistributed with its MIT license and provenance.
 [/list]
 

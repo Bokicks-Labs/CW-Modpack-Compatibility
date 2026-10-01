@@ -11,7 +11,7 @@ $ErrorActionPreference = 'Stop'
 
 $expectedInstallerHash = '2A52466AFE804FECE5E88868EEF75A70E8964D3E4E01A3629B57CF6FF19E24B3'
 $expectedPatchHash = '909D1FF579BE34AC2C3EE860A1A499B889A677D0DA74EB4A1D3632AE4E2ED102'
-$installerPath = Join-Path $PSScriptRoot 'ZombieBuddyInstaller_v4.2.exe'
+$installerDownloadUrl = 'https://github.com/zed-0xff/ZombieBuddy/releases/download/windows_installer_4.2/ZombieBuddyInstaller_v4.2.exe'
 $patchPath = Join-Path $PSScriptRoot 'ZombieBuddy-2.3.3-B42.21-Fix.jar'
 $backupRoot = Join-Path $env:USERPROFILE 'Zomboid\backups\CW-ZombieBuddy'
 
@@ -158,14 +158,30 @@ function Show-State($State) {
 }
 
 function Invoke-OfficialInstaller {
-    Assert-BundledFile $installerPath $expectedInstallerHash 'Bundled ZombieBuddy installer'
-    if (-not $PSCmdlet.ShouldProcess($installerPath, 'Run Zed''s official ZombieBuddy installer v4.2')) {
+    if (-not $PSCmdlet.ShouldProcess($installerDownloadUrl, 'Download, verify, and run Zed''s official ZombieBuddy installer v4.2')) {
         return
     }
-    Write-Output 'Starting the official interactive ZombieBuddy installer. Review its preview before accepting changes.'
-    $process = Start-Process -FilePath $installerPath -Wait -PassThru
-    if ($process.ExitCode -ne 0) {
-        throw "ZombieBuddy installer exited with code $($process.ExitCode)."
+
+    $downloadRoot = Join-Path ([IO.Path]::GetTempPath()) 'CW-ZombieBuddy'
+    New-Item -ItemType Directory -Path $downloadRoot -Force | Out-Null
+    $downloadPath = Join-Path $downloadRoot ('ZombieBuddyInstaller_v4.2-' + [guid]::NewGuid().ToString('N') + '.exe')
+    try {
+        Write-Output "Downloading Zed's official ZombieBuddy installer from $installerDownloadUrl"
+        try {
+            Invoke-WebRequest -Uri $installerDownloadUrl -OutFile $downloadPath -UseBasicParsing
+        } catch {
+            throw "Could not download the official ZombieBuddy installer. Download it manually from Zed's windows_installer_4.2 GitHub release, verify SHA-256 $expectedInstallerHash, run it, and then rerun this helper. $($_.Exception.Message)"
+        }
+        Assert-BundledFile $downloadPath $expectedInstallerHash 'Downloaded ZombieBuddy installer'
+        Write-Output 'Starting the verified interactive ZombieBuddy installer. Review its preview before accepting changes.'
+        $process = Start-Process -FilePath $downloadPath -Wait -PassThru
+        if ($process.ExitCode -ne 0) {
+            throw "ZombieBuddy installer exited with code $($process.ExitCode)."
+        }
+    } finally {
+        if (Test-Path -LiteralPath $downloadPath -PathType Leaf) {
+            Remove-Item -LiteralPath $downloadPath -Force
+        }
     }
 }
 
@@ -266,7 +282,6 @@ if ($env:OS -ne 'Windows_NT') {
     throw 'This bundled helper supports Windows clients and Windows dedicated servers only.'
 }
 
-Assert-BundledFile $installerPath $expectedInstallerHash 'Bundled ZombieBuddy installer'
 Assert-BundledFile $patchPath $expectedPatchHash 'Bundled ZombieBuddy 42.21 compatibility JAR'
 $gameRoot = Resolve-GameRoot $ProjectZomboidPath
 

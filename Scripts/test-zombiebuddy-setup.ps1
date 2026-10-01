@@ -4,6 +4,9 @@ param()
 $ErrorActionPreference = 'Stop'
 
 $setupScript = (Resolve-Path (Join-Path $PSScriptRoot '..\Contents\mods\CWModpackCompatibility\ZombieBuddy-Setup\Setup-ZombieBuddyForViewpoint.ps1')).Path
+$setupRoot = Split-Path -Parent $setupScript
+$expectedInstallerUrl = 'https://github.com/zed-0xff/ZombieBuddy/releases/download/windows_installer_4.2/ZombieBuddyInstaller_v4.2.exe'
+$expectedInstallerHash = '2A52466AFE804FECE5E88868EEF75A70E8964D3E4E01A3629B57CF6FF19E24B3'
 $expectedPatchHash = '909D1FF579BE34AC2C3EE860A1A499B889A677D0DA74EB4A1D3632AE4E2ED102'
 $testRoot = Join-Path ([IO.Path]::GetTempPath()) ('cw-zb-test-' + [guid]::NewGuid().ToString('N'))
 $gameRoot = Join-Path $testRoot 'ProjectZomboid'
@@ -19,6 +22,15 @@ $originalHash = (Get-FileHash -Algorithm SHA256 -LiteralPath (Join-Path $gameRoo
 $previousUserProfile = $env:USERPROFILE
 
 try {
+    $blockedPayload = @(Get-ChildItem -LiteralPath $setupRoot -File | Where-Object { $_.Extension -in @('.exe', '.dll', '.bat', '.app', '.dylib', '.sh', '.so', '.zip') })
+    if ($blockedPayload.Count) {
+        throw "The setup payload contains Workshop-blocked files: $($blockedPayload.Name -join ', ')"
+    }
+    $setupSource = Get-Content -Raw -LiteralPath $setupScript
+    if (-not $setupSource.Contains($expectedInstallerUrl) -or -not $setupSource.Contains($expectedInstallerHash)) {
+        throw 'The setup helper does not contain the pinned official installer URL and SHA-256.'
+    }
+
     $env:USERPROFILE = $testProfile
 
     & $setupScript -Action Status -ProjectZomboidPath $gameRoot | Out-Host

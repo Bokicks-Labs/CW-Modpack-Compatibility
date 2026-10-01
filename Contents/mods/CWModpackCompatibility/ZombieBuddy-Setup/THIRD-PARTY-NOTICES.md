@@ -8,13 +8,15 @@ Project Viewpoint, their authors, The Indie Stone, Valve, or Steam.
 - Author: Andrey "Zed" Zaikin (`zed-0xff`)
 - Project: https://github.com/zed-0xff/ZombieBuddy
 - Workshop: https://steamcommunity.com/sharedfiles/filedetails/?id=3619862853
-- Bundled installer release: `windows_installer_4.2`
+- Installer release downloaded on demand: `windows_installer_4.2`
 - Release page: https://github.com/zed-0xff/ZombieBuddy/releases/tag/windows_installer_4.2
 - License: MIT; see `LICENSE-ZombieBuddy.txt`
 
-The bundled installer is the unmodified GitHub release asset
-`ZombieBuddyInstaller_v4.2.exe`. It is not Authenticode-signed. CW verifies its
-bundled SHA-256 before launching it.
+The installer is not included because the Project Zomboid Workshop uploader
+forbids `.exe` files. When explicitly requested, the helper downloads the
+unmodified GitHub release asset `ZombieBuddyInstaller_v4.2.exe`, verifies its
+pinned SHA-256 before launching it, and deletes the temporary download after it
+exits. The upstream installer is not Authenticode-signed.
 
 ## Temporary Project Zomboid 42.21 compatibility fix
 
