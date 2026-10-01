@@ -1,0 +1,95 @@
+diff --git a/java/src/main/java/me/zed_0xff/zombie_buddy/KnownAuthors.java b/java/src/main/java/me/zed_0xff/zombie_buddy/KnownAuthors.java
+index 741a215..1e91cbf 100644
+--- a/java/src/main/java/me/zed_0xff/zombie_buddy/KnownAuthors.java
++++ b/java/src/main/java/me/zed_0xff/zombie_buddy/KnownAuthors.java
+@@ -2,10 +2,10 @@ package me.zed_0xff.zombie_buddy;
+ 
+ import static me.zed_0xff.zombie_buddy.SteamWorkshop.SteamID64;
+ 
+-import com.google.gson.annotations.SerializedName;
+-import com.google.gson.reflect.TypeToken;
+-import org.bouncycastle.crypto.params.Ed25519PublicKeyParameters;
+-import org.bouncycastle.crypto.signers.Ed25519Signer;
++import zb.com.google.gson.annotations.SerializedName;
++import zb.com.google.gson.reflect.TypeToken;
++import zb.org.bouncycastle.crypto.params.Ed25519PublicKeyParameters;
++import zb.org.bouncycastle.crypto.signers.Ed25519Signer;
+ 
+ import java.io.IOException;
+ import java.lang.reflect.Type;
+@@ -44,10 +44,18 @@ public final class KnownAuthors {
+     private static final Pattern SIG_PATTERN =
+         Pattern.compile("(\"signature\"\\s*:\\s*\")([0-9a-fA-F]*)(\")");
+ 
+-    private static final HttpClient HTTP = HttpClient.newBuilder()
+-        .connectTimeout(Duration.ofSeconds(10))
+-        .followRedirects(HttpClient.Redirect.NORMAL)
+-        .build();
++    /**
++     * Do not construct HttpClient while the agent classes are scanned during JVM
++     * premain. On PZ 42.21's Java 25 runtime that can initialize native hostname
++     * resolution before the platform charset is ready, permanently breaking DNS
++     * for the process with "platform encoding not initialized".
++     */
++    private static final class HttpHolder {
++        private static final HttpClient INSTANCE = HttpClient.newBuilder()
++            .connectTimeout(Duration.ofSeconds(10))
++            .followRedirects(HttpClient.Redirect.NORMAL)
++            .build();
++    }
+ 
+     private static final Type FILE_DATA_TYPE = new TypeToken<FileData>() {}.getType();
+ 
+@@ -193,7 +201,7 @@ public final class KnownAuthors {
+                 )
+                 .GET()
+                 .build();
+-            HttpResponse<String> resp = HTTP.send(req, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
++            HttpResponse<String> resp = HttpHolder.INSTANCE.send(req, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+             if (resp.statusCode() == 200) {
+                 return resp.body();
+             }
+diff --git a/java/src/main/java/me/zed_0xff/zombie_buddy/SteamWorkshop.java b/java/src/main/java/me/zed_0xff/zombie_buddy/SteamWorkshop.java
+index 45fdf2c..5d8b4a9 100644
+--- a/java/src/main/java/me/zed_0xff/zombie_buddy/SteamWorkshop.java
++++ b/java/src/main/java/me/zed_0xff/zombie_buddy/SteamWorkshop.java
+@@ -13,10 +13,10 @@ import java.util.List;
+ import java.util.Map;
+ import java.util.Set;
+ 
+-import com.google.gson.JsonElement;
+-import com.google.gson.JsonObject;
+-import com.google.gson.JsonParser;
+-import com.google.gson.JsonPrimitive;
++import zb.com.google.gson.JsonElement;
++import zb.com.google.gson.JsonObject;
++import zb.com.google.gson.JsonParser;
++import zb.com.google.gson.JsonPrimitive;
+ 
+ /**
+  * Steam Workshop API client for fetching mod details and ban status.
+@@ -53,9 +53,12 @@ public final class SteamWorkshop {
+ 
+     private static final String STEAM_GET_PUBLISHED_FILE_DETAILS_URL =
+         "https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/";
+-    private static final HttpClient HTTP_CLIENT = HttpClient.newBuilder()
+-        .connectTimeout(Duration.ofSeconds(10))
+-        .build();
++    /** Lazily initialized for the same Java 25 premain safety boundary as KnownAuthors. */
++    private static final class HttpClientHolder {
++        private static final HttpClient INSTANCE = HttpClient.newBuilder()
++            .connectTimeout(Duration.ofSeconds(10))
++            .build();
++    }
+     private static final int BATCH_SIZE = 100;
+ 
+     private SteamWorkshop() {}
+@@ -117,7 +120,7 @@ public final class SteamWorkshop {
+             .header("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
+             .POST(HttpRequest.BodyPublishers.ofString(body.toString()))
+             .build();
+-        HttpResponse<String> resp = HTTP_CLIENT.send(req, HttpResponse.BodyHandlers.ofString());
++        HttpResponse<String> resp = HttpClientHolder.INSTANCE.send(req, HttpResponse.BodyHandlers.ofString());
+         if (resp.statusCode() != 200) {
+             setUnknownDetails(out, new HashSet<>(chunk),
+                 "Steam API request failed (HTTP " + resp.statusCode() + ")");

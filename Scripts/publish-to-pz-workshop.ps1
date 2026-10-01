@@ -59,11 +59,22 @@ foreach ($metadata in @('workshop.txt', 'preview.png')) {
     }
 }
 
-$workshopDescription = @(Get-Content -LiteralPath (Join-Path $workshopRoot 'workshop.txt') | Where-Object { $_ -like 'description=*' } | ForEach-Object { $_.Substring(12) }) -join "`n"
-if ($workshopDescription.Length -gt 7900) {
-    throw "Workshop description is $($workshopDescription.Length) characters; shorten it below 7900 before uploading (Steam rejects oversized descriptions as result=8)."
+$workshopTextPath = Join-Path $workshopRoot 'workshop.txt'
+$workshopLines = @(Get-Content -LiteralPath $workshopTextPath)
+$workshopDescription = @($workshopLines | Where-Object { $_ -like 'description=*' } | ForEach-Object { $_.Substring(12) }) -join "`n"
+$workshopId = @($workshopLines | Where-Object { $_ -like 'id=*' } | Select-Object -First 1) -replace '^id=', ''
+$modIds = @(Get-ChildItem -LiteralPath (Join-Path $workshopRoot 'Contents\mods') -Directory | ForEach-Object {
+    $modInfo = Join-Path $_.FullName '42\mod.info'
+    if (Test-Path -LiteralPath $modInfo -PathType Leaf) {
+        Get-Content -LiteralPath $modInfo | Where-Object { $_ -like 'id=*' } | ForEach-Object { $_ -replace '^id=', '' }
+    }
+})
+$submitDescription = $workshopDescription + "`n`nWorkshop ID: $workshopId" + (($modIds | ForEach-Object { "`nMod ID: $_" }) -join '')
+$submitDescriptionBytes = [Text.Encoding]::UTF8.GetByteCount($submitDescription)
+if ($submitDescriptionBytes -gt 7900) {
+    throw "Submitted Workshop description is $submitDescriptionBytes UTF-8 bytes; shorten it below 7900 before uploading (Steam rejects oversized descriptions as result=8)."
 }
-Write-Output "Verified Workshop description length: $($workshopDescription.Length) characters"
+Write-Output "Verified submitted Workshop description length: $($submitDescription.Length) characters / $submitDescriptionBytes UTF-8 bytes"
 
 function Get-Hashes([string]$root) {
     $result = @{}

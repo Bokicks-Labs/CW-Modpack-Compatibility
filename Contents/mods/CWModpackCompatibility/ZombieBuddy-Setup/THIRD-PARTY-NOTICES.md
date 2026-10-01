@@ -26,9 +26,13 @@ exits. The upstream installer is not Authenticode-signed.
 - Compatibility marker: `b42.20.4-b42.21-list-loader-3`
 - License: MIT; see `LICENSE-Temporary-Fix.txt`
 
-The replacement JAR is based on ZombieBuddy 2.3.3 by Zed. It changes the loader
-boundary needed by Project Zomboid 42.21 and is redistributed here unchanged
-from temporary-fix package 1.2 for the private Chaosworld friend group.
+The replacement JAR is based on ZombieBuddy 2.3.3 by Zed and the Build 42.21
+temporary-fix package 1.2. CW network-fix revision 1 additionally changes the
+two upstream HTTP clients from eager static initialization to lazy holder
+initialization. It targets a suspected early initialization path associated
+with the observed Java 25 hostname error. All three changes remain
+covered by the upstream MIT license and are distributed for the private
+Chaosworld friend group.
 
 If either upstream author asks for bundled material to be removed, CW will
 remove it. When official ZombieBuddy includes the required 42.21 loader repair,

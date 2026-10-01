@@ -10,7 +10,7 @@ param(
 $ErrorActionPreference = 'Stop'
 
 $expectedInstallerHash = '2A52466AFE804FECE5E88868EEF75A70E8964D3E4E01A3629B57CF6FF19E24B3'
-$expectedPatchHash = '909D1FF579BE34AC2C3EE860A1A499B889A677D0DA74EB4A1D3632AE4E2ED102'
+$expectedPatchHash = '6A986C9E4CA962D184D7B87B9F0976DBD8C7399551A61736F0079DD84C9EE572'
 $installerDownloadUrl = 'https://github.com/zed-0xff/ZombieBuddy/releases/download/windows_installer_4.2/ZombieBuddyInstaller_v4.2.exe'
 $patchPath = Join-Path $PSScriptRoot 'ZombieBuddy-2.3.3-B42.21-Fix.jar'
 $backupRoot = Join-Path $env:USERPROFILE 'Zomboid\backups\CW-ZombieBuddy'

@@ -56,7 +56,27 @@ mods loaded by ZombieBuddy have unrestricted process access.
 | File | Source/version | SHA-256 |
 | --- | --- | --- |
 | `ZombieBuddyInstaller_v4.2.exe` (downloaded on demand; not included) | Zed's official GitHub release `windows_installer_4.2` | `2A52466AFE804FECE5E88868EEF75A70E8964D3E4E01A3629B57CF6FF19E24B3` |
-| `ZombieBuddy-2.3.3-B42.21-Fix.jar` | Antikristianos temporary-fix release 1.2, based on ZombieBuddy 2.3.3 | `909D1FF579BE34AC2C3EE860A1A499B889A677D0DA74EB4A1D3632AE4E2ED102` |
+| `ZombieBuddy-2.3.3-B42.21-Fix.jar` | CW network-fix revision 1, based on Antikristianos temporary-fix release 1.2 and ZombieBuddy 2.3.3 | `6A986C9E4CA962D184D7B87B9F0976DBD8C7399551A61736F0079DD84C9EE572` |
+
+## Java 25 multiplayer network fix
+
+The affected Windows client's log shows
+`java.lang.InternalError: platform encoding not initialized` during
+ZombieBuddy's authors-list request, followed by the same error in the server
+browser and direct connect. One plausible trigger is early initialization of
+ZombieBuddy's two static Java `HttpClient` instances. This patch addresses that
+specific initialization path; the full game join test is still needed to prove
+it resolves the incident.
+
+CW network-fix revision 1 moves both clients into lazy holder classes. They are
+created only when ZombieBuddy actually performs the authors-list or Steam
+Workshop request during mod loading. The fix does not disable those requests,
+change Java-mod approval policy, bypass signature verification, or alter the
+42.20.4/42.21 loader compatibility work.
+
+The patched agent passed a Java 25 premain probe using PZ's bundled runtime.
+The original JAR also passes that minimal probe, so it does not reproduce the
+reported PZ failure. A full client/server join remains the acceptance test.
 
 See `THIRD-PARTY-NOTICES.md` and the included license files for provenance,
 credit, and upstream links.
