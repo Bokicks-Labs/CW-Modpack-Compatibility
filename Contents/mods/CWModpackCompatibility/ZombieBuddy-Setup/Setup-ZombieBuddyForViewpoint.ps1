@@ -10,8 +10,10 @@ param(
 $ErrorActionPreference = 'Stop'
 
 $expectedInstallerHash = '2A52466AFE804FECE5E88868EEF75A70E8964D3E4E01A3629B57CF6FF19E24B3'
-$expectedPatchHash = '6A986C9E4CA962D184D7B87B9F0976DBD8C7399551A61736F0079DD84C9EE572'
+$expectedPatchHash = '909D1FF579BE34AC2C3EE860A1A499B889A677D0DA74EB4A1D3632AE4E2ED102'
+$expectedNativeHash = '49E5D596B54E5E4EAB535E613CDC7C3F0DE9BB7EF07239C255E2B127657104CE'
 $installerDownloadUrl = 'https://github.com/zed-0xff/ZombieBuddy/releases/download/windows_installer_4.2/ZombieBuddyInstaller_v4.2.exe'
+$nativeDownloadUrl = 'https://github.com/Bokicks-Labs/ZombieBuddy-Windows-Native-Fix/releases/download/v2.3.3-pz42.21-native1/zbNative.dll'
 $patchPath = Join-Path $PSScriptRoot 'ZombieBuddy-2.3.3-B42.21-Fix.jar'
 $backupRoot = Join-Path $env:USERPROFILE 'Zomboid\backups\CW-ZombieBuddy'
 
@@ -121,14 +123,18 @@ function Get-AgentState([string]$GameRoot) {
     }
 
     $liveHash = Get-Sha256 $liveJar
+    $nativeHash = Get-Sha256 $nativeDll
     return [pscustomobject]@{
         GameRoot = $GameRoot
         LiveJar = $liveJar
         LiveJarExists = Test-Path -LiteralPath $liveJar -PathType Leaf
         LiveJarHash = $liveHash
         NativeDllExists = Test-Path -LiteralPath $nativeDll -PathType Leaf
+        NativeDll = $nativeDll
+        NativeDllHash = $nativeHash
         LauncherFileConfigured = $launcherConfigured
         IsPatched = $liveHash -eq $expectedPatchHash
+        IsNativePatched = $nativeHash -eq $expectedNativeHash
     }
 }
 
@@ -150,8 +156,10 @@ function Show-State($State) {
     Write-Output "ZombieBuddy.jar present: $($State.LiveJarExists)"
     Write-Output "ZombieBuddy.jar SHA-256: $($State.LiveJarHash)"
     Write-Output "zbNative.dll present: $($State.NativeDllExists)"
+    Write-Output "zbNative.dll SHA-256: $($State.NativeDllHash)"
     Write-Output "Launcher file contains -agentlib:zbNative: $($State.LauncherFileConfigured)"
     Write-Output "42.21 compatibility JAR installed: $($State.IsPatched)"
+    Write-Output "Windows native DNS loader installed: $($State.IsNativePatched)"
     if (-not $State.LauncherFileConfigured) {
         Write-Warning 'The launcher files do not contain -agentlib:zbNative. Steam launch options may still provide it; verify them manually.'
     }
@@ -197,6 +205,9 @@ function Install-Patch([string]$GameRoot) {
     if (-not $state.LiveJarExists -or -not $state.NativeDllExists) {
         throw 'The base ZombieBuddy installation is incomplete. Rerun with -LaunchOfficialInstaller, then retry.'
     }
+    if (Test-Path -LiteralPath (Join-Path $GameRoot 'ZombieBuddy.jar.new') -PathType Leaf) {
+        throw 'A pending ZombieBuddy.jar.new update would replace the compatibility JAR at startup. Resolve it before installing.'
+    }
 
     if (-not $PSCmdlet.ShouldProcess($state.LiveJar, 'Back up and install the pinned ZombieBuddy 42.21 compatibility JAR')) {
         return
@@ -241,7 +252,68 @@ function Install-Patch([string]$GameRoot) {
     Write-Output "Backup: $backupJar"
 }
 
-function Restore-Backup([string]$GameRoot, [string]$RequestedBackup) {
+function Install-NativePatch([string]$GameRoot) {
+    Assert-GameStopped $GameRoot
+    $state = Get-AgentState $GameRoot
+    if ($state.IsNativePatched) {
+        Write-Output 'The expected Windows native DNS loader is already installed.'
+        return
+    }
+    if (-not $state.NativeDllExists) {
+        throw 'The base ZombieBuddy native DLL is missing. Install the official Windows agent first.'
+    }
+    if (-not $PSCmdlet.ShouldProcess($state.NativeDll, 'Download, verify, back up, and install the pinned Windows native DNS loader')) {
+        return
+    }
+
+    $downloadRoot = Join-Path ([IO.Path]::GetTempPath()) 'CW-ZombieBuddy'
+    New-Item -ItemType Directory -Path $downloadRoot -Force | Out-Null
+    $downloadPath = Join-Path $downloadRoot ('zbNative-' + [guid]::NewGuid().ToString('N') + '.dll')
+    $stagedDll = $null
+    try {
+        try {
+            Invoke-WebRequest -Uri $nativeDownloadUrl -OutFile $downloadPath -UseBasicParsing
+        } catch {
+            throw "Could not download the pinned native loader from $nativeDownloadUrl. $($_.Exception.Message)"
+        }
+        Assert-BundledFile $downloadPath $expectedNativeHash 'Downloaded Windows native DNS loader'
+
+        New-Item -ItemType Directory -Path $backupRoot -Force | Out-Null
+        $timestamp = Get-Date -Format 'yyyyMMdd-HHmmss'
+        $backupDll = Join-Path $backupRoot "zbNative-$timestamp-$($state.NativeDllHash).dll"
+        $manifestPath = "$backupDll.json"
+        Copy-Item -LiteralPath $state.NativeDll -Destination $backupDll
+        if ((Get-Sha256 $backupDll) -ne $state.NativeDllHash) {
+            throw 'Native DLL backup hash verification failed. The live DLL was not changed.'
+        }
+        [ordered]@{
+            formatVersion = 1
+            created = (Get-Date).ToString('o')
+            gameRoot = $GameRoot
+            livePath = $state.NativeDll
+            backupPath = $backupDll
+            originalHash = $state.NativeDllHash
+            installedHash = $expectedNativeHash
+        } | ConvertTo-Json | Set-Content -LiteralPath $manifestPath -Encoding UTF8
+
+        $stagedDll = Join-Path $GameRoot ('.zbNative.dll.cw-stage-' + [guid]::NewGuid().ToString('N'))
+        Copy-Item -LiteralPath $downloadPath -Destination $stagedDll
+        Assert-BundledFile $stagedDll $expectedNativeHash 'Staged Windows native DNS loader'
+        Move-Item -LiteralPath $stagedDll -Destination $state.NativeDll -Force
+        Assert-BundledFile $state.NativeDll $expectedNativeHash 'Installed Windows native DNS loader'
+        Write-Output "Installed Windows native DNS loader: $($state.NativeDll)"
+        Write-Output "Backup: $backupDll"
+    } finally {
+        if ($stagedDll -and (Test-Path -LiteralPath $stagedDll -PathType Leaf)) {
+            Remove-Item -LiteralPath $stagedDll -Force
+        }
+        if (Test-Path -LiteralPath $downloadPath -PathType Leaf) {
+            Remove-Item -LiteralPath $downloadPath -Force
+        }
+    }
+}
+
+function Restore-Backup([string]$GameRoot, [string]$RequestedBackup, [switch]$SkipIfMissing) {
     Assert-GameStopped $GameRoot
     if ($RequestedBackup) {
         $candidate = [IO.Path]::GetFullPath($RequestedBackup)
@@ -253,11 +325,20 @@ function Restore-Backup([string]$GameRoot, [string]$RequestedBackup) {
     } else {
         $latest = Get-ChildItem -LiteralPath $backupRoot -File -Filter '*.jar.json' -ErrorAction SilentlyContinue |
             Sort-Object LastWriteTime -Descending |
-            Select-Object -First 1
+            Where-Object {
+                try {
+                    $record = Get-Content -Raw -LiteralPath $_.FullName | ConvertFrom-Json
+                    [IO.Path]::GetFullPath([string]$record.gameRoot) -eq [IO.Path]::GetFullPath($GameRoot)
+                } catch { $false }
+            } | Select-Object -First 1
         if (-not $latest) {
+            if ($SkipIfMissing) { return }
             throw "No CW ZombieBuddy backup manifest was found under $backupRoot"
         }
         $manifest = Get-Content -Raw -LiteralPath $latest.FullName | ConvertFrom-Json
+    }
+    if ([IO.Path]::GetFullPath([string]$manifest.gameRoot) -ne [IO.Path]::GetFullPath($GameRoot)) {
+        throw 'Backup manifest belongs to a different Project Zomboid installation.'
     }
 
     $resolvedBackup = [IO.Path]::GetFullPath([string]$manifest.backupPath)
@@ -278,6 +359,51 @@ function Restore-Backup([string]$GameRoot, [string]$RequestedBackup) {
     Write-Output "Restored ZombieBuddy JAR: $resolvedTarget"
 }
 
+function Restore-NativeBackup([string]$GameRoot, [string]$RequestedBackup, [switch]$SkipIfMissing) {
+    Assert-GameStopped $GameRoot
+    if ($RequestedBackup) {
+        $candidate = [IO.Path]::GetFullPath($RequestedBackup)
+        $manifestCandidate = if ($candidate.EndsWith('.json')) { $candidate } else { "$candidate.json" }
+        if (-not (Test-Path -LiteralPath $manifestCandidate -PathType Leaf)) {
+            throw "Native backup manifest not found: $manifestCandidate"
+        }
+    } else {
+        $latest = Get-ChildItem -LiteralPath $backupRoot -File -Filter '*.dll.json' -ErrorAction SilentlyContinue |
+            Sort-Object LastWriteTime -Descending |
+            Where-Object {
+                try {
+                    $record = Get-Content -Raw -LiteralPath $_.FullName | ConvertFrom-Json
+                    [IO.Path]::GetFullPath([string]$record.gameRoot) -eq [IO.Path]::GetFullPath($GameRoot)
+                } catch { $false }
+            } | Select-Object -First 1
+        if (-not $latest) {
+            if ($SkipIfMissing) { return }
+            throw "No CW ZombieBuddy native backup manifest was found under $backupRoot"
+        }
+        $manifestCandidate = $latest.FullName
+    }
+    $manifest = Get-Content -Raw -LiteralPath $manifestCandidate | ConvertFrom-Json
+    if ([IO.Path]::GetFullPath([string]$manifest.gameRoot) -ne [IO.Path]::GetFullPath($GameRoot)) {
+        throw 'Native backup manifest belongs to a different Project Zomboid installation.'
+    }
+    $resolvedBackup = [IO.Path]::GetFullPath([string]$manifest.backupPath)
+    $resolvedTarget = [IO.Path]::GetFullPath((Join-Path $GameRoot 'zbNative.dll'))
+    if (-not (Test-Path -LiteralPath $resolvedBackup -PathType Leaf)) {
+        throw "Native backup DLL is missing: $resolvedBackup"
+    }
+    if ((Get-Sha256 $resolvedBackup) -ne [string]$manifest.originalHash) {
+        throw 'Native backup DLL does not match its recorded SHA-256.'
+    }
+    if (-not $PSCmdlet.ShouldProcess($resolvedTarget, "Restore ZombieBuddy native backup $resolvedBackup")) {
+        return
+    }
+    Copy-Item -LiteralPath $resolvedBackup -Destination $resolvedTarget -Force
+    if ((Get-Sha256 $resolvedTarget) -ne [string]$manifest.originalHash) {
+        throw 'Restored native DLL failed final hash verification.'
+    }
+    Write-Output "Restored ZombieBuddy native DLL: $resolvedTarget"
+}
+
 if ($env:OS -ne 'Windows_NT') {
     throw 'This bundled helper supports Windows clients and Windows dedicated servers only.'
 }
@@ -295,11 +421,22 @@ switch ($Action) {
             Invoke-OfficialInstaller
             $gameRoot = Resolve-GameRoot $ProjectZomboidPath
         }
+        if (Test-Path -LiteralPath (Join-Path $gameRoot 'ZombieBuddy.jar.new') -PathType Leaf) {
+            throw 'A pending ZombieBuddy.jar.new update would replace the compatibility JAR at startup. Resolve it before installing.'
+        }
+        Install-NativePatch $gameRoot
         Install-Patch $gameRoot
         Show-State (Get-AgentState $gameRoot)
     }
     'Restore' {
-        Restore-Backup $gameRoot $BackupPath
+        if ($BackupPath -match '\.dll(?:\.json)?$') {
+            Restore-NativeBackup $gameRoot $BackupPath
+        } elseif ($BackupPath) {
+            Restore-Backup $gameRoot $BackupPath
+        } else {
+            Restore-NativeBackup $gameRoot '' -SkipIfMissing
+            Restore-Backup $gameRoot '' -SkipIfMissing
+        }
         Show-State (Get-AgentState $gameRoot)
     }
 }

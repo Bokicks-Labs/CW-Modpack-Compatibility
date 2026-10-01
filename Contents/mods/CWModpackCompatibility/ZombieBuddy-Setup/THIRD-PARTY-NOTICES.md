@@ -26,14 +26,23 @@ exits. The upstream installer is not Authenticode-signed.
 - Compatibility marker: `b42.20.4-b42.21-list-loader-3`
 - License: MIT; see `LICENSE-Temporary-Fix.txt`
 
-The replacement JAR is based on ZombieBuddy 2.3.3 by Zed and the Build 42.21
-temporary-fix package 1.2. CW network-fix revision 1 additionally changes the
-two upstream HTTP clients from eager static initialization to lazy holder
-initialization. It targets a suspected early initialization path associated
-with the observed Java 25 hostname error. All three changes remain
-covered by the upstream MIT license and are distributed for the private
-Chaosworld friend group.
+The bundled JAR is Antikristianos' unchanged temporary-fix package 1.2, based
+on ZombieBuddy 2.3.3. An earlier CW Java-only candidate failed the hostname
+test and is no longer bundled.
+
+## Windows native loader fix
+
+- Based on: ZombieBuddy 2.3.3 Windows `zbNative.dll` by Zed
+- Release: https://github.com/Bokicks-Labs/ZombieBuddy-Windows-Native-Fix/releases/tag/v2.3.3-pz42.21-native1
+- SHA-256: `49E5D596B54E5E4EAB535E613CDC7C3F0DE9BB7EF07239C255E2B127657104CE`
+- License: ZombieBuddy MIT; see `LICENSE-ZombieBuddy.txt`
+
+This 5 KB DLL changes only how the loader finds the bundled JRE's
+`instrument.dll`. The public release repository contains only a README,
+license, and DLL release asset—no Chaosworld or Viewpoint source or artwork.
+The Workshop helper downloads the DLL only when explicitly run, verifies its
+hash, and backs up the previously installed native loader.
 
 If either upstream author asks for bundled material to be removed, CW will
-remove it. When official ZombieBuddy includes the required 42.21 loader repair,
-this temporary JAR and helper should be retired rather than reapplied.
+remove it. When official ZombieBuddy includes both the required 42.21 loader
+compatibility and native DLL repair, this temporary helper should be retired.

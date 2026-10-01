@@ -1,0 +1,25 @@
+diff --git a/c/windows/zbNative.c b/c/windows/zbNative.c
+--- a/c/windows/zbNative.c
++++ b/c/windows/zbNative.c
+@@ -22,9 +22,18 @@ void write_msg(const char* msg) {
+ void init_instrument_dll() {
+     if (hOrig) return; // already loaded
+ 
+-    SetDllDirectoryA(".\\jre64\\bin");
+-    hOrig = LoadLibraryA("instrument.dll");
+-    SetDllDirectoryA(NULL);
++    char instrumentPath[1024];
++    DWORD pathLen = GetFullPathNameA(".\\jre64\\bin\\instrument.dll",
++                                    sizeof(instrumentPath), instrumentPath, NULL);
++    if (pathLen == 0 || pathLen >= sizeof(instrumentPath)) {
++        write_msg("[zbNative] Failed to resolve JRE instrument.dll path\n");
++        return;
++    }
++
++    // An unqualified LoadLibrary can pick the copy beside ProjectZomboid64.exe,
++    // even after SetDllDirectory points at jre64/bin. Keep instrument.dll and
++    // its dependencies in the same bundled JRE directory.
++    hOrig = LoadLibraryExA(instrumentPath, NULL, LOAD_WITH_ALTERED_SEARCH_PATH);
+ 
+     if (!hOrig) {
+         write_msg("[zbNative] Failed to load instrument.dll\n");
