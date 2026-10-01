@@ -1,0 +1,9 @@
+- Headlights start way to far way from some vehicles.
+- Audio mod doesn't detect/alter game over music, its SUPER loud
+- I want to break weather out of the environment category
+- Want to add more audio categorys, And try to do a better job grouping modded sounds.
+- taking a shower needs to lower hygiene need from lifestyle way more than it does currently around ~10%
+- Want to make a new mod that makes things like water collection and power in your rv more clear, also then add on features like requrieing generator for power or adjusting battery usage of vehicle.
+- Make a sub mod that allows setting the time in am/pm (12hour)
+- sub mod that makes other mods like TASAB and BYDT to lower lifestyles hyginene need.
+- BYDT show what ever drives bad breath mood in pz pulse expanded.
