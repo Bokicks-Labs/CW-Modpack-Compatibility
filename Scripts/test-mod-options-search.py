@@ -60,6 +60,8 @@ def runtime_contract(source: str) -> None:
                 data = {
                     { type = 'tickbox', name = 'UI_Enable_Feature', tooltip = 'Controls feature at 75%', element = { y = 123 } },
                     { type = 'description', text = 'Detailed searchable words (100%)' },
+                    { type = 'tickbox', name = 'Later setting', element = { y = 456 } },
+                    { type = 'title', name = 'Section after setting' },
                 },
             },
         } } }
@@ -85,9 +87,10 @@ def runtime_contract(source: str) -> None:
     assert lua.eval("MainOptions.__cwModOptionsSearchInstalled") is True
     assert lua.eval("PZAPI.ModOptions.Data[1].modOptionsID") == "CWModOptionsSearch"
     assert lua.eval("PZAPI.ModOptions.Data[1]:getOption('OPEN_SEARCH') ~= nil") is True
-    assert lua.eval("#CWModOptionsSearch.buildIndex()") == 3
+    assert lua.eval("#CWModOptionsSearch.buildIndex()") == 5
     assert lua.eval("CWModOptionsSearch.buildIndex()[2].targetY") == 123
-    assert lua.eval("CWModOptionsSearch.buildIndex()[3].targetY") == 123
+    assert lua.eval("CWModOptionsSearch.buildIndex()[3].targetY") == 456
+    assert lua.eval("CWModOptionsSearch.buildIndex()[5].targetY") == 456
     assert lua.eval("string.find(CWModOptionsSearch.buildIndex()[3].searchText, 'searchable', 1, true) ~= nil") is True
     assert lua.eval("string.find(CWModOptionsSearch.buildIndex()[2].searchText, 'enable feature', 1, true) ~= nil") is True
     assert lua.eval("string.find(CWModOptionsSearch.buildIndex()[2].searchText, '75%', 1, true) ~= nil") is True

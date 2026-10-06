@@ -24,6 +24,46 @@ function Get-Sha256([string]$Path) {
     return (Get-FileHash -Algorithm SHA256 -LiteralPath $Path).Hash
 }
 
+function Get-JarVersion([string]$Path) {
+    Add-Type -AssemblyName System.IO.Compression.FileSystem
+    $jar = [IO.Compression.ZipFile]::OpenRead($Path)
+    try {
+        $manifest = $jar.GetEntry('META-INF/MANIFEST.MF')
+        if (-not $manifest) { return $null }
+        $reader = [IO.StreamReader]::new($manifest.Open())
+        try {
+            while (($line = $reader.ReadLine()) -ne $null -and $line -ne '') {
+                if ($line -match '^Implementation-Version:\s*(\S+)') { return $Matches[1] }
+            }
+        } finally {
+            $reader.Dispose()
+        }
+    } finally {
+        $jar.Dispose()
+    }
+    return $null
+}
+
+function Get-WorkshopJar([string]$GameRoot) {
+    $libraries = [Collections.Generic.List[string]]::new()
+    $gameMarker = '\steamapps\common\'
+    $index = $GameRoot.IndexOf($gameMarker, [StringComparison]::OrdinalIgnoreCase)
+    if ($index -ge 0) { $libraries.Add($GameRoot.Substring(0, $index)) }
+    foreach ($library in Get-SteamLibraries) { $libraries.Add($library) }
+
+    foreach ($library in @($libraries | Select-Object -Unique)) {
+        $path = Join-Path $library 'steamapps\workshop\content\108600\3619862853\mods\ZombieBuddy\libs\ZombieBuddy.jar'
+        if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { continue }
+        $versionText = Get-JarVersion $path
+        $version = $null
+        if (-not [version]::TryParse($versionText, [ref]$version)) {
+            throw "Could not read the official Workshop ZombieBuddy JAR version: $path"
+        }
+        return [pscustomobject]@{ Path = $path; Version = $version; Hash = Get-Sha256 $path }
+    }
+    return $null
+}
+
 function Assert-BundledFile([string]$Path, [string]$ExpectedHash, [string]$Label) {
     $actualHash = Get-Sha256 $Path
     if (-not $actualHash) {
@@ -193,13 +233,13 @@ function Invoke-OfficialInstaller {
     }
 }
 
-function Install-Patch([string]$GameRoot) {
-    Assert-BundledFile $patchPath $expectedPatchHash 'Bundled ZombieBuddy 42.21 compatibility JAR'
+function Install-Patch([string]$GameRoot, [string]$SourcePath, [string]$SourceHash, [string]$Description) {
+    Assert-BundledFile $SourcePath $SourceHash $Description
     Assert-GameStopped $GameRoot
     $state = Get-AgentState $GameRoot
 
-    if ($state.IsPatched) {
-        Write-Output 'The expected 42.21 compatibility JAR is already installed.'
+    if ($state.LiveJarHash -eq $SourceHash) {
+        Write-Output "$Description is already installed."
         return
     }
     if (-not $state.LiveJarExists -or -not $state.NativeDllExists) {
@@ -209,7 +249,7 @@ function Install-Patch([string]$GameRoot) {
         throw 'A pending ZombieBuddy.jar.new update would replace the compatibility JAR at startup. Resolve it before installing.'
     }
 
-    if (-not $PSCmdlet.ShouldProcess($state.LiveJar, 'Back up and install the pinned ZombieBuddy 42.21 compatibility JAR')) {
+    if (-not $PSCmdlet.ShouldProcess($state.LiveJar, "Back up and install $Description")) {
         return
     }
 
@@ -229,14 +269,14 @@ function Install-Patch([string]$GameRoot) {
         livePath = $state.LiveJar
         backupPath = $backupJar
         originalHash = $state.LiveJarHash
-        installedHash = $expectedPatchHash
+        installedHash = $SourceHash
     } | ConvertTo-Json | Set-Content -LiteralPath $manifestPath -Encoding UTF8
 
     $stagedJar = Join-Path $GameRoot ('.ZombieBuddy.jar.cw-stage-' + [guid]::NewGuid().ToString('N'))
     try {
-        Copy-Item -LiteralPath $patchPath -Destination $stagedJar
-        if ((Get-Sha256 $stagedJar) -ne $expectedPatchHash) {
-            throw 'Staged compatibility JAR failed hash verification.'
+        Copy-Item -LiteralPath $SourcePath -Destination $stagedJar
+        if ((Get-Sha256 $stagedJar) -ne $SourceHash) {
+            throw 'Staged ZombieBuddy JAR failed hash verification.'
         }
         Move-Item -LiteralPath $stagedJar -Destination $state.LiveJar -Force
     } finally {
@@ -245,10 +285,10 @@ function Install-Patch([string]$GameRoot) {
         }
     }
 
-    if ((Get-Sha256 $state.LiveJar) -ne $expectedPatchHash) {
+    if ((Get-Sha256 $state.LiveJar) -ne $SourceHash) {
         throw "Installed JAR failed final verification. Restore from: $backupJar"
     }
-    Write-Output "Installed ZombieBuddy 42.21 compatibility JAR: $($state.LiveJar)"
+    Write-Output "Installed ${Description}: $($state.LiveJar)"
     Write-Output "Backup: $backupJar"
 }
 
@@ -420,12 +460,40 @@ switch ($Action) {
         if ((-not $state.LiveJarExists -or -not $state.NativeDllExists) -and $LaunchOfficialInstaller) {
             Invoke-OfficialInstaller
             $gameRoot = Resolve-GameRoot $ProjectZomboidPath
+            $state = Get-AgentState $gameRoot
         }
         if (Test-Path -LiteralPath (Join-Path $gameRoot 'ZombieBuddy.jar.new') -PathType Leaf) {
             throw 'A pending ZombieBuddy.jar.new update would replace the compatibility JAR at startup. Resolve it before installing.'
         }
+        $sourcePath = $patchPath
+        $sourceHash = $expectedPatchHash
+        $sourceVersion = [version]'2.3.3'
+        $description = 'bundled ZombieBuddy 42.21 compatibility JAR'
+        $workshopJar = Get-WorkshopJar $gameRoot
+        if ($workshopJar -and $workshopJar.Version -gt $sourceVersion) {
+            $sourcePath = $workshopJar.Path
+            $sourceHash = $workshopJar.Hash
+            $sourceVersion = $workshopJar.Version
+            $description = "official Workshop ZombieBuddy $sourceVersion JAR"
+        }
+        $liveVersion = $null
+        if ($state.LiveJarExists -and -not $state.IsPatched) {
+            $liveVersionText = Get-JarVersion $state.LiveJar
+            if ($liveVersionText -and -not [version]::TryParse($liveVersionText, [ref]$liveVersion)) {
+                throw "Could not read the installed ZombieBuddy JAR version: $($state.LiveJar)"
+            }
+        }
+        $installJar = -not $state.IsPatched -or $sourceVersion -gt [version]'2.3.3'
+        if ($liveVersion -and ($liveVersion -gt $sourceVersion -or
+            ($sourceVersion -gt [version]'2.3.3' -and $liveVersion -eq $sourceVersion))) {
+            $installJar = $false
+        }
         Install-NativePatch $gameRoot
-        Install-Patch $gameRoot
+        if ($installJar) {
+            Install-Patch $gameRoot $sourcePath $sourceHash $description
+        } else {
+            Write-Output 'Keeping the installed ZombieBuddy JAR; it is current or newer.'
+        }
         Show-State (Get-AgentState $gameRoot)
     }
     'Restore' {

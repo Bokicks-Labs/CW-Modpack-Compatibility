@@ -3,6 +3,15 @@
 CW Modpack Compatibility is not affiliated with or endorsed by ZombieBuddy,
 Project Viewpoint, their authors, The Indie Stone, Valve, or Steam.
 
+The `Run-ZombieBuddy-Viewpoint-Setup.cmd` launcher downloads the latest
+ZombieBuddy Friends release from
+https://github.com/Bokicks-Labs/ZombieBuddy-Friends/releases/latest and checks
+its ZIP against the published SHA-256 before running its installer. That
+installer fetches the newest stable official ZombieBuddy 2.x JAR and matching
+Build 42 source. The older `Setup-ZombieBuddyForViewpoint.ps1` remains for
+status, restore, and existing installations; its official EXE download still
+requires the original Workshop item for a fresh installation.
+
 ## ZombieBuddy
 
 - Author: Andrey "Zed" Zaikin (`zed-0xff`)

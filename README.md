@@ -27,11 +27,11 @@ Run PowerShell from the repository root:
 This creates:
 
 ```text
-%UserProfile%\Zomboid\mods\CWModpackCompatibility
-    -> <repository>\Contents\mods\CWModpackCompatibility
+%UserProfile%\Zomboid\mods\CWModpackCompatibility_dev
+    -> <repository>\LocalTest\CWModpackCompatibility_dev_<timestamp>
 ```
 
-This is the same toggle-style junction workflow used by PZ Pulse Expanded. It refuses to replace a real folder. Run the same command again to remove only the junction after testing.
+The copied payload has ID `CWModpackCompatibility_dev` and a `(Dev)` name; release source and Workshop staging keep `CWModpackCompatibility`. Each activation builds a fresh copy, so rerun the command to remove the junction before testing new edits. Old copies under `LocalTest` may be removed after testing. The script refuses to replace a real folder. If the older `CWModpackCompatibility` junction is installed, remove that junction before activating this one. Enable only the dev ID in the test mod list.
 
 To test only the optional audio submod without changing the core compatibility junction, run:
 

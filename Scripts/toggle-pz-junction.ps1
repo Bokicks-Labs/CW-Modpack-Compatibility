@@ -1,27 +1,43 @@
-$JunctionPath = "C:\Users\Rim28\Zomboid\mods\CWModpackCompatibility"
-$RepoPath     = "C:\Users\Rim28\Projects\CW-Modpack-Compatibility\Contents\mods\CWModpackCompatibility"
+[CmdletBinding()]
+param()
 
-if (Test-Path -LiteralPath $JunctionPath) {
-    $item = Get-Item -LiteralPath $JunctionPath -Force
+$ErrorActionPreference = 'Stop'
+$repoRoot = Split-Path -Parent $PSScriptRoot
+$source = Join-Path $repoRoot 'Contents\mods\CWModpackCompatibility'
+$junction = Join-Path $env:USERPROFILE 'Zomboid\mods\CWModpackCompatibility_dev'
+$devRoot = Join-Path $repoRoot ('LocalTest\CWModpackCompatibility_dev_' + (Get-Date -Format 'yyyyMMdd-HHmmss-fffffff'))
+$devId = 'CWModpackCompatibility_dev'
 
-    if ($item.LinkType -ne "Junction") {
-        Write-Error "'$JunctionPath' exists but is not a junction. Refusing to delete it."
-        exit 1
+if (Test-Path -LiteralPath $junction) {
+    $item = Get-Item -LiteralPath $junction -Force
+    $allowedRoot = (Join-Path $repoRoot 'LocalTest\CWModpackCompatibility_dev_')
+    if ($item.LinkType -ne 'Junction' -or -not $item.Target.StartsWith($allowedRoot, [StringComparison]::OrdinalIgnoreCase)) {
+        throw "Refusing to remove an unmanaged path: $junction"
     }
-
-    Remove-Item -LiteralPath $JunctionPath
-    Write-Host "DEV OFF: CW Modpack Compatibility junction removed."
+    Remove-Item -LiteralPath $junction
+    Write-Output "DEV OFF: $junction"
+    return
 }
-else {
-    if (-not (Test-Path -LiteralPath (Join-Path $RepoPath '42\mod.info') -PathType Leaf)) {
-        Write-Error "Repository mod not found: '$RepoPath'"
-        exit 1
+
+$legacy = Join-Path $env:USERPROFILE 'Zomboid\mods\CWModpackCompatibility'
+if (Test-Path -LiteralPath $legacy) {
+    $item = Get-Item -LiteralPath $legacy -Force
+    if ($item.LinkType -eq 'Junction' -and $item.Target -eq $source) {
+        throw "Remove the old release-ID junction first: $legacy"
     }
-
-    New-Item `
-        -ItemType Junction `
-        -Path $JunctionPath `
-        -Target $RepoPath | Out-Null
-
-    Write-Host "DEV ON: CW Modpack Compatibility junction created."
 }
+if (-not (Test-Path -LiteralPath (Join-Path $source '42\mod.info') -PathType Leaf)) {
+    throw "Source mod is missing: $source"
+}
+
+Copy-Item -LiteralPath $source -Destination $devRoot -Recurse
+$info = Join-Path $devRoot '42\mod.info'
+$content = [IO.File]::ReadAllText($info)
+if (([regex]::Matches($content, '(?m)^id=CWModpackCompatibility\r?$')).Count -ne 1) {
+    throw "Expected one release mod ID in $info"
+}
+$content = [regex]::Replace($content, '(?m)^id=CWModpackCompatibility\r?$', "id=$devId")
+$content = [regex]::Replace($content, '(?m)^name=(.+)\r?$', 'name=$1 (Dev)')
+[IO.File]::WriteAllText($info, $content, [Text.UTF8Encoding]::new($false))
+New-Item -ItemType Junction -Path $junction -Target $devRoot | Out-Null
+Write-Output "DEV ON: $junction -> $devRoot (ID $devId)"

@@ -4,21 +4,20 @@ This optional Windows helper installs the prerequisites needed for Project
 Viewpoint on Project Zomboid 42.21. It is never executed by Project Zomboid or
 by enabling CW Modpack Compatibility. A user must run it explicitly.
 
-The helper installs two pinned files: Antikristianos' unchanged 42.21
-compatibility JAR bundled here, and the Windows native-loader fix downloaded
-from the public release linked below. Enabling the Workshop mod alone never
-installs anything.
+The CMD launcher downloads the latest verified
+[ZombieBuddy Friends](https://github.com/Bokicks-Labs/ZombieBuddy-Friends/releases/latest)
+package. That package installs the newest stable official ZombieBuddy 2.x JAR,
+the matching Build 42 Lua/media files, and the pinned Windows native-loader
+fix. It does not need the removed original ZombieBuddy Workshop item.
+Enabling this CW mod alone never installs anything.
 
 ## Quick setup
 
-1. Subscribe to and download the original ZombieBuddy and Project Viewpoint.
+1. Subscribe to and download CW Modpack Compatibility and Project Viewpoint.
 2. Close Project Zomboid and local Coop/server processes.
 3. Run `Run-ZombieBuddy-Viewpoint-Setup.cmd` from this folder.
-4. If the base agent is missing, the helper downloads Zed's pinned official
-   ZombieBuddy installer from GitHub. Review its preview and select the launch
-   modes you use. The CW helper continues only after it exits. It then
-   downloads and verifies the native fix, backs up the existing DLL and JAR,
-   and installs both fixes.
+4. The helper checks the package SHA-256 and runs its installer. It backs up
+   replaced files and enables normal and alternate Windows launch modes.
 5. Start Project Zomboid and approve the specific Viewpoint JAR when
    ZombieBuddy prompts. Do not approve unexpected Java mods.
 
@@ -28,37 +27,30 @@ only. It does not change the machine or user execution policy.
 ## Direct PowerShell use
 
 ```powershell
-# Inspect without changing anything
-.\Setup-ZombieBuddyForViewpoint.ps1 -Action Status
-
-# Install both fixes; launch the official installer if the base agent is missing
-.\Setup-ZombieBuddyForViewpoint.ps1 -Action Install -LaunchOfficialInstaller
-
-# Preview filesystem changes
-.\Setup-ZombieBuddyForViewpoint.ps1 -Action Install -WhatIf
+# Install or update from the latest ZombieBuddy Friends release
+.\Install-ZombieBuddy-Friends.ps1
 
 # Set an explicit game path if Steam library discovery fails
-.\Setup-ZombieBuddyForViewpoint.ps1 -Action Install `
-    -ProjectZomboidPath 'D:\SteamLibrary\steamapps\common\ProjectZomboid'
+.\Install-ZombieBuddy-Friends.ps1 -ProjectZomboidPath 'D:\SteamLibrary\steamapps\common\ProjectZomboid'
 
-# Restore the newest DLL and JAR backups for this installation
+# Inspect the older CW helper without changing anything
+.\Setup-ZombieBuddyForViewpoint.ps1 -Action Status
+
+# Restore the newest DLL and JAR backups made by the older CW helper
 .\Setup-ZombieBuddyForViewpoint.ps1 -Action Restore
 ```
 
-Backups are stored under
-`%USERPROFILE%\Zomboid\backups\CW-ZombieBuddy`. The helper does not edit saves,
-Workshop subscriptions, ZombieBuddy approvals, Steam launch options, security
-policy, or unrelated mods. The official installer remains responsible for the
-base native agent and launcher setup. Viewpoint's Java JAR is client-side;
-the dedicated server does not need this native change solely for Viewpoint.
+The Friends installer stores local mod backups under
+`%USERPROFILE%\Zomboid\backups\ZombieBuddy-Friends` and agent/launcher backups
+under `%USERPROFILE%\Zomboid\backups\CW-ZombieBuddy`. It does not edit saves,
+Workshop subscriptions, or ZombieBuddy approvals. Viewpoint's Java JAR is
+client-side; the dedicated server does not need this native change solely for
+Viewpoint.
 
-The official installer and patched native DLL cannot be carried as executable
-Workshop payloads. The helper downloads the official installer only when
-explicitly requested and the native DLL only during an explicit Install. Both
-downloads have pinned SHA-256 checks; temporary copies are removed after use.
-The installer and native DLL are not Authenticode-signed. Review their
-provenance before use; Java mods loaded by ZombieBuddy have unrestricted
-process access.
+The native DLL cannot be carried as a Workshop payload. The Friends package
+downloads and verifies it when needed. The older official Windows installer
+requires the removed ZombieBuddy Workshop item, so this launcher does not use
+it. Java mods loaded by ZombieBuddy have unrestricted process access.
 
 ## Bundled versions and hashes
 

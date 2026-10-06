@@ -24,11 +24,11 @@ For multiplayer, clients and the server should use the same mod list, order, and
 
 [h2]Optional Windows setup for Project Viewpoint[/h2]
 
-CW includes a [b]ZombieBuddy-Setup[/b] folder with a Build 42.21 JAR and PowerShell installer. Run it manually from the Workshop folder; enabling CW does not run it. If needed, it can download Zed's official installer v4.2 on request.
+CW includes a [b]ZombieBuddy-Setup[/b] folder with a manual Windows launcher. Run it from the CW Workshop folder with PZ closed; enabling CW does not run it. The launcher downloads the latest SHA-256-verified [url=https://github.com/Bokicks-Labs/ZombieBuddy-Friends/releases/latest]ZombieBuddy Friends[/url] release.
 
-The JAR includes a candidate Java 25 network fix. Install it on each ZombieBuddy client and Windows server. MP join validation is pending.
+The Friends installer fetches the latest stable official ZombieBuddy 2.x JAR and matching Build 42 Lua/media from GitHub, installs the local mod without the removed ZombieBuddy Workshop item, and applies the pinned Windows native-loader fix for affected clients.
 
-The helper verifies SHA-256, refuses while PZ runs, backs up the JAR, and supports restore. It does not change saves, approvals, or launch options. Workshop forbids EXE uploads, so its verified installer download is temporary. The installer is unsigned; Java mods have unrestricted process access.
+The helper verifies the release ZIP, refuses while PZ runs, and backs up files it replaces. It does not change saves or approvals. The Friends installer configures normal and alternate Windows launchers. Native code and Java mods have unrestricted process access.
 
 Project Viewpoint, ZombieBuddy, and the temporary fix remain third-party projects and are not authored or endorsed by Chaosworld. See the included third-party notices and licenses.
 
@@ -87,7 +87,7 @@ All original mods and assets remain the work of their respective authors. This c
 [*]EXACT MINUTE CLOCK (B42) by PorrisV99.
 [*]Quartermaster - Auto-Sort & Store Loot by deckard.
 [*]Beyond Ten - Level 15 Skills by Patryk, published on Workshop by Silver (Brek).
-[*]ZombieBuddy by Andrey "Zed" Zaikin. The helper downloads his official Windows installer v4.2 on request and verifies its SHA-256.
+[*]ZombieBuddy by Andrey "Zed" Zaikin. The Friends installer downloads his latest stable 2.x JAR and tagged Build 42 source from GitHub.
 [*]Temporary Build 42.21 ZombieBuddy compatibility fix by Antikristianos, based on ZombieBuddy 2.3.3 by Zed and redistributed with its MIT license and provenance.
 [/list]
 

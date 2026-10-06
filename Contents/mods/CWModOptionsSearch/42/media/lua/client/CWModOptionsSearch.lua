@@ -36,14 +36,33 @@ function Search.buildIndex()
     local results = {}
     for _, options in ipairs(PZAPI.ModOptions.Data or {}) do
         local modName = optionText(options.name)
-        local fallbackY = nil
-        for _, option in ipairs(options.data or {}) do
-            fallbackY = fallbackY or elementY(option.element)
+        local data = options.data or {}
+        local positions = {}
+        for index, option in ipairs(data) do
+            positions[index] = elementY(option.element)
         end
-        for _, option in ipairs(options.data or {}) do
+        for index, option in ipairs(data) do
             local optionName = optionText(option.name)
             local description = optionText(option.text or option.tooltip)
-            local targetY = elementY(option.element) or fallbackY
+            local targetY = positions[index]
+            if not targetY then
+                -- Titles, separators and descriptions have no option.element.
+                -- Prefer the next control in their section, then the previous one.
+                for nextIndex = index + 1, #data do
+                    if positions[nextIndex] then
+                        targetY = positions[nextIndex]
+                        break
+                    end
+                end
+                if not targetY then
+                    for previousIndex = index - 1, 1, -1 do
+                        if positions[previousIndex] then
+                            targetY = positions[previousIndex]
+                            break
+                        end
+                    end
+                end
+            end
             if optionName ~= "" or description ~= "" then
                 table.insert(results, {
                     modName = modName,
@@ -54,12 +73,12 @@ function Search.buildIndex()
                 })
             end
         end
-        if #(options.data or {}) == 0 then
+        if #data == 0 then
             table.insert(results, {
                 modName = modName,
                 optionName = "",
                 description = "",
-                targetY = fallbackY,
+                targetY = nil,
                 searchText = normalized(modName),
             })
         end
@@ -141,12 +160,18 @@ function SearchWindow:refreshResults()
 end
 
 function SearchWindow:openResult(result)
-    if result then Search.goTo(result) end
+    if result then self:openTarget(result) end
 end
 
 function SearchWindow:openSelected()
     local selected = self.results.items[self.results.selected]
-    if selected then Search.goTo(selected.item) end
+    if selected then self:openTarget(selected.item) end
+end
+
+function SearchWindow:openTarget(result)
+    if not Search.goTo(result) then
+        self.status:setName("Setting position unavailable")
+    end
 end
 
 function SearchWindow:close()
@@ -186,11 +211,12 @@ end
 
 function Search.goTo(result)
     local panel = Search.modPanel
-    if not panel or not result or not result.targetY then return end
+    if not panel or not result or not result.targetY then return false end
     local maximum = math.max(0, panel:getScrollHeight() - panel:getHeight())
     local wanted = math.max(0, math.min(maximum, result.targetY - 45))
     panel:setYScroll(-wanted)
     if Search.window then Search.window:close() end
+    return true
 end
 
 local function install()

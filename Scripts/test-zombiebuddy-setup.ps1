@@ -5,24 +5,66 @@ $ErrorActionPreference = 'Stop'
 
 $setupScript = (Resolve-Path (Join-Path $PSScriptRoot '..\Contents\mods\CWModpackCompatibility\ZombieBuddy-Setup\Setup-ZombieBuddyForViewpoint.ps1')).Path
 $setupRoot = Split-Path -Parent $setupScript
+$friendBootstrap = Join-Path $setupRoot 'Install-ZombieBuddy-Friends.ps1'
+$cmdLauncher = Join-Path $setupRoot 'Run-ZombieBuddy-Viewpoint-Setup.cmd'
+if (-not (Test-Path -LiteralPath $friendBootstrap -PathType Leaf)) {
+    throw 'The Workshop payload is missing the ZombieBuddy Friends bootstrap.'
+}
+$bootstrapSource = Get-Content -Raw -LiteralPath $friendBootstrap
+$launcherSource = Get-Content -Raw -LiteralPath $cmdLauncher
+if ($launcherSource -notmatch 'Install-ZombieBuddy-Friends\.ps1' -or
+    $bootstrapSource -notmatch 'Bokicks-Labs/ZombieBuddy-Friends/releases/latest' -or
+    $bootstrapSource -notmatch 'SHA256SUMS\.txt' -or
+    $bootstrapSource -notmatch 'Install-ZombieBuddy\.ps1') {
+    throw 'The friend-facing launcher does not use the verified ZombieBuddy Friends release.'
+}
+$parseTokens = $null
+$parseErrors = $null
+[System.Management.Automation.Language.Parser]::ParseFile($friendBootstrap, [ref]$parseTokens, [ref]$parseErrors) | Out-Null
+if ($parseErrors.Count) { throw "ZombieBuddy Friends bootstrap has a PowerShell parse error: $($parseErrors[0].Message)" }
 $expectedInstallerUrl = 'https://github.com/zed-0xff/ZombieBuddy/releases/download/windows_installer_4.2/ZombieBuddyInstaller_v4.2.exe'
 $expectedInstallerHash = '2A52466AFE804FECE5E88868EEF75A70E8964D3E4E01A3629B57CF6FF19E24B3'
 $expectedPatchHash = '909D1FF579BE34AC2C3EE860A1A499B889A677D0DA74EB4A1D3632AE4E2ED102'
 $expectedNativeUrl = 'https://github.com/Bokicks-Labs/ZombieBuddy-Windows-Native-Fix/releases/download/v2.3.3-pz42.21-native1/zbNative.dll'
 $expectedNativeHash = '49E5D596B54E5E4EAB535E613CDC7C3F0DE9BB7EF07239C255E2B127657104CE'
 $testRoot = Join-Path ([IO.Path]::GetTempPath()) ('cw-zb-test-' + [guid]::NewGuid().ToString('N'))
-$gameRoot = Join-Path $testRoot 'ProjectZomboid'
+$gameRoot = Join-Path $testRoot 'steamapps\common\ProjectZomboid'
+$workshopJar = Join-Path $testRoot 'steamapps\workshop\content\108600\3619862853\mods\ZombieBuddy\libs\ZombieBuddy.jar'
 $testProfile = Join-Path $testRoot 'profile'
+
+Add-Type -AssemblyName System.IO.Compression
+Add-Type -AssemblyName System.IO.Compression.FileSystem
+function New-FixtureJar([string]$Path, [string]$Version) {
+    if (Test-Path -LiteralPath $Path) { Remove-Item -LiteralPath $Path -Force }
+    $jar = [IO.Compression.ZipFile]::Open($Path, [IO.Compression.ZipArchiveMode]::Create)
+    try {
+        $entry = $jar.CreateEntry('META-INF/MANIFEST.MF')
+        $writer = [IO.StreamWriter]::new($entry.Open())
+        try { $writer.Write("Manifest-Version: 1.0`r`nImplementation-Version: $Version`r`n`r`n") }
+        finally { $writer.Dispose() }
+    } finally { $jar.Dispose() }
+}
 
 New-Item -ItemType Directory -Path $gameRoot, $testProfile -Force | Out-Null
 [IO.File]::WriteAllBytes((Join-Path $gameRoot 'ProjectZomboid64.exe'), [byte[]](1, 2, 3))
 [IO.File]::WriteAllBytes((Join-Path $gameRoot 'projectzomboid.jar'), [byte[]](4, 5, 6))
 [IO.File]::WriteAllBytes((Join-Path $gameRoot 'zbNative.dll'), [byte[]](7, 8, 9))
 [IO.File]::WriteAllText((Join-Path $gameRoot 'ProjectZomboid64.json'), '{"vmArgs":["-agentlib:zbNative"]}')
-[IO.File]::WriteAllText((Join-Path $gameRoot 'ZombieBuddy.jar'), 'fixture-original-zombiebuddy')
+New-FixtureJar (Join-Path $gameRoot 'ZombieBuddy.jar') '2.3.3'
+New-Item -ItemType Directory -Path (Split-Path -Parent $workshopJar) -Force | Out-Null
+New-FixtureJar $workshopJar '2.3.3'
 $originalHash = (Get-FileHash -Algorithm SHA256 -LiteralPath (Join-Path $gameRoot 'ZombieBuddy.jar')).Hash
 $originalNativeHash = (Get-FileHash -Algorithm SHA256 -LiteralPath (Join-Path $gameRoot 'zbNative.dll')).Hash
 $previousUserProfile = $env:USERPROFILE
+$localNative = $env:CW_ZB_TEST_NATIVE_DLL
+if ($localNative -and (Test-Path -LiteralPath $localNative -PathType Leaf) -and
+    (Get-FileHash -Algorithm SHA256 -LiteralPath $localNative).Hash -eq $expectedNativeHash) {
+    function Invoke-WebRequest {
+        param([string]$Uri, [string]$OutFile, [switch]$UseBasicParsing)
+        if ($Uri -ne $expectedNativeUrl) { throw "Unexpected test download: $Uri" }
+        Copy-Item -LiteralPath $localNative -Destination $OutFile
+    }
+}
 
 try {
     $blockedPayload = @(Get-ChildItem -LiteralPath $setupRoot -File | Where-Object { $_.Extension -in @('.exe', '.dll', '.bat', '.app', '.dylib', '.sh', '.so', '.zip') })
@@ -100,6 +142,24 @@ try {
     }
     if ((Get-FileHash -Algorithm SHA256 -LiteralPath (Join-Path $gameRoot 'zbNative.dll')).Hash -ne $restoredNativeHash) {
         throw 'The WhatIf installation changed the live native DLL.'
+    }
+
+    New-FixtureJar $workshopJar '2.3.4'
+    $workshopHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $workshopJar).Hash
+    & $setupScript -Action Install -ProjectZomboidPath $gameRoot | Out-Host
+    if ((Get-FileHash -Algorithm SHA256 -LiteralPath (Join-Path $gameRoot 'ZombieBuddy.jar')).Hash -ne $workshopHash) {
+        throw 'The newer official Workshop JAR was not installed.'
+    }
+    & $setupScript -Action Install -ProjectZomboidPath $gameRoot | Out-Host
+    if ((Get-FileHash -Algorithm SHA256 -LiteralPath (Join-Path $gameRoot 'ZombieBuddy.jar')).Hash -ne $workshopHash) {
+        throw 'Reinstall changed the current official Workshop JAR.'
+    }
+
+    New-FixtureJar (Join-Path $gameRoot 'ZombieBuddy.jar') '2.3.5'
+    $newerHash = (Get-FileHash -Algorithm SHA256 -LiteralPath (Join-Path $gameRoot 'ZombieBuddy.jar')).Hash
+    & $setupScript -Action Install -ProjectZomboidPath $gameRoot | Out-Host
+    if ((Get-FileHash -Algorithm SHA256 -LiteralPath (Join-Path $gameRoot 'ZombieBuddy.jar')).Hash -ne $newerHash) {
+        throw 'Install downgraded a JAR newer than the Workshop copy.'
     }
 
     Write-Output 'ZombieBuddy setup fixture tests passed.'
