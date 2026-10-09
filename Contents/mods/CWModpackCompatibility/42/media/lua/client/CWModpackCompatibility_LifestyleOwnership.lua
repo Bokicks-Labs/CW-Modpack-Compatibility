@@ -34,6 +34,50 @@ local function bydtOwnsDentalHygiene()
         and optionEnabled("BrushYourDamnTeethOwnsDentalHygiene")
 end
 
+function Ownership.isLifestyleHygieneDisabled()
+    local options = SandboxVars and SandboxVars.CWModpackCompatibility or nil
+    return isActive("LifestyleHobbies")
+        and (options == nil or options.DisableLifestyleHygieneNeed ~= false)
+end
+
+local function neutralizeLifestyleHygiene(player, data)
+    data = data or (player and player.getModData and player:getModData())
+    if not data then return end
+    -- Lifestyle's cleaning actions share DividerHygiene with this need. Keep
+    -- that feature group enabled and neutralize only the personal need.
+    data.hygieneNeed = 50
+    if data.LSMoodles then
+        for _, name in ipairs({"HygieneGood", "HygieneBad"}) do
+            local moodle = data.LSMoodles[name]
+            if moodle then
+                moodle.Value = 0
+                moodle.Level = 0
+            end
+        end
+    end
+end
+
+local function installHygieneOverride()
+    if not Ownership.isLifestyleHygieneDisabled() then return false end
+    require("Hygiene/HygieneNeed")
+    if not Ownership.hygieneInstalled and type(AdjustHygieneNeed) == "function" then
+        local original = AdjustHygieneNeed
+        AdjustHygieneNeed = function(player, data)
+            if Ownership.isLifestyleHygieneDisabled() then
+                neutralizeLifestyleHygiene(player, data)
+                return
+            end
+            return original(player, data)
+        end
+        Ownership.hygieneInstalled = true
+    end
+    local count = getNumActivePlayers and getNumActivePlayers() or 1
+    for playerIndex = 0, count - 1 do
+        neutralizeLifestyleHygiene(getSpecificPlayer and getSpecificPlayer(playerIndex))
+    end
+    return true
+end
+
 local function restoreLifestyleBathroomNeedsIfUnowned()
     if not isActive("LifestyleHobbies") or naturesCallOwnsBathroomNeeds()
         or not optionEnabled("RestoreLifestyleBathroomNeedsWhenUnowned") then
@@ -108,6 +152,9 @@ local function clearLocalLifestyleBladders()
 end
 
 local function onCreatePlayer(_, player)
+    if Ownership.isLifestyleHygieneDisabled() then
+        neutralizeLifestyleHygiene(player)
+    end
     if not naturesCallOwnsBathroomNeeds() then return end
     if SandboxVars and SandboxVars.LSHygiene then
         SandboxVars.LSHygiene.BladderNeedMultiplier = 0
@@ -201,6 +248,7 @@ end
 
 local function applyOwnershipDefaults()
     restoreLifestyleBathroomNeedsIfUnowned()
+    installHygieneOverride()
     installBathroomOwnership()
     installDentalOwnership()
     clearLocalLifestyleBladders()

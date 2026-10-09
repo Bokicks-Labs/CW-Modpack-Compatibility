@@ -18,6 +18,12 @@ option CWModpackCompatibility.BrushYourDamnTeethOwnsDentalHygiene = {
     translation = CWModpackCompatibility.BrushYourDamnTeethOwnsDentalHygiene,
 }
 
+option CWModpackCompatibility.DisableLifestyleHygieneNeed = {
+    type = boolean, default = true,
+    page = CWModpackCompatibility_Lifestyle,
+    translation = CWModpackCompatibility.DisableLifestyleHygieneNeed,
+}
+
 option CWModpackCompatibility.BanditPlayerHitReactions = {
     type = boolean, default = true,
     page = CWModpackCompatibility_Bandits,

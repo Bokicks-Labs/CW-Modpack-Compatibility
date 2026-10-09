@@ -6,6 +6,8 @@
   "Sandbox_CWModpackCompatibility.RestoreLifestyleBathroomNeedsWhenUnowned_tooltip": "Enabled by default. If Nature's Call ownership is inactive and an older preset left Lifestyle's bladder multiplier at zero, restores Lifestyle's default multiplier of 1. Disable this before intentionally turning off Lifestyle's bathroom need while Nature's Call is absent.",
   "Sandbox_CWModpackCompatibility.BrushYourDamnTeethOwnsDentalHygiene": "Brush Your Damn Teeth owns dental hygiene",
   "Sandbox_CWModpackCompatibility.BrushYourDamnTeethOwnsDentalHygiene_tooltip": "Enabled by default when both mods are active. Removes Lifestyle's brushing actions so Brush Your Damn Teeth exclusively controls brushing, item wear, dental hygiene, and dental consequences. Other Lifestyle mirror, cabinet, grooming, and hygiene actions remain available.",
+  "Sandbox_CWModpackCompatibility.DisableLifestyleHygieneNeed": "Disable Lifestyle personal hygiene need",
+  "Sandbox_CWModpackCompatibility.DisableLifestyleHygieneNeed_tooltip": "Enabled by default. Keeps Lifestyle's personal hygiene need neutral and hides its clean/dirty hygiene moodles. Lifestyle cleaning actions and skills remain enabled. PZ Pulse Expanded omits the Lifestyle hygiene bar when its compatible adapter is installed. Restart after changing this option.",
   "Sandbox_CWModpackCompatibility_Bandits": "Chaosworld Compatibility - Bandits",
   "Sandbox_CWModpackCompatibility.BanditPlayerHitReactions": "Player reactions to Bandit NPC hits",
   "Sandbox_CWModpackCompatibility.BanditPlayerHitReactions_tooltip": "Players visibly react when damaged by a Bandit NPC firearm, melee weapon, or bare-hand attack. Disable this if hit reactions interfere with another combat or animation mod. This does not change damage or wounds.",

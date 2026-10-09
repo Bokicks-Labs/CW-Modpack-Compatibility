@@ -1,8 +1,9 @@
 # Lifestyle feature ownership
 
-CW automatically resolves two overlapping Lifestyle systems when their more
-specialized owner mods are active. Both rules default to enabled, require no
-manual setup, and stay dormant when either relevant mod is absent.
+CW automatically resolves overlapping Lifestyle systems when their more
+specialized owner mods are active. The Nature's Call and BYDT rules default to
+enabled and stay dormant when their relevant mod is absent. The optional
+Lifestyle personal hygiene rule is also enabled by default.
 
 ## Bathroom needs
 
@@ -33,6 +34,14 @@ suppresses Lifestyle's mirror and medicine-cabinet brushing actions while
 preserving all other Lifestyle mirror, cabinet, grooming, and hygiene actions.
 
 ## Overrides
+
+**Disable Lifestyle personal hygiene need** is on by default. When enabled,
+CW holds only Lifestyle's `hygieneNeed` at its neutral value of `50` and clears
+its `HygieneGood` and `HygieneBad` moodles. Lifestyle's cleaning actions and
+Cleaning skill remain enabled. Nature's Call, TASAB body grime, and BYDT dental
+state are untouched. PZ Pulse Expanded omits the Lifestyle hygiene bar when
+this option is enabled; its other bars remain. Turning the option off and
+restarting resumes Lifestyle hygiene progression.
 
 Server owners can opt out under **Sandbox Options > Chaosworld Compatibility -
 Lifestyle Ownership**. Existing saves that do not yet contain the new settings

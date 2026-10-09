@@ -38,8 +38,9 @@ players={}
 getNumActivePlayers=function() return #players end
 getSpecificPlayer=function(index) return players[index+1] end
 function makePlayer(need,value,level)
- local data={bathroomNeed=need,IsDoingToilet=true,
-  LSMoodles={BladderNeed={Value=value,Level=level}}}
+ local data={bathroomNeed=need,IsDoingToilet=true,hygieneNeed=85,
+  LSMoodles={BladderNeed={Value=value,Level=level},
+   HygieneGood={Value=0.4,Level=2},HygieneBad={Value=0.6,Level=3}}}
  return {getModData=function() return data end,data=data}
 end
 function makeContext()
@@ -192,7 +193,7 @@ assert(CabinetContextMenu.doBuildMenu==originalCabinet)
 assert(ToiletContextMenu.doBuildMenu==originalToilet)
 """
 )
-print("PASS: Lifestyle remains untouched when the specialized owner mods are absent")
+print("PASS: bathroom and dental ownership stay inactive without their owner mods")
 
 lua = runtime(
     """
@@ -225,6 +226,55 @@ assert(SandboxVars.LSHygiene.BladderNeedMultiplier==0)
 )
 print("PASS: automatic Lifestyle bathroom restoration can be opted out")
 
+lua = runtime(
+    """
+enabled.LifestyleHobbies=true
+players[1]=makePlayer(72,0.6,3)
+AdjustHygieneNeed=function(_,data) data.hygieneNeed=data.hygieneNeed+1 end
+originalHygiene=AdjustHygieneNeed
+"""
+)
+lua.execute(
+    """
+callbacks.start()
+assert(players[1].data.hygieneNeed==50)
+assert(players[1].data.LSMoodles.HygieneGood.Value==0)
+assert(players[1].data.LSMoodles.HygieneBad.Value==0)
+assert(SandboxVars.LSHygiene.BladderNeedMultiplier==2)
+assert(AdjustHygieneNeed~=originalHygiene)
+players[1].data.hygieneNeed=90
+AdjustHygieneNeed(players[1],players[1].data)
+assert(players[1].data.hygieneNeed==50)
+local wrapper=AdjustHygieneNeed
+callbacks.start()
+assert(AdjustHygieneNeed==wrapper)
+SandboxVars.CWModpackCompatibility.DisableLifestyleHygieneNeed=false
+AdjustHygieneNeed(players[1],players[1].data)
+assert(players[1].data.hygieneNeed==51)
+"""
+)
+print("PASS: default neutralizes only Lifestyle hygiene and remains reversible")
+
+lua = runtime(
+    """
+enabled.LifestyleHobbies=true
+SandboxVars.CWModpackCompatibility.DisableLifestyleHygieneNeed=false
+players[1]=makePlayer(72,0.6,3)
+AdjustHygieneNeed=function(_,data) data.hygieneNeed=data.hygieneNeed+1 end
+originalHygiene=AdjustHygieneNeed
+"""
+)
+lua.execute(
+    """
+callbacks.start()
+assert(AdjustHygieneNeed==originalHygiene)
+assert(players[1].data.hygieneNeed==85)
+AdjustHygieneNeed(players[1],players[1].data)
+assert(players[1].data.hygieneNeed==86)
+"""
+)
+print("PASS: Lifestyle hygiene is untouched with the new option off")
+
 # Confirm the installed upstream surfaces still match the narrow wrappers.
 lifestyle = args.workshop_root / "3403870858/mods/Lifestyle/common/media/lua/client/Hygiene"
 mirror_text = (lifestyle / "MirrorContextMenu.lua").read_text(encoding="utf-8-sig")
@@ -246,3 +296,5 @@ for option in (
     assert "default = true" in sandbox_text
 
 print("PASS: installed Lifestyle surfaces and enabled-by-default sandbox contracts are current")
+assert "option CWModpackCompatibility.DisableLifestyleHygieneNeed" in sandbox_text
+assert "type = boolean, default = true" in sandbox_text
