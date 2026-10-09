@@ -1,0 +1,8 @@
+name=Chaosworld Viewpoint Patch (Diagnostics)
+id=CWViewpointPatch
+author=chaosworld
+description=Optional client-side diagnostics for Project Viewpoint interaction failures. No interaction behavior changes yet.
+versionMin=42.21.0
+modversion=0.1.0
+require=Viewpoint
+category=fixes

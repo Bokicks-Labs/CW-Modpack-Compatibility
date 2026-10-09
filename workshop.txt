@@ -20,6 +20,7 @@ description=Bandits2, BanditsWeekOne, DynamicTradingCommon, DynamicTradingV2, ET
 description=
 description=CW Audio Mixer is optional and, when enabled, must appear after CWModpackCompatibility.
 description=CW Mod Options Search is optional and, when enabled, must also appear after CWModpackCompatibility.
+description=CW Viewpoint Patch is an optional diagnostic submod. Enable it after Viewpoint only while investigating missing interactions; it does not change menu behavior yet.
 description=
 description=For multiplayer, clients and the server should use the same mod list, order, and CW version. Fully restart the client and server after changing the order.
 description=

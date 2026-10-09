@@ -4,7 +4,7 @@ Private source repository for the Chaosworld Project Zomboid Build 42 compatibil
 
 The Workshop payloads are kept under `Contents/mods`. The core `CWModpackCompatibility` mod contains targeted compatibility fixes for the Chaosworld modpack, including the Lifestyle hidden-skill display bridge and automatic feature ownership for Nature's Call and Brush Your Damn Teeth.
 
-It also contains two optional client-only submods. `CWAudioMixer` provides discovered-sound group and per-sound volume controls; `CWModOptionsSearch` adds search-and-jump navigation to the Build 42 Mod Options page. See [CW Audio Mixer](docs/audio-mixer.md) and [CW Mod Options Search](docs/mod-options-search.md).
+It also contains optional client-only submods. `CWAudioMixer` provides discovered-sound group and per-sound volume controls; `CWModOptionsSearch` adds search-and-jump navigation to the Build 42 Mod Options page. `CWViewpointPatch` currently provides isolated interaction diagnostics for Viewpoint and requires Viewpoint only when enabled. See [CW Audio Mixer](docs/audio-mixer.md), [CW Mod Options Search](docs/mod-options-search.md), and [Viewpoint patch work](docs/viewpoint-patch.md).
 
 ## Workshop copy
 
@@ -61,6 +61,12 @@ To test only the optional Mod Options Search submod, run:
 
 ```powershell
 .\Scripts\toggle-pz-mod-options-search-junction.ps1
+```
+
+To test only the optional Viewpoint diagnostics without changing the CW core, run:
+
+```powershell
+.\Scripts\toggle-pz-viewpoint-patch-junction.ps1
 ```
 
 ## Workshop staging
