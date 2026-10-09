@@ -31,7 +31,7 @@ This creates:
     -> <repository>\LocalTest\CWModpackCompatibility_dev_<timestamp>
 ```
 
-The copied payload has ID `CWModpackCompatibility_dev` and a `(Dev)` name; release source and Workshop staging keep `CWModpackCompatibility`. Each activation builds a fresh copy, so rerun the command to remove the junction before testing new edits. Old copies under `LocalTest` may be removed after testing. The script refuses to replace a real folder. If the older `CWModpackCompatibility` junction is installed, remove that junction before activating this one. Enable only the dev ID in the test mod list.
+The copied payload has ID `CWModpackCompatibility_dev` and a `(Dev)` name; release source and Workshop staging keep `CWModpackCompatibility`. The command discovers submods under `Contents/mods` whose `42/mod.info` lists `CWModpackCompatibility` in `require=`. It creates a `_dev` copy of each and changes that dependency to `CWModpackCompatibility_dev`; newly added submods need no toggle-script edit. Enable the dev core and whichever dev submods you want in the test mod list; disable their release IDs for that test. Each activation builds fresh copies, so rerun the command to remove the junctions before testing new edits. Old copies under `LocalTest` may be removed after testing. The script refuses to replace real folders or unmanaged junctions. If the older `CWModpackCompatibility` junction is installed, remove that junction before activating this one.
 
 To test only the optional audio submod without changing the core compatibility junction, run:
 
