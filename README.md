@@ -16,6 +16,22 @@ It also contains two optional client-only submods. `CWAudioMixer` provides disco
 - [Version 1.1.13 changelog](docs/workshop-changelog-1.1.13.md)
 - [Lifestyle feature ownership](docs/lifestyle-feature-ownership.md)
 
+## Version bumps
+
+Choose the release impact yourself: `patch` for a compatible fix, `minor` for a
+compatible feature, or `major` for a breaking change. From this repo, run:
+
+```powershell
+.\Scripts\bump-version.ps1 -Bump patch -Summary 'Keep vanilla moodles hidden after UI repositioning.' -Notes @('Keep the vanilla Moodle UI off screen while Moodles in Lua is active.', 'Remove the temporary UI trace.') -WhatIf
+```
+
+Remove `-WhatIf` to write the next version. The script updates the core
+`mod.info`, Lua runtime version, Workshop description and metadata, README
+links, and new Markdown/Steam changelog files. It refuses mismatched version
+markers or existing release-note files. Review and edit the generated notes
+before publishing. CW Audio Mixer and CW Mod Options Search have independent
+versions; this command does not change them.
+
 ## Local testing
 
 For a separate Project RV bus-interior backup/import helper, see [Project RV Interior Manager](docs/rv-interior-manager.md). It stores templates and backups under the user Zomboid folder and does not alter Workshop content.
