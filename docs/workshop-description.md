@@ -59,7 +59,7 @@ Project Viewpoint, ZombieBuddy, and the temporary fix remain third-party project
 [*][b]CW Mod Options Search (optional submod):[/b] Enable it separately after CW Modpack Compatibility. It adds a client-only search launcher to the first section of the Build 42 Mod Options page and jumps to matching registered mod settings without changing their values.
 [/list]
 
-CW 1.1.14 adds the optional, user-launched Windows setup bundle. It does not run during gameplay or change save data. Back up important saves before changing mod lists.
+CW 1.1.15 updates Moodle UI and Lifestyle hygiene ownership. Windows setup is optional and user-launched. Back up saves before changing mod lists.
 
 [h2]Verification[/h2]
 
@@ -93,4 +93,4 @@ All original mods and assets remain the work of their respective authors. This c
 
 If an original mod author asks for support for their mod or redistributed material to be removed, it will be removed.
 
-[i]WIP: created and maintained with Codex for a private friend-group modpack. Current compatibility release: 1.1.14.[/i]
+[i]WIP: created and maintained with Codex for a private friend-group modpack. Current compatibility release: 1.1.15.[/i]

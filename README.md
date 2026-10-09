@@ -9,6 +9,8 @@ It also contains two optional client-only submods. `CWAudioMixer` provides disco
 ## Workshop copy
 
 - [Current Workshop description](docs/workshop-description.md)
+- [Steam-formatted version 1.1.15 changelog](docs/steam-changelog-1.1.15.txt)
+- [Version 1.1.15 changelog](docs/workshop-changelog-1.1.15.md)
 - [Steam-formatted version 1.1.14 changelog](docs/steam-changelog-1.1.14.txt)
 - [Version 1.1.14 changelog](docs/workshop-changelog-1.1.14.md)
 - [Version 1.1.13 changelog](docs/workshop-changelog-1.1.13.md)
@@ -56,6 +58,8 @@ After testing a commit, update the local PZ Workshop staging folder with:
 This mirrors the core compatibility mod, both optional client submods, and Workshop metadata to `%UserProfile%\Zomboid\Workshop\CW-Modpack-Compatibility`, removes destination-only files inside each managed staging mod, and verifies each staged file set and SHA-256 hashes. It does not edit the Steam installation, base-game media, launchers, DLLs, saves, or the live Steam Workshop cache.
 
 ## Repository boundaries
+
+Every new submod under `Contents/mods` must ship its own `42/poster.png` and `42/icon.png` image files, with matching `poster=poster.png` and `icon=icon.png` entries in its `42/mod.info`, so its artwork appears in the in-game mod list. Reusing the Chaosworld artwork is fine when a submod has no separate design.
 
 - `Contents/mods/CWModpackCompatibility` is the authoritative mod source.
 - `Scripts` contains local-only development, regression, and staging helpers.
