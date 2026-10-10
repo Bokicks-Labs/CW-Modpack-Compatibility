@@ -13,6 +13,15 @@ if (Get-Process -Name 'ProjectZomboid64', 'ProjectZomboid32', 'ProjectZomboid' -
 }
 
 if (Test-Path -LiteralPath $junction) {
+    $coreJunction = Join-Path $env:USERPROFILE 'Zomboid\mods\CWModpackCompatibility_dev'
+    if (Test-Path -LiteralPath $coreJunction) {
+        $coreItem = Get-Item -LiteralPath $coreJunction -Force
+        $manifest = Join-Path $coreItem.Target 'dev-submods.txt'
+        if ($coreItem.LinkType -eq 'Junction' -and (Test-Path -LiteralPath $manifest -PathType Leaf) -and
+            (Get-Content -LiteralPath $manifest) -contains $modId) {
+            throw 'The main CW toggle manages this Viewpoint junction. Use toggle-pz-junction.ps1 to remove it.'
+        }
+    }
     $item = Get-Item -LiteralPath $junction -Force
     if ($item.LinkType -ne 'Junction' -or -not $item.Target.StartsWith($devRootPrefix, [StringComparison]::OrdinalIgnoreCase)) {
         throw "Refusing to remove an unmanaged path: $junction"

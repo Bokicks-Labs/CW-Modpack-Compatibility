@@ -1,7 +1,7 @@
 name=Chaosworld Mod Options Search
 id=CWModOptionsSearch
 author=chaosworld
-description=Optional client-side search and jump navigation for Build 42's Mod Options page.
+description=[b]Optional client-side Mod Options search.[/b] Find registered settings by name, description, or tooltip, then jump directly to the matching option on Build 42's Mod Options page. Search does not change setting values.
 versionMin=42.20.0
 modversion=0.1.1
 require=CWModpackCompatibility

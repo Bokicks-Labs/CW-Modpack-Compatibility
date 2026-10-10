@@ -9,8 +9,13 @@ $devRoot = Join-Path $repoRoot ('LocalTest\CWModpackCompatibility_dev_' + (Get-D
 $devId = 'CWModpackCompatibility_dev'
 $coreId = 'CWModpackCompatibility'
 $manifestName = 'dev-submods.txt'
+$independentSubmodIds = @('CWViewpointPatch')
 
-function Get-DependentSubmods {
+if (Get-Process -Name 'ProjectZomboid64', 'ProjectZomboid32', 'ProjectZomboid' -ErrorAction SilentlyContinue) {
+    throw 'Project Zomboid is running. Close it before changing dev junctions.'
+}
+
+function Get-ManagedSubmods {
     foreach ($directory in Get-ChildItem -LiteralPath (Join-Path $repoRoot 'Contents\mods') -Directory) {
         if ($directory.Name -eq $coreId) { continue }
         $modInfo = Join-Path $directory.FullName '42\mod.info'
@@ -20,14 +25,14 @@ function Get-DependentSubmods {
         $requireMatch = [regex]::Match($content, '(?m)^require=([^\r\n]+)\r?$')
         if (-not $idMatch.Success -or -not $requireMatch.Success) { continue }
         $requirements = @($requireMatch.Groups[1].Value -split ',' | ForEach-Object { $_.Trim().TrimStart('\') })
-        if ($requirements -notcontains $coreId) { continue }
         $id = $idMatch.Groups[1].Value.Trim()
         if ($id -notmatch '^[A-Za-z0-9_]+$') { throw "Unsafe submod ID in $modInfo`: $id" }
+        if ($requirements -notcontains $coreId -and $independentSubmodIds -notcontains $id) { continue }
         [pscustomobject]@{ Id = $id; Source = $directory.FullName }
     }
 }
 
-$submods = @(Get-DependentSubmods)
+$submods = @(Get-ManagedSubmods)
 
 function Remove-ManagedDevJunction([string]$path, [string]$name) {
     if (-not (Test-Path -LiteralPath $path)) { return }

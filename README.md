@@ -14,6 +14,11 @@ It also contains optional client-only submods. `CWAudioMixer` provides discovere
 - [Steam-formatted version 1.1.14 changelog](docs/steam-changelog-1.1.14.txt)
 - [Version 1.1.14 changelog](docs/workshop-changelog-1.1.14.md)
 - [Version 1.1.13 changelog](docs/workshop-changelog-1.1.13.md)
+
+Steam Workshop descriptions may use Steam BBCode such as `[b]`, `[h2]`,
+`[list]`, and `[url]`. The CW Steam changelog `.txt` inputs are plain text:
+avoid Markdown and BBCode in those entries. Keep readable Markdown release
+notes separately.
 - [Lifestyle feature ownership](docs/lifestyle-feature-ownership.md)
 
 ## Version bumps
@@ -49,7 +54,7 @@ This creates:
     -> <repository>\LocalTest\CWModpackCompatibility_dev_<timestamp>
 ```
 
-The copied payload has ID `CWModpackCompatibility_dev` and a `(Dev)` name; release source and Workshop staging keep `CWModpackCompatibility`. The command discovers submods under `Contents/mods` whose `42/mod.info` lists `CWModpackCompatibility` in `require=`. It creates a `_dev` copy of each and changes that dependency to `CWModpackCompatibility_dev`; newly added submods need no toggle-script edit. Enable the dev core and whichever dev submods you want in the test mod list; disable their release IDs for that test. Each activation builds fresh copies, so rerun the command to remove the junctions before testing new edits. Old copies under `LocalTest` may be removed after testing. The script refuses to replace real folders or unmanaged junctions. If the older `CWModpackCompatibility` junction is installed, remove that junction before activating this one.
+The copied payload has ID `CWModpackCompatibility_dev` and a `(Dev)` name; release source and Workshop staging keep `CWModpackCompatibility`. The command discovers submods under `Contents/mods` whose `42/mod.info` lists `CWModpackCompatibility` in `require=`, plus the independent `CWViewpointPatch` submod. It creates a `_dev` copy of each, changing only dependencies on `CWModpackCompatibility` to `CWModpackCompatibility_dev`; the Viewpoint patch retains `require=Viewpoint`. Enable the dev core and whichever dev submods you want in the test mod list; disable their release IDs for that test. Each activation builds fresh copies, so rerun the command to remove the junctions before testing new edits. Old copies under `LocalTest` may be removed after testing. The script refuses to replace real folders or unmanaged junctions. If the older `CWModpackCompatibility` junction is installed, remove that junction before activating this one.
 
 To test only the optional audio submod without changing the core compatibility junction, run:
 
@@ -81,7 +86,7 @@ This mirrors the core compatibility mod, both optional client submods, and Works
 
 ## Repository boundaries
 
-Every new submod under `Contents/mods` must ship its own `42/poster.png` and `42/icon.png` image files, with matching `poster=poster.png` and `icon=icon.png` entries in its `42/mod.info`, so its artwork appears in the in-game mod list. Reusing the Chaosworld artwork is fine when a submod has no separate design.
+Every new submod under `Contents/mods` must ship unique `42/poster.png` and `42/icon.png` images that identify that submod, with matching `poster=poster.png` and `icon=icon.png` entries in its `42/mod.info`, so its artwork appears in the in-game mod list. Do not reuse the core mod's artwork or another submod's artwork.
 
 - `Contents/mods/CWModpackCompatibility` is the authoritative mod source.
 - `Scripts` contains local-only development, regression, and staging helpers.

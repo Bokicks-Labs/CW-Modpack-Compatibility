@@ -16,7 +16,12 @@ local function wrap(name)
     if type(original) ~= "function" then return false end
     ViewpointInteract[name] = function(...)
         local ok, result = pcall(original, ...)
-        local failure = ok and describe(result) or "error: " .. tostring(result)
+        local failure
+        if ok then
+            failure = describe(result)
+        else
+            failure = "error: " .. tostring(result)
+        end
         if failure ~= lastFailure[name] then
             if failure then print("[CWViewpointPatch] " .. name .. ": " .. failure) end
             lastFailure[name] = failure

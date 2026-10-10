@@ -8,17 +8,22 @@ require "ISUI/ISLabel"
 require "ISUI/ISButton"
 require "ISUI/ISComboBox"
 require "ISUI/ISVolumeControl"
+require "OptionScreens/MainOptions"
 
 CWAudioMixer = CWAudioMixer or {}
 local Mixer = CWAudioMixer
 
 local CONFIG_FILE = "CWAudioMixer.ini"
-local GROUPS = { "Music", "Devices", "Menu", "World", "Other" }
+local GROUPS = { "MenuUI", "Death", "TV", "Radio", "Music", "Weather", "Vehicles", "Combat", "Other" }
 local GROUP_LABELS = {
-    Music = "Music and performances",
-    Devices = "Radio, TV, and media devices",
-    Menu = "Menu and UI sounds",
-    World = "World ambience (includes vanilla rain)",
+    MenuUI = "Menu and UI effects",
+    Death = "Death music (Game/GameOver)",
+    TV = "TV and shared radio program audio",
+    Radio = "Radio sound effects",
+    Music = "Music and performances (not title-video audio)",
+    Weather = "Weather and world ambience (includes vanilla rain)",
+    Vehicles = "Vehicles",
+    Combat = "Combat and weapons",
     Other = "Other discovered sounds",
 }
 
@@ -74,19 +79,39 @@ local function loadSettings()
     local reader = getFileReader(CONFIG_FILE, false)
     if not reader then return end
 
+    local oldGroups = {}
+    local seenGroups = {}
+
     while true do
         local line = reader:readLine()
         if not line then break end
         local fields = luautils.split(line, "|")
-        if fields[1] == "group" and Mixer.settings.groups[fields[2]] and tonumber(fields[3]) then
-            Mixer.settings.groups[fields[2]] = clamp(tonumber(fields[3]), 0, 2)
+        if fields[1] == "group" and fields[2] and tonumber(fields[3]) then
+            local value = clamp(tonumber(fields[3]), 0, 2)
+            if Mixer.settings.groups[fields[2]] then
+                Mixer.settings.groups[fields[2]] = value
+                seenGroups[fields[2]] = true
+            else
+                oldGroups[fields[2]] = value
+            end
         elseif fields[1] == "base" and fields[2] and tonumber(fields[3]) then
             Mixer.settings.baseline[unescape(fields[2])] = clamp(tonumber(fields[3]), 0, 2)
-        elseif fields[1] == "assign" and fields[2] and GROUP_LABELS[unescape(fields[3])] then
-            Mixer.settings.assignments[unescape(fields[2])] = unescape(fields[3])
+        elseif fields[1] == "assign" and fields[2] and fields[3] then
+            local oldGroup = unescape(fields[3])
+            local migrated = ({ Menu = "MenuUI", World = "Weather", MenuBackground = "Music" })[oldGroup] or oldGroup
+            if GROUP_LABELS[migrated] or migrated == "Devices" then
+                Mixer.settings.assignments[unescape(fields[2])] = migrated
+            end
         end
     end
     reader:close()
+    if oldGroups.Devices then
+        if not seenGroups.TV then Mixer.settings.groups.TV = oldGroups.Devices end
+        if not seenGroups.Radio then Mixer.settings.groups.Radio = oldGroups.Devices end
+    end
+    if oldGroups.Menu and not seenGroups.MenuUI then Mixer.settings.groups.MenuUI = oldGroups.Menu end
+    if oldGroups.World and not seenGroups.Weather then Mixer.settings.groups.Weather = oldGroups.World end
+    if oldGroups.MenuBackground and not seenGroups.Music then Mixer.settings.groups.Music = oldGroups.MenuBackground end
 end
 
 local function ensureAdvancedSoundVolumes()
@@ -103,12 +128,16 @@ local function classify(sound)
     local category = string.lower(sound:getCategory() or "")
     local master = string.lower(sound:getMasterName() or "")
 
+    if name == "playerdied" then return "Death" end
+    if name == "radiotalk" then return "TV" end -- PZ shares this program loop between TVs and radios.
+    if name:find("television", 1, true) or name:find("tvstatic", 1, true) then return "TV" end
+    if name:find("radio", 1, true) or name:find("broadcast", 1, true) then return "Radio" end
     if category == "ui" or master == "ui"
         or name:find("menu", 1, true) or name:find("button", 1, true)
         or name:find("toggle", 1, true) or name:find("hover", 1, true)
         or name:find("select", 1, true) or name:find("activate", 1, true)
         or name:find("tab", 1, true) then
-        return "Menu"
+        return "MenuUI"
     end
     if category == "music" or master == "music"
         or name:find("music", 1, true) or name:find("song", 1, true)
@@ -116,14 +145,14 @@ local function classify(sound)
         or name:find("dj", 1, true) or name:find("disco", 1, true) then
         return "Music"
     end
-    if name:find("radio", 1, true) or name:find("television", 1, true)
-        or name:find("broadcast", 1, true) or name:find("media", 1, true) then
-        return "Devices"
+    if master == "ambient" or category == "world" or name == "worldambiance"
+        or name:find("rain", 1, true) or name:find("weather", 1, true)
+        or name:find("thunder", 1, true) then
+        return "Weather"
     end
-    if master == "ambient" or name == "worldambiance" or name:find("rain", 1, true)
-        or name:find("weather", 1, true) then
-        return "World"
-    end
+    if category == "vehicle" or name:find("vehicle", 1, true) or name:find("engine", 1, true) then return "Vehicles" end
+    if category == "weapon" or category == "combat" or name:find("gun", 1, true)
+        or name:find("weapon", 1, true) or name:find("impact", 1, true) then return "Combat" end
     return "Other"
 end
 
@@ -164,6 +193,10 @@ function Mixer.discover()
             local name = sound:getName()
             if name and not discovered[name] then
                 discovered[name] = sound
+                if Mixer.settings.assignments[name] == "Devices" then
+                    local detected = classify(sound)
+                    Mixer.settings.assignments[name] = (detected == "TV" or detected == "Radio") and detected or "Other"
+                end
                 if Mixer.settings.baseline[name] == nil then
                     Mixer.settings.baseline[name] = clamp(tonumber(sound:getUserVolume()) or 1.0, 0, 2)
                 end
@@ -185,7 +218,10 @@ function Mixer.applyAll()
 end
 
 function Mixer.setGroupVolume(group, sliderValue)
-    Mixer.settings.groups[group] = clamp(sliderValue / 5, 0, 2)
+    if not GROUP_LABELS[group] then return end
+    local value = clamp(sliderValue / 5, 0, 2)
+    if Mixer.settings.groups[group] == value then return end
+    Mixer.settings.groups[group] = value
     Mixer.applyAll()
 end
 
@@ -218,37 +254,51 @@ function Mixer.restoreOriginalVolumes()
     end
     pcall(GameSounds.saveINI)
     saveSettings()
+    if Mixer.audioControls then
+        for group, control in pairs(Mixer.audioControls) do
+            control:setVolume(5)
+        end
+    end
 end
 
 local MixerPanel = ISPanel:derive("CWAudioMixerPanel")
 
+function MixerPanel:prerender()
+    if self.optionsOwner and not self.optionsOwner:isVisible() then
+        self:onClose()
+        return
+    end
+    ISPanel.prerender(self)
+end
+
 function MixerPanel:addLabel(x, y, text)
-    local label = ISLabel:new(x, y, 18, text, 1, 1, 1, 1, UIFont.Small, true)
+    local label = ISLabel:new(x, y, 18 * self.layoutScale, text, 1, 1, 1, 1, UIFont.Small, true)
     label:initialise()
     self:addChild(label)
     return label
 end
 
 function MixerPanel:createChildren()
-    self:addLabel(14, 12, "CW Audio Mixer")
-    self:addLabel(14, 34, "Group sliders adjust safe, discovered sound definitions. 0% to 200%.")
+    local function px(value) return math.floor(value * self.layoutScale + 0.5) end
+    self:addLabel(px(14), px(12), "CW Audio Mixer")
+    self:addLabel(px(14), px(34), "Group sliders adjust discovered sounds. 0% to 200%.")
 
     self.groupControls = {}
-    local y = 60
+    local y = px(60)
     for _, group in ipairs(GROUPS) do
-        self:addLabel(14, y + 2, GROUP_LABELS[group])
-        local control = ISVolumeControl:new(260, y, 180, 20, self, function(panel, _, value)
+        self:addLabel(px(14), y + px(2), GROUP_LABELS[group])
+        local control = ISVolumeControl:new(px(430), y, px(200), px(20), self, function(panel, _, value)
             if not panel.refreshing then Mixer.setGroupVolume(group, value) end
         end)
         control:initialise()
         control.tooltip = "0% to 200%; 100% is the normal level."
         self:addChild(control)
         self.groupControls[group] = control
-        y = y + 28
+        y = y + px(28)
     end
 
-    self:addLabel(14, y + 8, "Discovered sound")
-    self.filterBox = ISComboBox:new(150, y + 4, 140, 22, self, MixerPanel.onFilterChanged)
+    self:addLabel(px(14), y + px(8), "Discovered sound")
+    self.filterBox = ISComboBox:new(px(150), y + px(4), px(140), px(22), self, MixerPanel.onFilterChanged)
     self.filterBox:initialise()
     self.filterBox:addOptionWithData("All groups", "All")
     for _, group in ipairs(GROUPS) do
@@ -256,41 +306,41 @@ function MixerPanel:createChildren()
     end
     self:addChild(self.filterBox)
 
-    self.soundBox = ISComboBox:new(14, y + 32, 426, 22, self, MixerPanel.onSoundChanged)
+    self.soundBox = ISComboBox:new(px(14), y + px(32), px(616), px(22), self, MixerPanel.onSoundChanged)
     self.soundBox:initialise()
     self.soundBox:setEditable(true)
     self:addChild(self.soundBox)
 
-    self.selectedLabel = self:addLabel(14, y + 62, "Select a sound to inspect its current group and volume.")
-    self.soundVolume = ISVolumeControl:new(260, y + 86, 180, 20, self, MixerPanel.onSoundVolumeChanged)
+    self.selectedLabel = self:addLabel(px(14), y + px(62), "Select a sound to inspect its group and volume.")
+    self.soundVolume = ISVolumeControl:new(px(430), y + px(86), px(200), px(20), self, MixerPanel.onSoundVolumeChanged)
     self.soundVolume:initialise()
     self.soundVolume.tooltip = "Individual volume: 0% to 200%."
     self:addChild(self.soundVolume)
-    self:addLabel(14, y + 88, "Individual volume")
+    self:addLabel(px(14), y + px(88), "Individual volume")
 
-    self.assignmentBox = ISComboBox:new(150, y + 114, 290, 22, self, MixerPanel.onAssignmentChanged)
+    self.assignmentBox = ISComboBox:new(px(150), y + px(114), px(480), px(22), self, MixerPanel.onAssignmentChanged)
     self.assignmentBox:initialise()
     for _, group in ipairs(GROUPS) do
         self.assignmentBox:addOptionWithData(GROUP_LABELS[group], group)
     end
     self:addChild(self.assignmentBox)
-    self:addLabel(14, y + 118, "Assign group")
+    self:addLabel(px(14), y + px(118), "Assign group")
 
-    self.previewButton = ISButton:new(14, y + 150, 100, 24, "Preview", self, MixerPanel.onPreview)
+    self.previewButton = ISButton:new(px(14), y + px(150), px(100), px(24), "Preview", self, MixerPanel.onPreview)
     self.previewButton:initialise()
     self:addChild(self.previewButton)
-    self.stopButton = ISButton:new(122, y + 150, 100, 24, "Stop preview", self, MixerPanel.onStopPreview)
+    self.stopButton = ISButton:new(px(122), y + px(150), px(100), px(24), "Stop preview", self, MixerPanel.onStopPreview)
     self.stopButton:initialise()
     self:addChild(self.stopButton)
-    self.restoreButton = ISButton:new(230, y + 150, 130, 24, "Restore originals", self, MixerPanel.onRestore)
+    self.restoreButton = ISButton:new(px(230), y + px(150), px(130), px(24), "Restore originals", self, MixerPanel.onRestore)
     self.restoreButton:initialise()
     self.restoreButton.tooltip = "Restores the sound volumes from before this mixer first adjusted them."
     self:addChild(self.restoreButton)
-    self.closeButton = ISButton:new(368, y + 150, 72, 24, "Close", self, MixerPanel.onClose)
+    self.closeButton = ISButton:new(px(558), y + px(150), px(72), px(24), "Close", self, MixerPanel.onClose)
     self.closeButton:initialise()
     self:addChild(self.closeButton)
 
-    self:addLabel(14, y + 184, "Vanilla rain is part of the World Ambience FMOD event, so its control also affects other world ambience.")
+    self:addLabel(px(14), y + px(184), "Rain shares world ambience. TV volume also depends on its device setting.")
     self:refresh()
 end
 
@@ -385,15 +435,29 @@ function MixerPanel:onClose()
     Mixer.panel = nil
 end
 
-function MixerPanel:new(x, y, width, height)
+function MixerPanel:onKeyRelease(key)
+    if key == Keyboard.KEY_ESCAPE then self:onClose() end
+end
+
+function MixerPanel:new(x, y, width, height, scale)
     local panel = ISPanel.new(self, x, y, width, height)
+    panel.layoutScale = scale
     panel.moveWithMouse = true
     panel.backgroundColor = { r = 0.05, g = 0.05, b = 0.05, a = 0.94 }
     panel.borderColor = { r = 0.5, g = 0.5, b = 0.5, a = 1.0 }
     return panel
 end
 
-function Mixer.open()
+function Mixer.panelGeometry(screenWidth, screenHeight)
+    local scale = math.min(1.4, math.max(1, screenHeight / 1080),
+        (screenWidth - 32) / 645, (screenHeight - 32) / 550)
+    local width, height = math.floor(645 * scale), math.floor(550 * scale)
+    local x = math.floor((screenWidth - width) / 2)
+    local y = math.floor((screenHeight - height) / 2)
+    return x, y, width, height, scale
+end
+
+function Mixer.open(owner)
     ensureAdvancedSoundVolumes()
     Mixer.discover()
     if Mixer.panel then
@@ -402,33 +466,74 @@ function Mixer.open()
         Mixer.panel:refresh()
         return
     end
-    local width, height = 455, 390
-    local x = math.floor((getCore():getScreenWidth() - width) / 2)
-    local y = math.floor((getCore():getScreenHeight() - height) / 2)
-    Mixer.panel = MixerPanel:new(x, y, width, height)
+    local x, y, width, height, scale = Mixer.panelGeometry(getCore():getScreenWidth(), getCore():getScreenHeight())
+    Mixer.panel = MixerPanel:new(x, y, width, height, scale)
+    Mixer.panel.optionsOwner = owner
     Mixer.panel:initialise()
     Mixer.panel:instantiate()
     Mixer.panel:addToUIManager()
 end
 
-local function addContextOption(player, context, worldobjects, test)
-    if test then return end
-    context:addOption("CW Audio Mixer", nil, Mixer.open)
+local function closeAdvancedFor(options)
+    if Mixer.panel and Mixer.panel.optionsOwner == options then Mixer.panel:onClose() end
 end
 
-local function registerModOptions()
-    local ok = pcall(require, "PZAPI/ModOptions")
-    local api = ok and PZAPI and PZAPI.ModOptions or nil
-    if not api or not api.create then return end
-    local options = api.getOptions and api:getOptions("CWAudioMixer") or nil
-    options = options or api:create("CWAudioMixer", "CW Audio Mixer")
-    if not options or not options.addButton then return end
-    options:addButton("OPEN_MIXER", "Open audio mixer", "Discover loaded sounds and adjust their volumes.", Mixer.open)
+local originalOptionsClose = MainOptions.close
+function MainOptions:close()
+    closeAdvancedFor(self)
+    return originalOptionsClose(self)
 end
 
--- Mod Options builds its menu before OnGameStart. Register while this client
--- script loads so the entry is present when the player opens Options.
-registerModOptions()
+local originalOnGameSounds = MainOptions.onGameSounds
+function MainOptions:onGameSounds()
+    closeAdvancedFor(self)
+    return originalOnGameSounds(self)
+end
+
+-- Build 42 constructs its Audio tab inside MainOptions:addSoundPanel(). Add
+-- controls there so they use the same Apply/Back lifecycle as vanilla sliders.
+local originalAddSoundPanel = MainOptions.addSoundPanel
+function MainOptions:addSoundPanel()
+    originalAddSoundPanel(self)
+    local y = MainOptions.style.initialY
+    local splitpoint = self:getWidth() / 2
+    local controlWidth = 45 * (getCore():getOptionFontSizeReal() + 1) + 60
+    self:addHorizontalLine(y, "CW Audio Mixer")
+    Mixer.audioControls = {}
+    for _, group in ipairs(GROUPS) do
+        local groupId = group
+        local control = self:addVolumeControl(splitpoint, y, controlWidth, 20, GROUP_LABELS[groupId], 5)
+        local option = GameOption:new("CWAudioMixer." .. groupId, control)
+        function option:storeCurrentValue()
+            self.originalValue = Mixer.settings.groups[groupId] or 1
+        end
+        function option:restoreOriginalValue()
+            Mixer.setGroupVolume(groupId, (self.originalValue or 1) * 5)
+        end
+        function option:toUI()
+            self.syncing = true
+            self.control:setVolume(math.floor((Mixer.settings.groups[groupId] or 1) * 5 + 0.5))
+            self.syncing = false
+        end
+        function option:onChange(_, value)
+            if not self.syncing then Mixer.setGroupVolume(groupId, value) end
+        end
+        function option:apply()
+            Mixer.setGroupVolume(groupId, self.control:getVolume())
+        end
+        self.gameOptions:add(option)
+        Mixer.audioControls[groupId] = control
+    end
+    local button = ISButton:new(splitpoint + 20, y + self.addY + 8, 160, 24,
+        "Advanced sound mixer", self, Mixer.open)
+    button:initialise()
+    button:instantiate()
+    self.mainPanel:addChild(button)
+    self.mainPanel:insertNewLineOfButtons(button)
+    self.mainPanel:setScrollHeight(y + self.addY + 44)
+end
+
+loadSettings()
 
 local function initialise()
     ensureAdvancedSoundVolumes()
@@ -438,4 +543,4 @@ local function initialise()
 end
 
 Events.OnGameStart.Add(initialise)
-Events.OnFillWorldObjectContextMenu.Add(addContextOption)
+Events.OnMainMenuEnter.Add(function() Mixer.applyAll() end)

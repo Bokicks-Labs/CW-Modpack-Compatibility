@@ -1,3 +1,5 @@
+<!-- Steam Workshop descriptions support Steam BBCode. CW docs/steam-changelog-*.txt inputs are plain text; keep formatting in the description and Markdown notes. -->
+
 [h1]Chaosworld B42 Modpack Compatibility[/h1]
 
 Targeted, conditional compatibility fixes maintained for the Chaosworld Project Zomboid 42.20 modpack. Install the original mods for the features you use; this item does not replace them. Each runtime patch stays dormant when its supported mod is absent.

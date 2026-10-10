@@ -1,7 +1,7 @@
 name=Chaosworld Audio Mixer
 id=CWAudioMixer
 author=chaosworld
-description=Optional client-side mixer for discovered Project Zomboid and mod sounds. Provides safe group controls and per-sound overrides without changing server or save data.
+description=[b]Optional client-side audio mixer.[/b] Discover sounds loaded by Project Zomboid and mods, then adjust group volume or individual sound overrides. Changes are local and do not modify server or save data.
 versionMin=42.20.0
 modversion=0.1.0
 require=CWModpackCompatibility

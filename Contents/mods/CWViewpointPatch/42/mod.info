@@ -1,8 +1,10 @@
 name=Chaosworld Viewpoint Patch (Diagnostics)
 id=CWViewpointPatch
 author=chaosworld
-description=Optional client-side diagnostics for Project Viewpoint interaction failures. No interaction behavior changes yet.
+description=[b]Optional client-side diagnostics for Project Viewpoint.[/b] Trace right-click interaction and player-zombie collision failures while investigating missing interactions. Diagnostic only; it does not change gameplay behavior.
 versionMin=42.21.0
-modversion=0.1.0
+modversion=0.1.1
 require=Viewpoint
 category=fixes
+poster=poster.png
+icon=icon.png
