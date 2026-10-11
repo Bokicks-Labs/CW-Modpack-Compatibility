@@ -51,6 +51,16 @@ References: [Viewpoint core workshop and controls](https://steamcommunity.com/sh
 
 Source: [official Workshop mechanics and bug reports](https://steamcommunity.com/sharedfiles/filedetails/?id=3805748433).
 
+### Showing Casualties Undead moodles in PZ Pulse Expanded screenshots
+
+The original mod exposes **three distinct moodle types**, not 21 independent diagnosis icons: `High` (drug high), `Miserable`, and `Condition` (the highest-severity clinical problem, with the matching organ icon). Its full set of clinical conditions belongs to the medical report. The separate **Drug Euphoria** continuous value is a Needs Expanded bar, not a fourth moodle.
+
+PZ Pulse Expanded's current `CustomMoodleAdapter.lua` already has read-only collectors for all three. It observes `CasualtiesUndead.Drugs.highLevel(player)`, `CasualtiesUndead.Mind.isMiserable(player)`, and `CasualtiesUndead.Conditions.worst(player)` / `organOf(id)`. Only active source states are exported, and the source's `showMoodles()` option can suppress all three.
+
+For **screenshots** without damaging or drugging a character, a local disposable single-player preview can safely replace just the **adapter's exported UI payload** with example values: High 4/4, Miserable 1/1 and Condition/Concussion 3/3 with the Brain icon. It must **not** modify the Casualties Undead runtime, `player:getModData()`, true health, game moodles, or the live dedicated server; remove it after photography. The browser preview represents what Needs Expanded would display; the actual in-game Casualties HUD/medical report remains unchanged.
+
+Reference: [PZ Pulse Expanded source adapter](https://github.com/Bokicks-Labs/PZ-Pulse-Expanded/blob/main/42/media/lua/client/PZPulseExpanded/CustomMoodleAdapter.lua); [optional mod integration inventory](https://github.com/Bokicks-Labs/PZ-Pulse-Expanded/blob/main/docs/integrations/installed-mod-moodles.md).
+
 ## Project A-Life (ProjectALifeNPCs)
 
 **What it really adds:** persistent factions and squads operating off-screen; faction relationships, radio calls, roadblocks, snipers, robberies, building clearance, medics, bleeding NPCs, raids and tiered outposts. The creator describes **148 preset factions** in version 1.3.17 (September 30): less than half hostile. You may be robbed instead of shot; NPCs that flee can remember prior fights. Disabling an outpost radio changes its dispatch behavior. Admins have a squad map overlay.
