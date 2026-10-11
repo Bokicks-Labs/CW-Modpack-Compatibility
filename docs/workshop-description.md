@@ -24,15 +24,11 @@ For multiplayer, clients and the server should use the same mod list, order, and
 
 [hr][/hr]
 
-[h2]Optional Windows setup for Project Viewpoint[/h2]
+[h2]Project Viewpoint prerequisite[/h2]
 
-CW includes a [b]ZombieBuddy-Setup[/b] folder with a manual Windows launcher. Run it from the CW Workshop folder with PZ closed; enabling CW does not run it. The launcher downloads the latest SHA-256-verified [url=https://github.com/Bokicks-Labs/ZombieBuddy-Friends/releases/latest]ZombieBuddy Friends[/url] release.
+Subscribe to [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3619862853]ZombieBuddy[/url] and follow its official one-time installation instructions before using Project Viewpoint. Enabling CW does not install or update ZombieBuddy. Existing Windows installations that relied on the separate native-loader repair should retain their working DLL until the upstream installer is verified to resolve that issue.
 
-The Friends installer fetches the latest stable official ZombieBuddy 2.x JAR and matching Build 42 Lua/media from GitHub, installs the local mod without the removed ZombieBuddy Workshop item, and applies the pinned Windows native-loader fix for affected clients.
-
-The helper verifies the release ZIP, refuses while PZ runs, and backs up files it replaces. It does not change saves or approvals. The Friends installer configures normal and alternate Windows launchers. Native code and Java mods have unrestricted process access.
-
-Project Viewpoint, ZombieBuddy, and the temporary fix remain third-party projects and are not authored or endorsed by Chaosworld. See the included third-party notices and licenses.
+Project Viewpoint and ZombieBuddy are third-party projects and are not authored or endorsed by Chaosworld.
 
 [hr][/hr]
 
@@ -61,7 +57,7 @@ Project Viewpoint, ZombieBuddy, and the temporary fix remain third-party project
 [*][b]CW Mod Options Search (optional submod):[/b] Enable it separately after CW Modpack Compatibility. It adds a client-only search launcher to the first section of the Build 42 Mod Options page and jumps to matching registered mod settings without changing their values.
 [/list]
 
-CW 1.1.15 updates Moodle UI and Lifestyle hygiene ownership. Windows setup is optional and user-launched. Back up saves before changing mod lists.
+CW 1.1.16 directs players to the official ZombieBuddy Workshop item and refreshes mod update guidance.
 
 [h2]Verification[/h2]
 
@@ -89,10 +85,9 @@ All original mods and assets remain the work of their respective authors. This c
 [*]EXACT MINUTE CLOCK (B42) by PorrisV99.
 [*]Quartermaster - Auto-Sort & Store Loot by deckard.
 [*]Beyond Ten - Level 15 Skills by Patryk, published on Workshop by Silver (Brek).
-[*]ZombieBuddy by Andrey "Zed" Zaikin. The Friends installer downloads his latest stable 2.x JAR and tagged Build 42 source from GitHub.
-[*]Temporary Build 42.21 ZombieBuddy compatibility fix by Antikristianos, based on ZombieBuddy 2.3.3 by Zed and redistributed with its MIT license and provenance.
+[*]ZombieBuddy by Andrey "Zed" Zaikin. Install it from its official Workshop item and follow its setup instructions.
 [/list]
 
 If an original mod author asks for support for their mod or redistributed material to be removed, it will be removed.
 
-[i]WIP: created and maintained with Codex for a private friend-group modpack. Current compatibility release: 1.1.15.[/i]
+[i]WIP: created and maintained with Codex for a private friend-group modpack. Current compatibility release: 1.1.16.[/i]

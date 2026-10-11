@@ -4,11 +4,13 @@ Private source repository for the Chaosworld Project Zomboid Build 42 compatibil
 
 The Workshop payloads are kept under `Contents/mods`. The core `CWModpackCompatibility` mod contains targeted compatibility fixes for the Chaosworld modpack, including the Lifestyle hidden-skill display bridge and automatic feature ownership for Nature's Call and Brush Your Damn Teeth.
 
-It also contains optional client-only submods. `CWAudioMixer` provides discovered-sound group and per-sound volume controls; `CWModOptionsSearch` adds search-and-jump navigation to the Build 42 Mod Options page. `CWViewpointPatch` currently provides isolated interaction diagnostics for Viewpoint and requires Viewpoint only when enabled. See [CW Audio Mixer](docs/audio-mixer.md), [CW Mod Options Search](docs/mod-options-search.md), and [Viewpoint patch work](docs/viewpoint-patch.md).
+It also contains optional client-only submods. `CWAudioMixer` provides discovered-sound group and per-sound volume controls; `CWModOptionsSearch` adds search-and-jump navigation to the Build 42 Mod Options page. `CWViewpointPatch` contains optional Viewpoint menu, NPC targeting, and world right-click patches, and requires Viewpoint and ZombieBuddy only when enabled. See [CW Audio Mixer](docs/audio-mixer.md), [CW Mod Options Search](docs/mod-options-search.md), and [Viewpoint patch work](docs/viewpoint-patch.md).
 
 ## Workshop copy
 
 - [Current Workshop description](docs/workshop-description.md)
+- [Steam-formatted version 1.1.16 changelog](docs/steam-changelog-1.1.16.txt)
+- [Version 1.1.16 changelog](docs/workshop-changelog-1.1.16.md)
 - [Steam-formatted version 1.1.15 changelog](docs/steam-changelog-1.1.15.txt)
 - [Version 1.1.15 changelog](docs/workshop-changelog-1.1.15.md)
 - [Steam-formatted version 1.1.14 changelog](docs/steam-changelog-1.1.14.txt)
@@ -20,6 +22,7 @@ Steam Workshop descriptions may use Steam BBCode such as `[b]`, `[h2]`,
 avoid Markdown and BBCode in those entries. Keep readable Markdown release
 notes separately.
 - [Lifestyle feature ownership](docs/lifestyle-feature-ownership.md)
+- [October 11 mod update audit](docs/mod-update-audit-2026-10-11.md)
 
 ## Version bumps
 
@@ -54,7 +57,7 @@ This creates:
     -> <repository>\LocalTest\CWModpackCompatibility_dev_<timestamp>
 ```
 
-The copied payload has ID `CWModpackCompatibility_dev` and a `(Dev)` name; release source and Workshop staging keep `CWModpackCompatibility`. The command discovers submods under `Contents/mods` whose `42/mod.info` lists `CWModpackCompatibility` in `require=`, plus the independent `CWViewpointPatch` submod. It creates a `_dev` copy of each, changing only dependencies on `CWModpackCompatibility` to `CWModpackCompatibility_dev`; the Viewpoint patch retains `require=Viewpoint`. Enable the dev core and whichever dev submods you want in the test mod list; disable their release IDs for that test. Each activation builds fresh copies, so rerun the command to remove the junctions before testing new edits. Old copies under `LocalTest` may be removed after testing. The script refuses to replace real folders or unmanaged junctions. If the older `CWModpackCompatibility` junction is installed, remove that junction before activating this one.
+The copied payload has ID `CWModpackCompatibility_dev` and a `(Dev)` name; release source and Workshop staging keep `CWModpackCompatibility`. The command discovers submods under `Contents/mods` whose `42/mod.info` lists `CWModpackCompatibility` in `require=`, plus the independent `CWViewpointPatch` submod. It creates a `_dev` copy of each, changing only dependencies on `CWModpackCompatibility` to `CWModpackCompatibility_dev`; the Viewpoint patch retains its Viewpoint and ZombieBuddy requirements. Enable the dev core and whichever dev submods you want in the test mod list; disable their release IDs for that test. Each activation builds fresh copies, so rerun the command to remove the junctions before testing new edits. Old copies under `LocalTest` may be removed after testing. The script refuses to replace real folders or unmanaged junctions. If the older `CWModpackCompatibility` junction is installed, remove that junction before activating this one.
 
 To test only the optional audio submod without changing the core compatibility junction, run:
 
@@ -68,7 +71,7 @@ To test only the optional Mod Options Search submod, run:
 .\Scripts\toggle-pz-mod-options-search-junction.ps1
 ```
 
-To test only the optional Viewpoint diagnostics without changing the CW core, run:
+To test only the optional Viewpoint patch without changing the CW core, run:
 
 ```powershell
 .\Scripts\toggle-pz-viewpoint-patch-junction.ps1

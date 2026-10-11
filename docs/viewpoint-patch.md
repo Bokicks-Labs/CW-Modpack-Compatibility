@@ -1,27 +1,31 @@
 # Viewpoint patch work
 
-`CWViewpointPatch` is an optional client mod in the CW Workshop item. It requires
-`Viewpoint`; the CW core does not. Viewpoint itself requires ZombieBuddy. Version
-0.1.1 records transitions into failed or empty interaction harvests and reports
-the failure reason and number of context options seen in the PZ log. It does not
-alter action selection, the menu, or Java classes. Enable it after Viewpoint.
+`CWViewpointPatch` is an optional client mod in the CW Workshop item. Version
+0.2.0 requires Viewpoint and ZombieBuddy; the CW core requires neither. Enable
+it after Viewpoint. The patch JAR extends the Viewpoint loot/interaction label
+width and adds Project A-Life NPC shells to Viewpoint's person-target list. A
+Lua listener retries short world right-clicks when the press and release pick
+different objects. Existing interaction-failure logging remains available.
 
-It also logs right-clicks when the world picker changes between having a result
-and having none on button press and release, or the player world menu is absent
-two ticks later. The log
-includes cursor mode when Viewpoint QOL exposes it; `unknown` means that bridge
-was unavailable. UI panels may own their own context menus, so an absent player
-world menu by itself is not proof that a UI click failed. The logger does not
-change click handling. The first right-click diagnostic tried to read the Java
-picker object's `tile` field through Lua and raised an error on every click.
-The corrected logger records only whether the picker returned an object; it
-cannot establish whether the exact picked target changed.
+The menu width setting is under Options > Mods > CW Viewpoint Patch. It ranges
+from 360 to 900 pixels and defaults to 600. Restart after changing it because
+Viewpoint caches fitted labels. The Java source is under
+`dev-scripts/viewpoint-patch/src`; run `Scripts/build-viewpoint-patch.ps1` to
+rebuild the client JAR from the installed ZombieBuddy API. Repeated builds
+produce the same SHA-256 hash. ZombieBuddy must approve the new JAR before it
+loads. The patch never edits the installed Viewpoint or ZombieBuddy JARs.
 
-The collision logger samples the nearest zombie every 12 frames and logs at
-most once per second while the player is within 0.6 world tiles. It records
-bump state, collision-skip state, animation state, and both positions. It does
-not move or push either character. Use a disposable save for a one-zombie
-walking comparison in isometric, first-person, and third-person views.
+The NPC bridge recognizes live Project A-Life shells by their owned/UID
+mod-data markers. Other NPC mods may use different representations and are not
+yet covered. The right-click fallback handles world-object picker mismatches;
+UI panels still own their right-click events. Verify both behaviors in a
+disposable save before using this build in a new playthrough. In particular,
+an interaction target being selected does not by itself prove its mesh outline
+renders correctly.
+
+Earlier builds included a right-click trace that raised on a Java field access
+and a collision trace. Both have been removed from the 0.2.0 play build.
+Collision work is deferred.
 
 The first diagnostic build mistakenly logged successful result tables as
 `error: table ...` on every interaction. Those messages are false positives.
@@ -30,7 +34,7 @@ dev mod after closing PZ before treating its next log as failure evidence.
 
 ## Current evidence and first reproduction
 
-The inspected installed Viewpoint is `0.1.5a-hotfix` (Build 42.21). Its Lua
+The inspected installed Viewpoint is `0.1.6` (Build 42.21, October 11). Its Lua
 `ViewpointInteract.harvest` exits early for an open right-click menu, a placement
 cursor, an object without a square, or a missing player context menu. It calls
 `ISWorldObjectContextMenu.createMenu`, recursively collects submenu options,
@@ -63,7 +67,7 @@ right-clicks, so any fallback must leave captured UI clicks alone. Compare the
 press/release target and menu result in a disposable save before changing the
 handler; preserve the native `ISContextManager` menu path and mod entries.
 
-### Player and zombie collision
+### Deferred player and zombie collision
 
 The user reports walking as well as running through zombies in Viewpoint first
 and third person, while isometric view retains the bump. Viewpoint patches
@@ -78,24 +82,25 @@ grab risk and multiplayer movement.
 
 ## Installed fix audit
 
-The current mod inventory includes Barricade, Car, Door, Fire, Light, Menu,
+The earlier mod inventory included Barricade, Car, Door, Fire, Light, Menu,
 Surface, KI5 Vehicle Parts, Tile, Bunker, General Mod Map, 3D Tracer, Turbo,
 and Project Viewpoint QOL. All are separate mods from Viewpoint. Their
 installed metadata still declares Viewpoint as a dependency, and the Menu Fix
 contains a Java patch for `LootPanel.fit` that normalizes multiline labels.
 QOL patches `LootPanel.rounded` and several interaction target/menu classes;
 both Java mods were transformed in the inspected log. This shared surface is a
-conflict candidate, not proof of a conflict. No fix is currently proven
-obsolete, already incorporated into the base mod, or safe to remove.
+conflict candidate, not proof of a conflict. The Menu Fix author now marks it
+obsolete because Viewpoint 0.1.6 fixed the row-overlap issue. Its old patch
+does not supply the new width setting.
 
 | Installed fix | Current target | Audit result |
 | --- | --- | --- |
 | Barricade | Placement and textures | Keep pending scene comparison |
-| Car | 3D vehicle color | Keep pending scene comparison |
+| Car | 3D vehicle color | Obsolete per its author after Viewpoint 0.1.6; remove from future mod lists |
 | Door | Lighting and textures | Keep pending scene comparison |
 | Fire | 3D sprites | Keep pending scene comparison |
 | Light | Headlight position | Keep pending scene comparison |
-| Menu | Multiline row text | Shared `LootPanel` surface with QOL; isolate first |
+| Menu | Multiline row text | Author marks obsolete after Viewpoint 0.1.6; exclude from new playthrough test |
 | Surface | Wall and roof textures | Keep pending scene comparison |
 | KI5 Vehicle Parts | Near-camera part visibility | Keep pending KI5 vehicle comparison |
 | Tile | Roof completion | Save removal procedure required |
@@ -105,10 +110,13 @@ obsolete, already incorporated into the base mod, or safe to remove.
 | Turbo | Rendering performance | Keep pending measured comparison |
 | QOL | Interaction and UI controls | Shared Java menu/target surface; isolate first |
 
-An installed fix being older than Viewpoint `0.1.5a-hotfix` is insufficient to
+An installed fix being older than Viewpoint `0.1.6` is insufficient to
 declare it outdated: it may still correct a feature the base mod does not own.
-Each row needs a same-scene enabled/disabled comparison against this Viewpoint
-version before it can be marked replaced or redundant.
+Each remaining row needs a same-scene enabled/disabled comparison against this
+Viewpoint version before it can be marked replaced or redundant. The Car Fix
+Workshop author explicitly marks that one obsolete; the local default preset
+and recent saves still list `ViewpointCar`, so a save/mod-list migration should
+be checked separately.
 
 QOL already provides a `K` loot-menu toggle, so a new show/hide key should be
 assessed against it before implementation. Tile Fix documents a removal
@@ -125,6 +133,6 @@ junction alongside the CW dev mods, or run
 Do not use both toggles for the same active junction. Disable the release ID
 when testing the dev ID; rerun the same script to remove its junction. Restart PZ after changing
 the mod list. To roll back, disable `CWViewpointPatch` or its dev ID and restart.
-The diagnostic version does not write save data. The Workshop staging script
-copies this optional mod but does not upload it; do not publish a behavioral
-fix until the reproduction and comparison above are complete.
+The patch does not write save data. The Workshop staging script copies the
+optional mod and JAR but does not upload it. First verify the JAR load, menu
+width, NPC target and outline, and right-click behavior in a disposable save.

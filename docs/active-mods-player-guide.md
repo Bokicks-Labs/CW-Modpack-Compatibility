@@ -29,9 +29,9 @@ Key details from your installed add-ons:
 - **Viewpoint Tile Fix** supplies roof backs/corners/gables missing from the isometric view. It covers vanilla Kentucky and Grapeseed, not Louisville, and avoids map cells changed by map mods. If removing it, first disable its roof-completion option and visit explored affected places before removing the mod from the save.
 - **Viewpoint Bunker Fix** is a Build 42.21 visual geometry fix for vanilla bunker embankments/walls; enabling or disabling it requires a full game restart.
 - **Viewpoint Turbo** is a client-side performance optimization that aims to preserve quality. Its description does not promise a fixed FPS gain; results depend on the scene and hardware.
-- Remaining Viewpoint patches address specific rendering/interaction defects: barricade textures/placement, vehicle colors and KI5 parts, door lighting/textures, fire sprites, headlight position, wall/roof surfaces, and custom menu text overlap. These are support fixes rather than separate gameplay systems.
+- Remaining Viewpoint patches address specific rendering/interaction defects: barricade textures/placement, KI5 vehicle parts, door lighting/textures, fire sprites, headlight position, wall/roof surfaces, and custom menu text overlap. These are support fixes rather than separate gameplay systems.
 - **AviationCore** plus **AviationCore - Higher Limits** support flight content and lift speed/altitude limits for Viewpoint; the higher-limits add-on says it is solely for Viewpoint.
-- **ZombieBuddy** is a Java runtime patching framework required for Viewpoint's Java-side features. It is infrastructure, not a player-facing menu. The active log confirms it loaded.
+- **ZombieBuddy** is a Java runtime patching framework required for Viewpoint's Java-side features. Subscribe through its official Workshop item and follow its one-time setup instructions. The October 9 active log confirms it loaded; the installed native DLL differs from the Workshop DLL because of the previously tested Windows hostname repair.
 
 ### Project A-Life NPC factions
 
