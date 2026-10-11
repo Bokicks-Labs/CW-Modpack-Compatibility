@@ -1,93 +1,56 @@
-<!-- Steam Workshop descriptions support Steam BBCode. CW docs/steam-changelog-*.txt inputs are plain text; keep formatting in the description and Markdown notes. -->
+<!-- Steam Workshop BBCode. Keep the description fields in workshop.txt synchronized; use plain text for Steam changelog entries. -->
 
 [h1]Chaosworld B42 Modpack Compatibility[/h1]
 
-Targeted, conditional compatibility fixes maintained for the Chaosworld Project Zomboid 42.20 modpack. Install the original mods for the features you use; this item does not replace them. Each runtime patch stays dormant when its supported mod is absent.
+Targeted compatibility fixes for a heavily modded Project Zomboid Build 42 multiplayer world. [b]The core supports Build 42.20+; the optional Viewpoint patch requires 42.21+.[/b] Install each original mod you use; CW does not replace upstream mods. Runtime hooks are conditional on their target mods.
 
-[h2]Important load order[/h2]
+[h2]Load order and multiplayer[/h2]
+Place [b]CWModpackCompatibility after the mods it patches[/b], near the end of the Mods list.
 
-Place [b]CW Modpack Compatibility after the mods it patches[/b], near the end of the Mods list.
-
-Required Lifestyle order:
+For Lifestyle:
 [olist]
 [*]LifestyleHobbies
-[*]LifestyleHobbiesFix — optional; include it only when installed
+[*]LifestyleHobbiesFix (only if installed)
 [*]CWModpackCompatibility
 [/olist]
+Bandits2, BanditsWeekOne, DynamicTradingCommon, DynamicTradingV2, ETO_B and other patched mods should also load before the CW core. Enable optional submods separately. CWAudioMixer and CWModOptionsSearch should load after the core; CWViewpointPatch should load after Viewpoint.
 
-Bandits2, BanditsWeekOne, DynamicTradingCommon, DynamicTradingV2, ETO_B, and other supported mods must also appear before CWModpackCompatibility.
+For multiplayer, keep server/client versions and mod lists aligned and restart after changing order or ownership settings. Back up saves before removing mods.
 
-CW Audio Mixer is optional and, when enabled, must appear after CWModpackCompatibility.
-CW Mod Options Search is optional and, when enabled, must also appear after CWModpackCompatibility.
-
-For multiplayer, clients and the server should use the same mod list, order, and CW version. Fully restart the client and server after changing the order.
-
-[hr][/hr]
-
-[h2]Project Viewpoint prerequisite[/h2]
-
-Subscribe to [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3619862853]ZombieBuddy[/url] and follow its official one-time installation instructions before using Project Viewpoint. Enabling CW does not install or update ZombieBuddy. Existing Windows installations that relied on the separate native-loader repair should retain their working DLL until the upstream installer is verified to resolve that issue.
-
-Project Viewpoint and ZombieBuddy are third-party projects and are not authored or endorsed by Chaosworld.
-
-[hr][/hr]
-
-[h2]Current compatibility features[/h2]
-
+[h2]Core compatibility fixes[/h2]
 [list]
-[*][b]Lifestyle: Hobbies:[/b] Optional hidden-skill view for Yoga, Inventing, Ping Pong, Pool, and Arcade; Beyond Ten progress bridging; focused recovery and diagnostic controls; automatic feature ownership; and a 400-file animation mirror restored to prevent missing-animation regressions. When the corresponding owner mods are active, Nature's Call handles bathroom needs and Brush Your Damn Teeth handles dental hygiene by default. Lifestyle continues to own its other hygiene, grooming, cleaning, hobby, yoga, and animation features.
-[*][b]Nature's Call:[/b] Owns bladder and bowel needs when used with Lifestyle by default. Also prevents a fresh character's startup clock transition from being mistaken for hours of needs progression, retains multiplayer clothing-wash recovery, and leaves legitimate Nature's Call needs untouched.
-[*][b]Brush Your Damn Teeth:[/b] Owns dental hygiene when used with Lifestyle by default. Lifestyle's duplicate brushing actions are suppressed without removing its other mirror, cabinet, grooming, or hygiene actions.
-[*][b]CleanUI + Equipment UI:[/b] Guards transient missing inventory context menus during UI initialization and teardown, preventing the repeated tooltip exception and console flood.
-[*][b]Every Texture Optimized — Well Balanced:[/b] Supplies a narrowly scoped vanilla-safe rain texture after ETO_B to prevent a null weather-particle texture from crashing an existing save during world loading.
-[*][b]Bandits NPC:[/b] Safe companion container-loot targeting and configurable client hit reactions after confirmed firearm or melee damage.
-[*][b]Week One NPC:[/b] Guarded multiplayer variant, population-removal, inhabitant-spawn, and pre-player chat boundaries. These hooks activate only when BanditsWeekOne is installed.
-[*][b]Dynamic Trading:[/b] NPC attachment guards, pre-network player-anchor guards, obsolete wardrobe ID repair, and contacts UI compatibility.
-[*][b]Timed actions and washing:[/b] Safe Gael Gun Store weapon-part completion, Take A Bath And Shower menu compatibility, and generic alternate-form item recovery.
-[*][b]UI and data:[/b] Fast Forward plus Exact Minute Clock positioning, Quartermaster runtime categories, moved Build 42 UI modules, DAMN/KI5 semi-attachment compatibility, and malformed English and sandbox text repairs.
+[*][b]Lifestyle: Hobbies:[/b] Hidden-skill view (Yoga, Inventing, Ping Pong, Pool and Arcade), Beyond Ten progress integration, animation-regression mirror, diagnostics and automatic feature ownership. Nature's Call can own bathroom needs, Brush Your Damn Teeth can own dental hygiene, and CW can disable Lifestyle's overlapping personal hygiene meter/moodles by default. Lifestyle cleaning actions, Cleaning skill, other grooming, hobbies and animations remain available.
+[*][b]Nature's Call:[/b] Fresh-character clock-jump guard and multiplayer clothing-wash recovery without discarding real need progression.
+[*][b]Brush Your Damn Teeth:[/b] Suppress Lifestyle's duplicate brushing actions while keeping its unrelated actions.
+[*][b]Moodles in Lua:[/b] Keep the duplicate vanilla Moodle UI off screen even when Build 42 repositions it.
+[*][b]CleanUI + Equipment UI:[/b] Guard temporary missing inventory context menus to prevent tooltip exceptions.
+[*][b]Every Texture Optimized (ETO_B):[/b] Narrow vanilla-safe rain-texture override for a world-loading crash.
+[*][b]Bandits and Week One:[/b] Safe companion-loot targeting, optional player-hit reactions, and guarded Week One multiplayer variant/removal/chat boundaries.
+[*][b]Dynamic Trading:[/b] NPC attachment, networking and old wardrobe-ID guards plus contacts UI compatibility.
+[*][b]Other fixes:[/b] Gael Gun Store timed-action safety; Take A Bath And Shower menus; item recovery; Fast Forward / Exact Minute Clock layout; Quartermaster categories; moved Build 42 UI modules; DAMN/KI5 attachments and text repairs.
+[*][b]Casualties Undead (optional):[/b] Adds top-level Full health shortcuts to the Health panel's body-part menu only while the game's Cheat option is enabled; no normal treatment changes.
 [/list]
 
-[h2]Configuration[/h2]
-
+[h2]Optional submods[/h2]
 [list]
-[*]Bandits hit reactions can be enabled and tuned in Sandbox Options.
-[*]Lifestyle ownership defaults require no setup and can be overridden independently under Chaosworld Compatibility - Lifestyle Ownership in Sandbox Options. Restart after changing them. Removing an owner mod automatically returns that feature to Lifestyle; CW also restores Lifestyle's default bladder multiplier if an older preset left it at zero, unless that fallback is disabled.
-[*]The Lifestyle compatibility skill view can be toggled in Mod Options.
-[*][b]CW Audio Mixer (optional submod):[/b] Enable [i]CW Audio Mixer[/i] separately after CW Modpack Compatibility. It is client-only and discovers loaded game/mod sounds for local group and per-sound volume controls. Open it in Mod Options or from the world right-click menu. Vanilla rain shares PZ's World Ambience event, so its control also changes other weather ambience.
-[*][b]CW Mod Options Search (optional submod):[/b] Enable it separately after CW Modpack Compatibility. It adds a client-only search launcher to the first section of the Build 42 Mod Options page and jumps to matching registered mod settings without changing their values.
+[*][b]CW Audio Mixer (0.2.0):[/b] Client-only group and individual sound sliders. Find its group controls under Options > Audio > CW Audio Mixer; Advanced sound mixer handles individual sounds and assignments. Categories include UI, death music, TV, radio, music, ambience, vehicles and combat. Settings are local. The title-screen video audio cannot reliably be controlled by this Lua mixer; vanilla rain is part of a shared ambience event, not an isolated rain slider.
+[*][b]CW Mod Options Search (0.1.2):[/b] Client-only search inside Options > Mods for registered mod settings, labels and tooltips. Select a result to jump to an available option; search never edits setting values.
+[*][b]CW Viewpoint Patch (0.2.0, experimental):[/b] Client-only Build 42.21+ patch for wider Viewpoint interaction labels, Project A-Life NPC selection and a guarded right-click fallback. Requires [b]Viewpoint and ZombieBuddy[/b]. Enable separately after Viewpoint. Configure label width under Options > Mods > CW Viewpoint Patch and restart. The included Java JAR requires explicit approval via ZombieBuddy. Test in a disposable save; NPC outlines and world interactions are not fully verified.
 [/list]
 
-CW 1.1.16 directs players to the official ZombieBuddy Workshop item and refreshes mod update guidance.
+[h2]Project Viewpoint and ZombieBuddy[/h2]
+Subscribe to the [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3619862853]official ZombieBuddy Workshop item[/url] and follow its current installation instructions before using Viewpoint. [b]The old CW ZombieBuddy setup launcher and bundled compatibility JAR were removed.[/b] Installing CW never downloads, executes, or repairs ZombieBuddy. On Windows, do not overwrite an already-working native DLL merely for cleanup if its current setup differs from upstream. ZombieBuddy and Viewpoint are third-party projects, not Chaosworld releases.
 
-[h2]Verification[/h2]
+[h2]Configuration and testing[/h2]
+Bandits hit reactions and Lifestyle feature ownership are configured under Sandbox Options. Each Lifestyle ownership rule can be disabled independently; restart for changes. The optional Lifestyle skill view is under Mod Options. Existing saves may contain settings or obsolete Viewpoint add-ons: back up saves and validate any migration separately.
 
-[list]
-[*]All compatibility regression suites pass.
-[*]The Lifestyle animation mirror matches the installed compatible upstream files by filename, size, and SHA-256.
-[*]The affected local save was runtime-tested successfully with ETO_B enabled and the CW weather-texture override active.
-[*]The Nature's Call and CleanUI/Equipment UI fixes behaved correctly during runtime testing.
-[/list]
+Compatibility behavior was previously tested for several fixes, and the repo has focused regression scripts, but this 1.2.0 candidate has [b]not yet passed a new end-to-end game or multiplayer test[/b]. Please report reproducible errors with the current game/mod version and relevant console log.
 
-[h2]Credits and upstream ownership[/h2]
+[h2]Credits[/h2]
+Original mods and assets belong to their creators. This is an unofficial compatibility project. Lifestyle: Hobbies by Angry; Every Texture Optimized by maceleet; Bandits/Week One by Slayer; Dynamic Trading by Psychopatz; GaelGunStore by Pen-Pen Pirulin; Nature's Call by RedChili; Brush Your Damn Teeth by Cam3; Take A Bath And Shower by si-cafe; Fast Forward by Maumau; Exact Minute Clock by PorrisV99; Quartermaster by deckard; Beyond Ten by Patryk (Workshop publication by Silver/Brek); ZombieBuddy by Andrey "Zed" Zaikin. Viewpoint, Project A-Life, Casualties Undead and all other supported third-party projects remain the property of their respective authors.
 
-All original mods and assets remain the work of their respective authors. This compatibility mod is not an official release from those authors.
+CW 1.2.0 expands optional interface/experimental Viewpoint support and updates hygiene ownership and installation guidance.
 
-[list]
-[*]Lifestyle: Hobbies by Angry. CW carries a compatibility animation mirror from the verified upstream version while leaving the current yoga implementation and mappings under Lifestyle's ownership.
-[*]Every Texture Optimized by maceleet. CW overrides only the incompatible rain texture with its vanilla Project Zomboid counterpart.
-[*]Bandits NPC and Week One NPC by Slayer.
-[*]Dynamic Trading (w/ NPC) and Dynamic Trading Common Library by Psychopatz.
-[*]GaelGunStore-Firearms by Pen-Pen Pirulin.
-[*]Nature's Call by RedChili.
-[*]Brush Your Damn Teeth by Cam3.
-[*]Take A Bath And Shower (SP/MP) by si-cafe.
-[*]Fast Forward (MP) by Maumau.
-[*]EXACT MINUTE CLOCK (B42) by PorrisV99.
-[*]Quartermaster - Auto-Sort & Store Loot by deckard.
-[*]Beyond Ten - Level 15 Skills by Patryk, published on Workshop by Silver (Brek).
-[*]ZombieBuddy by Andrey "Zed" Zaikin. Install it from its official Workshop item and follow its setup instructions.
-[/list]
+CW maintains a mirrored set of Lifestyle animations for regression prevention. If any original author requests removal of their material or compatibility support, CW will honor that request.
 
-If an original mod author asks for support for their mod or redistributed material to be removed, it will be removed.
-
-[i]WIP: created and maintained with Codex for a private friend-group modpack. Current compatibility release: 1.1.16.[/i]
+[i]Maintained with Codex for the Chaosworld friend-group modpack. Current compatibility release: 1.2.0. Optional modules may have independent versions.[/i]

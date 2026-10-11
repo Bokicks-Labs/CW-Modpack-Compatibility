@@ -1,6 +1,6 @@
 # CW Modpack Compatibility
 
-Private source repository for the Chaosworld Project Zomboid Build 42 compatibility mod.
+Source repository for the Chaosworld Project Zomboid Build 42 compatibility mod.
 
 The Workshop payloads are kept under `Contents/mods`. The core `CWModpackCompatibility` mod contains targeted compatibility fixes for the Chaosworld modpack, including the Lifestyle hidden-skill display bridge and automatic feature ownership for Nature's Call and Brush Your Damn Teeth.
 
@@ -9,6 +9,8 @@ It also contains optional client-only submods. `CWAudioMixer` provides discovere
 ## Workshop copy
 
 - [Current Workshop description](docs/workshop-description.md)
+- [Steam-formatted version 1.2.0 changelog](docs/steam-changelog-1.2.0.txt)
+- [Version 1.2.0 changelog](docs/workshop-changelog-1.2.0.md)
 - [Steam-formatted version 1.1.16 changelog](docs/steam-changelog-1.1.16.txt)
 - [Version 1.1.16 changelog](docs/workshop-changelog-1.1.16.md)
 - [Steam-formatted version 1.1.15 changelog](docs/steam-changelog-1.1.15.txt)
@@ -59,23 +61,7 @@ This creates:
 
 The copied payload has ID `CWModpackCompatibility_dev` and a `(Dev)` name; release source and Workshop staging keep `CWModpackCompatibility`. The command discovers submods under `Contents/mods` whose `42/mod.info` lists `CWModpackCompatibility` in `require=`, plus the independent `CWViewpointPatch` submod. It creates a `_dev` copy of each, changing only dependencies on `CWModpackCompatibility` to `CWModpackCompatibility_dev`; the Viewpoint patch retains its Viewpoint and ZombieBuddy requirements. Enable the dev core and whichever dev submods you want in the test mod list; disable their release IDs for that test. Each activation builds fresh copies, so rerun the command to remove the junctions before testing new edits. Old copies under `LocalTest` may be removed after testing. The script refuses to replace real folders or unmanaged junctions. If the older `CWModpackCompatibility` junction is installed, remove that junction before activating this one.
 
-To test only the optional audio submod without changing the core compatibility junction, run:
-
-```powershell
-.\Scripts\toggle-pz-audio-mixer-junction.ps1
-```
-
-To test only the optional Mod Options Search submod, run:
-
-```powershell
-.\Scripts\toggle-pz-mod-options-search-junction.ps1
-```
-
-To test only the optional Viewpoint patch without changing the CW core, run:
-
-```powershell
-.\Scripts\toggle-pz-viewpoint-patch-junction.ps1
-```
+The main dev-junction command above can stage all supported dev submods, including Audio Mixer, Mod Options Search and Viewpoint Patch. To toggle only Viewpoint Patch, use `Scripts/toggle-pz-viewpoint-patch-junction.ps1`.
 
 ## Workshop staging
 
@@ -85,7 +71,7 @@ After testing a commit, update the local PZ Workshop staging folder with:
 .\Scripts\publish-to-pz-workshop.ps1
 ```
 
-This mirrors the core compatibility mod, both optional client submods, and Workshop metadata to `%UserProfile%\Zomboid\Workshop\CW-Modpack-Compatibility`, removes destination-only files inside each managed staging mod, and verifies each staged file set and SHA-256 hashes. It does not edit the Steam installation, base-game media, launchers, DLLs, saves, or the live Steam Workshop cache.
+This mirrors the core compatibility mod, all three optional client submods, and Workshop metadata to `%UserProfile%\Zomboid\Workshop\CW-Modpack-Compatibility`, removes destination-only files inside each managed staging mod, and verifies each staged file set and SHA-256 hashes. It does not edit the Steam installation, base-game media, launchers, DLLs, saves, or the live Steam Workshop cache.
 
 ## Repository boundaries
 
@@ -93,4 +79,4 @@ Every new submod under `Contents/mods` must ship unique `42/poster.png` and `42/
 
 - `Contents/mods/CWModpackCompatibility` is the authoritative mod source.
 - `Scripts` contains local-only development, regression, and staging helpers.
-- The Steam Workshop item remains separate from this private source repository.
+- The Steam Workshop item remains separate from this source repository.
