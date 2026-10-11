@@ -6,6 +6,13 @@ The Workshop payloads are kept under `Contents/mods`. The core `CWModpackCompati
 
 It also contains optional client-only submods. `CWAudioMixer` provides discovered-sound group and per-sound volume controls; `CWModOptionsSearch` adds search-and-jump navigation to the Build 42 Mod Options page. `CWViewpointPatch` contains optional Viewpoint menu, NPC targeting, and world right-click patches, and requires Viewpoint and ZombieBuddy only when enabled. See [CW Audio Mixer](docs/audio-mixer.md), [CW Mod Options Search](docs/mod-options-search.md), and [Viewpoint patch work](docs/viewpoint-patch.md).
 
+## Player guide and server mod sync
+
+- [Major gameplay systems guide (controls, progression, linked official wikis and bug checks)](docs/major-mods-feature-guide.md). Focuses on substantial systems; excludes Viewpoint and simple item/cosmetic mods.
+- [Workshop-backed active server mod list (October 11, 2026)](docs/active-server-mods-2026-10-11.csv). This is the release-only client/server sync reference: **342 distinct in-game mod IDs across 300 Workshop items**, with no local development IDs or unresolved Workshop links. The CSV is a dated snapshot, not a live read of server.ini. Multiple mod IDs can map to one Workshop item; only unique numeric Workshop IDs belong in `WorkshopItems=`, while individual module IDs belong in `Mods=`. Preserve dependency-aware server load order.
+- [October 9 loaded-session player guide](docs/active-mods-player-guide.md). Older diagnostic snapshot that may include local development IDs; **do not use it to synchronize clients**.
+- "Yeah, It's Water, Bitch" remains excluded from the active CSV because it is currently malfunctioning.
+
 ## Workshop copy
 
 - [Current Workshop description](docs/workshop-description.md)
