@@ -162,6 +162,32 @@ The active mod index describes a very broad set of machinery and production feat
 
 Reference: [Workshop item from actual active CSV](https://steamcommunity.com/sharedfiles/filedetails/?id=3794133594).
 
+## Immersive Blackouts (ImmersiveBlackouts)
+
+This mod means a temporary utility outage is **not necessarily** the permanent vanilla shutdown. It simulates electricity and water going off and recovering, then eventually declining for good. Its creator lists default periodic outage/restoration chances of **1%/5% per 10-minute check**, adjustable by sandbox settings. Tune outage windows and permanent-shutoff behavior in Sandbox Options. Clients can adjust flickering effects separately in Mod Options.
+
+**Use:** tune the world settings and listen to **KERS 89.2 MHz** radio broadcasts for infrastructure warnings and restoration reports. Debug/server admins can also toggle events from a debug context menu before permanent shutoff.
+
+**Watch:** temporary failures versus permanent shutdown, radio announcements lining up with actual state, flickering on each client, and generator-powered buildings continuing to work during grid loss. Since LG Extended Electricity, BADLANDS and water mods are installed, test power and water as distinct systems, not a single switch.
+
+Source: [Workshop features and configuration](https://steamcommunity.com/sharedfiles/filedetails/?id=3607686447).
+
+## Beyond Ten (BeyondTen)
+
+Skills continue from **level 10 to 15** with separate mastery progress, a 15-slot skill panel and additional combat, strength, endurance and crafting bonuses. The underlying native game tables still max at 10: mastery lives in the mod's extra saved state. This matters for compatibility with other skills and player panels.
+
+**Watch:** XP and mastery after logout, other mods' skills appearing in the expanded panel, normal tooltip and status display in CleanUI, and whether skills that have their own level-10 gates continue awarding XP. The author notes not every external save/death-recovery mod preserves mastery. It is **not equivalent to changing native perk levels to 15**.
+
+Source: [Workshop progression, values and compatibility notes](https://steamcommunity.com/sharedfiles/filedetails/?id=3765241705).
+
+## PZ Pulse, PZ Pulse Expanded and companion panels
+
+These are **read-only external dashboards**, not in-world treatment or stat-changing gameplay. The active CSV includes PZ Pulse (`PZ_Pulse`), your released PZ Pulse Expanded (`PZ_Pulse_Expanded`), Nutrition Panel (`PZ_Nutri_Panel`) and Companion Dogs panel (`PZ_Pulse_CompanionDogs`). Expanded's Needs panel supports extra moodles/stats; where CW disables Lifestyle hygiene by ownership, its hygiene bar can be intentionally omitted.
+
+**Use:** open the PZ Pulse browser UI while playing and confirm the exported character/needs panels update. **Watch:** panels absent due to optional mod data, stale browser values, duplicated status providers, and the difference between one player's locally loaded development addon and the **released** server-sync ID. Never substitute `PZ_Pulse_Expanded_Dev` in the CSV.
+
+References: [PZ Pulse Workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=3753700423), [PZ Pulse Expanded Workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=3804774101), [CW ownership](lifestyle-feature-ownership.md).
+
 ## First-pass test order (short, repeatable)
 
 1. **Safe-house baseline:** confirm CW overlap settings, Nature's Call health tab, hygiene actions, Lifestyle music/hobby interactions, and client/server agreement.
