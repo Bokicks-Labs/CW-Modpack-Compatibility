@@ -76,7 +76,7 @@ $updates[$steamPath] = "[h1]Version $next[/h1]`n`n$summaryLine`n`n[list]`n" + ((
 $workshopLines = $updates[$workshopPath] -split '\r?\n'
 $submitDescription = @($workshopLines | Where-Object { $_ -like 'description=*' } | ForEach-Object { $_.Substring(12) }) -join "`n"
 $workshopId = @($workshopLines | Where-Object { $_ -like 'id=*' } | Select-Object -First 1) -replace '^id=', ''
-$modIds = foreach ($modName in @('CWModpackCompatibility', 'CWAudioMixer', 'CWModOptionsSearch')) {
+$modIds = foreach ($modName in @('CWModpackCompatibility', 'CWAudioMixer', 'CWModOptionsSearch', 'CWViewpointPatch')) {
     $modInfo = Read-Source "Contents/mods/$modName/42/mod.info"
     $modId = @($modInfo -split '\r?\n' | Where-Object { $_ -like 'id=*' } | Select-Object -First 1) -replace '^id=', ''
     if (-not $modId) { throw "Missing mod ID for $modName." }

@@ -1,9 +1,9 @@
 name=Chaosworld B42 Modpack Compatibility
 id=CWModpackCompatibility
 author=chaosworld
-description=[b]Targeted compatibility fixes for the Chaosworld Build 42 modpack.[/b] Each patch activates only when its supported mod is enabled. Includes Lifestyle feature ownership for Nature's Call and Brush Your Damn Teeth, Bandits player hit reactions, Week One multiplayer guards, a Lifestyle skill view, shower networking and timed-action fixes, clock and fast-forward layout, skill-media sorting, moved Build 42 UI modules, and text repairs.
+description=[b]Conditional compatibility fixes for Chaosworld Build 42.[/b] Covers Lifestyle needs ownership, Moodle UI, Nature's Call, CleanUI, Bandits/Week One, Dynamic Trading, timed actions, and other narrow B42 patches. Optional client submods supply Audio Mixer, Mod Options Search and experimental Viewpoint integration.
 versionMin=42.20.0
-modversion=1.1.16
+modversion=1.2.0
 category=fixes
 poster=poster.png
 icon=icon.png

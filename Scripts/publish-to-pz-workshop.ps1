@@ -63,11 +63,18 @@ $workshopTextPath = Join-Path $workshopRoot 'workshop.txt'
 $workshopLines = @(Get-Content -LiteralPath $workshopTextPath)
 $workshopDescription = @($workshopLines | Where-Object { $_ -like 'description=*' } | ForEach-Object { $_.Substring(12) }) -join "`n"
 $workshopId = @($workshopLines | Where-Object { $_ -like 'id=*' } | Select-Object -First 1) -replace '^id=', ''
-$modIds = @(Get-ChildItem -LiteralPath (Join-Path $workshopRoot 'Contents\mods') -Directory | ForEach-Object {
-    $modInfo = Join-Path $_.FullName '42\mod.info'
-    if (Test-Path -LiteralPath $modInfo -PathType Leaf) {
-        Get-Content -LiteralPath $modInfo | Where-Object { $_ -like 'id=*' } | ForEach-Object { $_ -replace '^id=', '' }
-    }
+$stagingModsRoot = Join-Path $workshopRoot 'Contents\mods'
+$unexpectedMods = @(Get-ChildItem -LiteralPath $stagingModsRoot -Directory |
+    Where-Object { $modNames -notcontains $_.Name })
+if ($unexpectedMods.Count -gt 0) {
+    throw "Unexpected, unmanaged Workshop staging mod folder(s): $($unexpectedMods.Name -join ', '). Review and remove these from the staging directory manually before publishing."
+}
+$modIds = @($modNames | ForEach-Object {
+    $modInfo = Join-Path $stagingModsRoot "$_\42\mod.info"
+    if (-not (Test-Path -LiteralPath $modInfo -PathType Leaf)) { throw "Missing staged mod.info: $modInfo" }
+    $ids = @(Get-Content -LiteralPath $modInfo | Where-Object { $_ -like 'id=*' } | ForEach-Object { $_ -replace '^id=', '' })
+    if ($ids.Count -ne 1 -or $ids[0] -ne $_) { throw "Wrong/missing ID in $modInfo" }
+    $ids[0]
 })
 $submitDescription = $workshopDescription + "`n`nWorkshop ID: $workshopId" + (($modIds | ForEach-Object { "`nMod ID: $_" }) -join '')
 $submitDescriptionBytes = [Text.Encoding]::UTF8.GetByteCount($submitDescription)
