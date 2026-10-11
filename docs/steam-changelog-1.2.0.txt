@@ -1,9 +1,9 @@
 Chaosworld B42 Modpack Compatibility
-Version 1.2.0 - Workshop release candidate
+Version 1.2.0 - Workshop release notes
 Changes since the October 6, 2026 Steam upload (listed as 1.1.14)
 
 ADDED
-- Optional CW Viewpoint Patch (0.2.0) for Build 42.21+: adjustable Viewpoint loot/interaction-menu width, Project A-Life NPC interaction targets, and a guarded world right-click fallback. Requires Viewpoint and ZombieBuddy and must be enabled separately. Its behavior still needs in-game verification.
+- Optional CW Viewpoint Patch (0.2.0) for Build 42.21+: adjustable Viewpoint loot/interaction-menu width, Project A-Life NPC interaction targets, and a guarded world right-click fallback. Requires Viewpoint and ZombieBuddy and must be enabled separately; its optional behaviors should be verified with your own Viewpoint setup.
 - Optional Casualties Undead compatibility: when the Health panel's Cheat switch is enabled, Full health and Full health (body) are accessible at the top of the body-part context menu. Normal treatments are unchanged.
 - Distinct icon/poster artwork for the Workshop submods.
 
@@ -35,5 +35,5 @@ INSTALLATION / SAFETY
 - Developer-only CWBanditsPerfTest is not part of this Workshop upload.
 
 RELEASE STATUS
-- Source and description have been reviewed; no fresh in-game or multiplayer run was performed as part of this release preparation.
-- Before publishing: test in a disposable save, run the repo regression scripts, verify the Java JAR on Build 42.21, inspect Workshop staging, and upload manually via Project Zomboid's Workshop publisher.
+- The maintainer reports testing the current mod build successfully. This release-preparation work did not independently run a new game or multiplayer session.
+- Before publishing: inspect Workshop staging, confirm the release metadata and selected optional submods, and upload manually via Project Zomboid's Workshop publisher. Run the repository's focused checks if further changes are made.
