@@ -2,7 +2,7 @@
 
 Last reviewed: **2026-10-11**. Scope: the release-only IDs in [active-server-mods-2026-10-11.csv](active-server-mods-2026-10-11.csv), cross-checked against [active-mod-index.tsv](active-mod-index.tsv) and official Steam Workshop listings. This is a **feature handbook**, not a claim that every system has been runtime-tested on the current dedicated server.
 
-**Deliberately excluded:** Project Viewpoint and its visual/compatibility submods, individual vehicles, cosmetics, passive libraries, simple item packs, and other self-explanatory content. The CSV still tracks all those mods for syncing. If a mod is not in the CSV, this guide does not declare it active.
+**Coverage:** major gameplay systems, now including Project Viewpoint and its substantial 3D interaction/combat add-ons. Individual vehicles, cosmetics, passive libraries, simple item packs and other self-explanatory content remain outside the detailed handbook. The CSV continues to track every active entry for synchronization. If a mod is not in the CSV, this guide does not declare it active.
 
 **How to read:** "Use" is a documented action, "Watch" is a reproducible test to try, **not** an assertion of an observed Chaosworld bug. Keybinds are defaults reported by the creator; personal mappings or another mod may override them.
 
@@ -10,6 +10,7 @@ Last reviewed: **2026-10-11**. Scope: the release-only IDs in [active-server-mod
 
 | System | Actual major mechanic | Quick entry point | Official source |
 | --- | --- | --- | --- |
+| Project Viewpoint | Full 3D perspective, optics, ballistics, weather and interactions | **O** perspective, **Shift+O** first/third, **Delete** graphics/settings | [Workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=3809306528) |
 | Casualties Undead | Physiology, 21 conditions, treatment minigames, prosthetics, resuscitation | Health panel; right-click/Esc exits a procedure | [Workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=3805748433) |
 | Project A-Life | Persistent faction squads, territory, raids, radios and creator | NPC/faction creator; 100+ sandbox settings | [Workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=3803984183) |
 | Companion Dogs and Cats | Commands, loyalty, needs, skills, hunting, combat, breeding | Paw sidebar; **hold Q** radial; Paw window > Settings for hotkeys | [Features wiki](https://companiondogs.pet/docs/en/features.html) / [Breeds wiki](https://companiondogs.pet/docs/en/breeds.html) |
@@ -25,6 +26,20 @@ Last reviewed: **2026-10-11**. Scope: the release-only IDs in [active-server-mod
 | RadArchery | Bows, quivers, arrow recovery, Archery + Fletching | In-game Archery Handbook | [Workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=3775407541) |
 | Maskarad's Summer Car | Detailed vehicle engines, transmissions, fluids, lift maintenance | Vehicle mechanics/engine panels, car lift | [Workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=3790160840) |
 | Artel Manufactory | Large production suite: food processing, brewing, crafting, chemistry, commerce | In-game crafting/machine recipes | [Workshop link from active CSV](https://steamcommunity.com/sharedfiles/filedetails/?id=3794133594) |
+
+## Project Viewpoint (Viewpoint) and installed gameplay add-ons
+
+Viewpoint changes the camera, rendering, interactions, targeting and visual weather rather than just applying a graphics filter. The **core Steam listing** documents these defaults: **middle mouse** toggles cursor, **O** enables/disables first-person Viewpoint, **Shift+O** switches between first and third person, **Insert+O** enables Free Cam, **Shift+Insert+O** enables Physical Free Cam, and **Delete** opens shader/FOV/mouse/settings. Its bug reports use lines prefixed `[Viewpoint]` in `%USERPROFILE%\Zomboid\console.txt`. Settings include Vanilla, Default and Vivid shader profiles; test one profile at a time when troubleshooting.
+
+**Combat changes:** the installed **Recoil & ADS** handles sights, scopes and weapon-specific aim alignment; **True Ballistics** starts a projectile at the muzzle rather than at the camera and models travel time, drop, body hit locations, solid cover, glass, drag and falloff. **Advanced Throwables** supplies hold-to-charge throws and object collisions. True Ballistics documents debug-console diagnostics `VTB_status()`, `VTB_debug("trajectories", true)`, and `VTB_tracers(1)` (debug mode required). **Full-range dedicated-server ballistics** require the appropriate ZombieBuddy server integration; a client-rendered bullet is not proof that server-side hit validation succeeded. The author specifically warns against combining competing firearm-hit replacements.
+
+**Interactions and world systems:** installed mods include 3D foraging pins, fishing, shovel/grave placement (**Period** while holding a suitable tool), 3D fences (**F8** original/3D toggle), weather/lighting effects, weather-driven gameplay, 3D construction ghost previews, windows, surfaces, barricades, lighting, rendering fixes and Viewpoint QOL. **Viewpoint QOL uses K for the loot-menu toggle**, potentially conflicting with Senator's Martial Arts and HydeCo Underground's K actions. The QOL mod also touches menu and interaction-target hooks.
+
+**Installed vs optional:** the server-sync CSV still includes `ViewpointCar` and `ViewpointMenu` even though the respective patches have been labeled obsolete by their authors. Keep them in the dated membership CSV until you deliberately change the live server preset and confirm save impact; do not assume they remain beneficial. **Viewpoint Turbo** appears in an older loaded-mod inventory but not in the October 11 release-only CSV. CW's own experimental `CWViewpointPatch` is documented separately and is **not** automatically an active mod just because its source exists in this repository.
+
+**Watch:** (1) weapons striking cover from their muzzle versus firing through walls, and server/client hit agreement; (2) NPCs getting shot / losing collision or interaction targetability; (3) disappearance of world right-click menu vs inventory UI context menus; (4) opaque glass/roof surfaces, headlight offset, barricades and stairs; (5) view-dependent FPS and shader side effects; (6) ZombieBuddy Java/native integration after game updates; (7) overlapping keybinds, particularly **K**. Isolate in first-person, third-person and isometric modes in the same scene.
+
+References: [Viewpoint core workshop and controls](https://steamcommunity.com/sharedfiles/filedetails/?id=3809306528), [True Ballistics mechanics and server setup](https://steamcommunity.com/sharedfiles/filedetails/?id=3812864848), [CW Viewpoint patch implementation/audit](viewpoint-patch.md), [earlier general player guide](active-mods-player-guide.md).
 
 ## Casualties Undead (CasualtiesUndead)
 
@@ -204,4 +219,4 @@ The CSV is the **Workshop-backed mod membership reference** for matching a clien
 
 **Known excluded mod:** "Yeah, It's Water, Bitch" is intentionally disabled because it is not working correctly, and has no row in the release-only CSV.
 
-See [complete, older session player guide](active-mods-player-guide.md) for brief notes on remaining mods; ignore its Viewpoint sections for this focused handbook.
+See [complete, older session player guide](active-mods-player-guide.md) for brief notes on remaining mods. Its session inventory may contain development IDs; the October 11 CSV remains the release-only sync reference.
