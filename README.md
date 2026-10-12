@@ -9,7 +9,7 @@ It also contains optional client-only submods. `CWAudioMixer` provides discovere
 ## Player guide and server mod sync
 
 - [Major gameplay systems guide (controls, progression, linked official wikis and bug checks)](docs/major-mods-feature-guide.md). Focuses on substantial systems, including Viewpoint; excludes simple item/cosmetic mods.
-- [Workshop-backed active server mod list (October 11, 2026)](docs/active-server-mods-2026-10-11.csv). This is the release-only client/server sync reference: **342 distinct in-game mod IDs across 300 Workshop items**, with no local development IDs or unresolved Workshop links. The CSV is a dated snapshot, not a live read of server.ini. Multiple mod IDs can map to one Workshop item; only unique numeric Workshop IDs belong in `WorkshopItems=`, while individual module IDs belong in `Mods=`. Preserve dependency-aware server load order.
+- [Workshop-backed active mod list (October 11, 2026)](docs/active-server-mods-2026-10-11.csv). This is the release-ID sync reference refreshed from the latest October 11 loaded game session: **345 distinct in-game mod IDs across 302 Workshop items**, with local development IDs mapped to their public Workshop IDs. The CSV is a dated snapshot, not a live read of server.ini. Multiple mod IDs can map to one Workshop item; only unique numeric Workshop IDs belong in `WorkshopItems=`, while individual module IDs belong in `Mods=`. Preserve dependency-aware server load order.
 - [October 9 loaded-session player guide](docs/active-mods-player-guide.md). Older diagnostic snapshot that may include local development IDs; **do not use it to synchronize clients**.
 - "Yeah, It's Water, Bitch" remains excluded from the active CSV because it is currently malfunctioning.
 
