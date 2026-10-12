@@ -1,6 +1,6 @@
 # Chaosworld major gameplay systems: player guide and bug checklist
 
-Last reviewed: **2026-10-11**. Scope: the release-only IDs in [active-server-mods-2026-10-11.csv](active-server-mods-2026-10-11.csv), cross-checked against [active-mod-index.tsv](active-mod-index.tsv) and official Steam Workshop listings. This is a **feature handbook**, not a claim that every system has been runtime-tested on the current dedicated server.
+Last reviewed: **2026-10-11**. Scope: the release-only IDs in [active-server-mods-2026-10-11.csv](active-server-mods-2026-10-11.csv), cross-checked against [active-mod-index.tsv](active-mod-index.tsv), installed Workshop payloads and official Steam Workshop listings. This is a **feature handbook**, not a claim that every system has been runtime-tested on the current dedicated server.
 
 **Coverage:** major gameplay systems, now including Project Viewpoint and its substantial 3D interaction/combat add-ons. Individual vehicles, cosmetics, passive libraries, simple item packs and other self-explanatory content remain outside the detailed handbook. The CSV continues to track every active entry for synchronization. If a mod is not in the CSV, this guide does not declare it active.
 
@@ -26,6 +26,8 @@ Last reviewed: **2026-10-11**. Scope: the release-only IDs in [active-server-mod
 | RadArchery | Bows, quivers, arrow recovery, Archery + Fletching | In-game Archery Handbook | [Workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=3775407541) |
 | Maskarad's Summer Car | Detailed vehicle engines, transmissions, fluids, lift maintenance | Vehicle mechanics/engine panels, car lift | [Workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=3790160840) |
 | Artel Manufactory | Large production suite: food processing, brewing, crafting, chemistry, commerce | In-game crafting/machine recipes | [Workshop link from active CSV](https://steamcommunity.com/sharedfiles/filedetails/?id=3794133594) |
+
+**Guide coverage note:** the major systems already have entries here, including the linked Casualties Undead guide. This handbook has focused code-derived player workflows for Artel Manufactory; remaining entries are prioritization candidates rather than confirmed missing guides. See the code/source coverage note in Artel's section.
 
 ## Project Viewpoint (Viewpoint) and installed gameplay add-ons
 
@@ -181,11 +183,29 @@ Source: [Workshop description and caveats](https://steamcommunity.com/sharedfile
 
 ## Artel Manufactory (ArtelManufactory)
 
-The active mod index describes a very broad set of machinery and production features: brewing, canning and rations, beekeeping/dairy, drying, freeze-drying, farming, electric machines, chemical/steam equipment, reputation and trading. Some features may be tied to individual sandbox pack toggles. **Important verification limit:** its Steam page was not retrievable during this audit, so the index is the source of these feature claims. Do not treat roadmap-like descriptions as guaranteed existing recipes.
+The installed payload is a large, late-game production suite, but it is not one linear tech tree. It mixes ordinary learned recipes and found loot with special machines that have their own windows or right-click actions. Sandbox Options > Artel groups features and loot by pack. The installed version identifies itself as **0.2.0** and targets Build 42.21+.
 
-**Use:** inspect Artel entries in Sandbox Options and in-game recipe/workstation menus; identify which machine chains are active. **Watch:** duplicate beekeeping/food preservation paths alongside HydeCo Bees and Long Term Preservation; workstation power versus LG systems; trading persistence. No authoritative external wiki link was verified.
+### Find recipes and learn the system
 
-Reference: [Workshop item from actual active CSV](https://steamcommunity.com/sharedfiles/filedetails/?id=3794133594).
+Start with books and magazines found in the world, then use the crafting search to find unlocked recipes. When holding an ingredient, right-click it and choose **Recipes with this item** to open the handcraft list filtered to recipes that consume it. The mod adds this entry as a fallback where the normal menu does not expose it. Machine recipes are separate: use the machine's own window and recipe list. If an expected recipe is absent, check that its Artel pack is enabled and that any required book has been read.
+
+### Production paths
+
+- **Food, medicine, rations and sport nutrition:** the installed recipe and item data includes preserved foods, medical supplies, field rations and protein/supplement bars. The factory sealer and bar extruder are powered CraftBench stations with their own recipe panels; look for the machine's recipe book and required station in the recipe requirements. Some product groups have separate sandbox toggles, including super bars and their cooldown/defect settings.
+- **Brewing:** recipes cover fermentation and bottling/kegging. The process preserves liquid and container state: fill an empty container from a valid batch, seal bottles with the matching cork/cap or close a keg, then let the batch age. The Brew Speed setting changes supported fermentation and aging durations; it does not accelerate every Artel process.
+- **Beekeeping:** build and place an apiary outdoors. It starts with one frame and can be expanded to three; add a queen, then inspect the hive for its state. Each frame fills separately, with production strongest in May–July, slower in spring/autumn and stopped in winter by default. Nearby flowering Artel planters speed production. Place and light a smoker at the entrance before harvesting to reduce sting risk; harvesting is one timed action per ready frame. The installed options can enable year-round production and independently control disease and sting wounds. This is a separate system from HydeCo Bees.
+- **Drying and freeze-drying:** load a drying rack or electric dryer through its station window and select a listed recipe. The electric dryer needs power; its batch pauses while its square has no electricity and resumes when power returns. The sublimator is a separate station with its own recipes. The drying sandbox toggle gates these stations. Their recipe timers are not all affected by Artel's general speed settings.
+- **Chemistry and power:** the chemical bench, bioreactor, retort and steam generator are buildable/usable stations, not simply recipes made in inventory. The steam generator is assembled in stages from its construction context menu: frame, boiler, engine, then piping. Once complete, its vanilla generator interaction starts/stops it; the Artel context menu handles fuel, water and boiler repair. It burns solid fuel, needs water, and stops when fuel/water is depleted or its condition is too low. Chemistry and steam have separate sandbox gates; the machine speed option applies only to the retort and bioreactor.
+- **Cold storage:** the cooler bag accepts up to three batteries. With charge, it slows food aging to one quarter of the normal rate until its battery reserve is spent. A buildable cellar slows food aging to 60% continuously and does not require power. The Cold Storage sandbox toggle controls both systems.
+- **Trade post:** find and read the trade-post note, then build the radio station using its recipe. It must have power (mains/generator or its supported battery setup) to conduct trades. Sell items or place purchase orders in the station window; orders join one shipment rather than completing instantly. When the shipment arrives, collect purchased goods from its manifest and claim sales proceeds. The trader's stock and selected rare goods refresh on an 11-day cycle. Buying is limited by stock, account balance and reputation level; the trade UI shows locked tiers and current demand/discounts. The Trade Post sandbox toggle disables its loot, construction recipe and interactions.
+
+### Configuration and practical cautions
+
+Artel's loot frequency is configurable separately from pack enable/disable switches. The installed file documents four loot-rate levels (×1, ×3, ×8 and ×15); process-speed settings are narrower and do not affect every timed craft. Change world-facing pack settings before relying on that content in a long-running save. Turning a pack off generally stops its station/actions and new loot; it does not necessarily remove already-built objects. The installed code explicitly preserves some built storage and trade/steam objects when their options are disabled, while their functionality is gated.
+
+**Code/source coverage, not runtime validation:** these steps were derived from the installed Workshop files for Artel 0.2.0, especially its sandbox options, recipe/item definitions, player context menus and station logic. They provide a route into its systems, not an exhaustive ingredient-by-ingredient recipe catalog. Multiplayer behavior is claimed only where the installed code routes state changes through shared/server handlers; still validate a disposable setup before committing a valuable save. The upstream Workshop page is a primary reference, but no separate authored walkthrough/wiki was linked in the installed description.
+
+Source: [Artel Manufactory Workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=3794133594); locally installed payload, `ArtelManufactory/42/media` (version 0.2.0).
 
 ## Immersive Blackouts (ImmersiveBlackouts)
 
