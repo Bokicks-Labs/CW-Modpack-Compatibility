@@ -1,6 +1,6 @@
 Chaosworld B42 Modpack Compatibility
 Version 1.2.0 - Workshop release notes
-Changes since the October 6, 2026 Steam upload (listed as 1.1.14)
+Changes since the October 9, 2026 Steam Workshop update (live description listed 1.1.15)
 
 ADDED
 - Optional CW Viewpoint Patch (0.2.0) for Build 42.21+: adjustable Viewpoint loot/interaction-menu width, Project A-Life NPC interaction targets, and a guarded world right-click fallback. Requires Viewpoint and ZombieBuddy and must be enabled separately; its optional behaviors should be verified with your own Viewpoint setup.
@@ -8,7 +8,8 @@ ADDED
 - Distinct icon/poster artwork for the Workshop submods.
 
 FIXED
-- Keep the original vanilla Moodle UI hidden if Build 42 repositions it after Moodles in Lua takes ownership; remove temporary Moodle tracing.
+- Keep the duplicate vanilla Moodle UI hidden if Build 42 repositions it after Moodles in Lua takes ownership.
+- Place Casualties Undead's custom moodles after visible vanilla and Moodle Framework entries, including when Moodles in Lua owns vanilla rendering.
 - Improve Mod Options Search navigation when a search result refers to a heading or description without its own setting control; show a message if a jump target is unavailable.
 - Restore the intended default division of hygiene responsibilities: CW can neutralize Lifestyle's own personal hygiene meter and clear its clean/dirty moodles without disabling Lifestyle cleaning actions or its Cleaning skill. Nature's Call and Brush Your Damn Teeth ownership remain separate.
 
@@ -23,7 +24,7 @@ CHANGED
 - CW Mod Options Search: 0.1.1 -> 0.1.2 (search-navigation fix).
 - CW Audio Mixer: 0.1.0 -> 0.2.0 (expanded controls).
 - CW Viewpoint Patch: remains 0.2.0 (first Workshop release).
-- Core compatibility mod: 1.1.16 in GitHub -> 1.2.0; last published Workshop description said 1.1.14.
+- Core compatibility mod: 1.1.15 in the last Workshop description -> 1.2.0.
 
 INSTALLATION / SAFETY
 - The core mod supports Build 42.20+; CW Viewpoint Patch requires Build 42.21+.
@@ -35,5 +36,5 @@ INSTALLATION / SAFETY
 - Developer-only CWBanditsPerfTest is not part of this Workshop upload.
 
 RELEASE STATUS
-- The maintainer reports testing the current mod build successfully. This release-preparation work did not independently run a new game or multiplayer session.
+- The Casualties Undead stack placement was checked with Lua mocks for Moodles in Lua and vanilla MoodleUI plus Moodle Framework. In-game placement and other multiplayer combinations were not retested for this release preparation.
 - Before publishing: inspect Workshop staging, confirm the release metadata and selected optional submods, and upload manually via Project Zomboid's Workshop publisher. Run the repository's focused checks if further changes are made.

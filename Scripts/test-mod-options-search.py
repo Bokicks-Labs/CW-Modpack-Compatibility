@@ -15,7 +15,7 @@ def main() -> None:
     require(INFO, "id=CWModOptionsSearch")
     require(INFO, "require=CWModpackCompatibility")
     require(INFO, "versionMin=42.20.0")
-    require(INFO, "modversion=0.1.1")
+    require(INFO, "modversion=0.1.2")
     require(LUA, 'require "OptionScreens/MainOptions"')
     require(LUA, "MainOptions.close = function")
     require(LUA, 'api:create("CWModOptionsSearch", "Mod Options Search")')
