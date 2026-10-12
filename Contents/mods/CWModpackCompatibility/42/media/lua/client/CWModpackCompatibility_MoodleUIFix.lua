@@ -5,13 +5,15 @@ if not mods then return end
 local hasMoodlesInLua = mods:contains("moodlesinlua")
 local hasCasualties = mods:contains("CasualtiesUndead")
 local hasMoodleFramework = mods:contains("MoodleFramework")
-if not hasMoodlesInLua and not hasCasualties then return end
+local hasLifestyle = mods:contains("LifestyleHobbies")
+if not hasMoodlesInLua and not hasCasualties and not (hasMoodleFramework and hasLifestyle) then return end
 
 local hiddenCount = 0
 local vanillaMoodles = {}
 local nextScan = 0
 local SCAN_INTERVAL_MS = 250
 local casualtiesPlacementInstalled = false
+local frameworkPlacementInstalled = false
 
 local function discoverVanillaMoodles()
     local uiList = UIManager and UIManager.getUI and UIManager.getUI()
@@ -99,6 +101,20 @@ local function installCasualtiesPlacementBridge()
             y = y + frameworkCount * (frameworkSize + 10)
         end
 
+        local lifestyleCount = 0
+        local modData = player and player.getModData and player:getModData()
+        local lifestyleMoodles = modData and modData.LSMoodles
+        if hasLifestyle and type(lifestyleMoodles) == "table" then
+            for _, moodle in pairs(lifestyleMoodles) do
+                if type(moodle) == "table" and (tonumber(moodle.Level) or 0) ~= 0 then
+                    lifestyleCount = lifestyleCount + 1
+                end
+            end
+        end
+        if lifestyleCount > 0 then
+            y = y + lifestyleCount * spacing
+        end
+
         ui:setX(x)
         ui:setY(y)
         ui:setWidth(size)
@@ -111,8 +127,48 @@ local function installCasualtiesPlacementBridge()
     print("[CWModpackCompatibility][MoodleUIFix] Added Casualties Undead placement bridge for Moodles in Lua.")
 end
 
+local function installLifestyleFrameworkPlacementBridge()
+    if frameworkPlacementInstalled or not hasMoodleFramework or not hasLifestyle then return end
+    local mf = rawget(_G, "MF")
+    local moodleType = mf and mf.ISMoodle
+    local place = moodleType and moodleType.getXYPosition
+    if type(place) ~= "function" then return end
+
+    -- Lifestyle installs its own Moodle Framework placement bridge when its
+    -- compatibility flag is set, except MoodlePriority makes Framework skip
+    -- Lifestyle rows. Reserve those rows in either case where Framework does
+    -- not already include them.
+    local lifestyleFrameworkBridge = rawget(_G, "LS_AMcache")
+        and LS_AMcache.mf == true
+    local debugMoodlePriority = SandboxVars and SandboxVars.Debug
+        and SandboxVars.Debug.MoodlePriority == true
+    if not lifestyleFrameworkBridge or debugMoodlePriority then
+        moodleType.getXYPosition = function(self, ...)
+            local x, y = place(self, ...)
+            local modData = self and self.char and self.char.getModData and self.char:getModData()
+            local lifestyleMoodles = modData and modData.LSMoodles
+            if type(lifestyleMoodles) == "table" then
+                local activeCount = 0
+                for _, moodle in pairs(lifestyleMoodles) do
+                    if type(moodle) == "table" and (tonumber(moodle.Level) or 0) ~= 0 then
+                        activeCount = activeCount + 1
+                    end
+                end
+                if activeCount > 0 then
+                    local scale = mf.scale or 1
+                    y = y + activeCount * (10 + (mf.defaultWidth or 32) * scale)
+                end
+            end
+            return x, y
+        end
+        print("[CWModpackCompatibility][MoodleUIFix] Added Lifestyle row spacing to Moodle Framework placement.")
+    end
+    frameworkPlacementInstalled = true
+end
+
 local function updateMoodleUICompatibility()
     installCasualtiesPlacementBridge()
+    installLifestyleFrameworkPlacementBridge()
     if hasMoodlesInLua then keepVanillaMoodlesHidden() end
 end
 

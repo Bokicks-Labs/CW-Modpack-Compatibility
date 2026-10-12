@@ -17,6 +17,7 @@ ADDED
 FIXED
 - Keep the duplicate vanilla Moodle UI hidden if Build 42 repositions it after Moodles in Lua takes ownership.
 - Place Casualties Undead's custom moodles after visible vanilla and Moodle Framework entries, including when Moodles in Lua owns vanilla rendering.
+- Reserve separate stack rows for active Lifestyle and Infirmities Moodle Framework moodles, including when MoodlePriority is enabled.
 - Improve Mod Options Search navigation when a search result refers to a heading or description without its own setting control; show a message if a jump target is unavailable.
 - Restore the intended default division of hygiene responsibilities: CW can neutralize Lifestyle's own personal hygiene meter and clear its clean/dirty moodles without disabling Lifestyle cleaning actions or its Cleaning skill. Nature's Call and Brush Your Damn Teeth ownership remain separate.
 
