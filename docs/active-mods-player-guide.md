@@ -1,6 +1,6 @@
 # Active Mods Player Guide
 
-**For the current feature handbook, use [Major gameplay systems guide](major-mods-feature-guide.md).** This older guide reflects the October 9 loaded session and may contain local development IDs. The [October 11 active-server CSV](active-server-mods-2026-10-11.csv) is the Workshop-backed, release-ID-only synchronization reference; **do not sync clients using this session list**.
+**For the current feature handbook, use [Major gameplay systems guide](major-mods-feature-guide.md).** This older guide reflects the October 9 loaded session and may contain local development IDs. The [October 19 saved-profile CSV](active-server-mods-2026-10-19.csv) is the current Workshop-backed synchronization reference; **do not sync clients using this session list**.
 
 This guide is for the mods loaded in the Project Zomboid session captured on **October 9, 2026** (Build **42.21.0**). The inventory comes from the newest local `DebugLog.txt`, not from a guess based on installed Workshop subscriptions. The log contains **344 distinct mod IDs**. This guide focuses on mods with mechanics, controls, menus, setup, or interactions that are easy to miss; it deliberately skips the many single-vehicle additions and cosmetic-only packs.
 
