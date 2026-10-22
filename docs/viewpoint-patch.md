@@ -1,10 +1,9 @@
 # Viewpoint patch work
 
 `CWViewpointPatch` is an optional client mod in the CW Workshop item. Version
-0.2.0 requires Viewpoint and ZombieBuddy; the CW core requires neither. Enable
+0.2.1 requires Viewpoint and ZombieBuddy; the CW core requires neither. Enable
 it after Viewpoint. The patch JAR extends the Viewpoint loot/interaction label
-width and adds Project A-Life NPC shells to Viewpoint's person-target list. A
-Lua listener retries short world right-clicks when the press and release pick
+width. A Lua listener retries short world right-clicks when the press and release pick
 different objects. Existing interaction-failure logging remains available.
 
 The menu width setting is under Options > Mods > CW Viewpoint Patch. It ranges
@@ -15,26 +14,16 @@ rebuild the client JAR from the installed ZombieBuddy API. Repeated builds
 produce the same SHA-256 hash. ZombieBuddy must approve the new JAR before it
 loads. The patch never edits the installed Viewpoint or ZombieBuddy JARs.
 
-The NPC bridge recognizes live Project A-Life shells by their owned/UID
-mod-data markers. Other NPC mods may use different representations and are not
-yet covered. The right-click fallback handles world-object picker mismatches;
-UI panels still own their right-click events. Verify both behaviors in a
-disposable save before using this build in a new playthrough. In particular,
-an interaction target being selected does not by itself prove its mesh outline
-renders correctly.
+The right-click fallback handles world-object picker mismatches; UI panels
+still own their right-click events. Verify both remaining behaviors in a
+disposable save before using this build in a new playthrough.
 
-When Viewpoint targets an A-Life NPC, the Lua bridge now keeps Talk entries for
-that shell and drops entries whose callbacks point at other A-Life shells. It
-offers Jimmy's Trade (including visiting traders and gifts), Medical Check,
-and eligible crew recruitment for that specific NPC using Jimmy's public
-client and server paths. Talk opens A-Life's own conversation panel, which
-supplies the NPC's available dialogue and visitor choices. Medical Check opens
-Jimmy's wound view and treatment actions. Downed-survivor interrogation and
-first aid, and A-Life's separate wound/body menus, remain tied to their native
-body targets. The bridge uses the upstream availability checks and can change
-when those mods update. This NPC menu change has not yet been exercised in game;
-check two nearby NPCs with different identities and conditions before relying
-on it in a live playthrough.
+The locally installed Viewpoint x A-LIFE 1.3.4 mod scans Project A-Life NPC
+shells independently, projects them into Viewpoint's camera, highlights the
+crosshair target, and supplies its own Talk, Trade, Equip, and Medical Check
+menu. It hides Viewpoint's loot panel while targeting an NPC. CW's Lua NPC
+menu bridge and Java NPC target bridge were removed because this mod owns that
+interaction. Install Viewpoint x A-LIFE separately for those features.
 
 Earlier builds included a right-click trace that raised on a Java field access
 and a collision trace. Both have been removed from the 0.2.0 play build.
@@ -148,4 +137,5 @@ when testing the dev ID; rerun the same script to remove its junction. Restart P
 the mod list. To roll back, disable `CWViewpointPatch` or its dev ID and restart.
 The patch does not write save data. The Workshop staging script copies the
 optional mod and JAR but does not upload it. First verify the JAR load, menu
-width, NPC target and outline, and right-click behavior in a disposable save.
+width and right-click behavior in a disposable save. Test A-Life targeting with
+Viewpoint x A-LIFE separately.

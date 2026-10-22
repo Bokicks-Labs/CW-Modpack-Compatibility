@@ -1,7 +1,7 @@
 CWModpackCompatibility = CWModpackCompatibility or {}
 
 local Compat = CWModpackCompatibility
-Compat.version = "1.2.0"
+Compat.version = "1.2.1"
 
 local function isActive(modID)
     local activeMods = getActivatedMods and getActivatedMods() or nil

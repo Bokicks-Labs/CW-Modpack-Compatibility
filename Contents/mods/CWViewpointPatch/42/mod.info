@@ -1,9 +1,9 @@
 name=Chaosworld Viewpoint Patch
 id=CWViewpointPatch
 author=chaosworld
-description=[b]Optional client-side Viewpoint patch.[/b] Wider loot and interaction menus, A-Life NPC interaction targets, and a world right-click picker fallback. Requires Viewpoint and ZombieBuddy.
+description=[b]Optional client-side Viewpoint patch.[/b] Wider loot and interaction menus and a world right-click picker fallback. Requires Viewpoint and ZombieBuddy. Use Viewpoint x A-LIFE for A-Life NPC interactions.
 versionMin=42.21.0
-modversion=0.2.0
+modversion=0.2.1
 require=\ZombieBuddy,\Viewpoint
 ZBVersionMin=2.3.0
 javaJarFile=media/java/client/CWViewpointPatch.jar

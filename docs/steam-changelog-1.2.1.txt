@@ -1,0 +1,11 @@
+Chaosworld B42 Modpack Compatibility
+Version 1.2.1 - Workshop release notes
+
+CHANGED
+- CW Viewpoint Patch 0.2.1 removes its A-Life NPC Java target bridge. Viewpoint x A-LIFE provides the NPC crosshair, outline, and interaction menu.
+- CW Viewpoint Patch retains its menu-width and guarded world right-click fixes.
+
+FIXED
+- Replace literal percent signs in 31 English sandbox labels and tooltips from installed mods to prevent formatting warnings.
+
+The core mod supports Build 42.20+. CW Viewpoint Patch requires Build 42.21+, Viewpoint, and ZombieBuddy. Viewpoint x A-LIFE is a separate mod. The rebuilt CW JAR needs ZombieBuddy approval. In-game verification of the remaining Viewpoint behaviors is pending.

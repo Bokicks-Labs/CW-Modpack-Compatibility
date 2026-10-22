@@ -4,7 +4,7 @@ Source repository for the Chaosworld Project Zomboid Build 42 compatibility mod.
 
 The Workshop payloads are kept under `Contents/mods`. The core `CWModpackCompatibility` mod contains targeted compatibility fixes for the Chaosworld modpack, including the Lifestyle hidden-skill display bridge and automatic feature ownership for Nature's Call and Brush Your Damn Teeth.
 
-It also contains optional client-only submods. `CWAudioMixer` provides discovered-sound group and per-sound volume controls; `CWModOptionsSearch` adds search-and-jump navigation to the Build 42 Mod Options page. `CWViewpointPatch` contains optional Viewpoint menu, NPC targeting, and world right-click patches, and requires Viewpoint and ZombieBuddy only when enabled. See [CW Audio Mixer](docs/audio-mixer.md), [CW Mod Options Search](docs/mod-options-search.md), and [Viewpoint patch work](docs/viewpoint-patch.md).
+It also contains optional client-only submods. `CWAudioMixer` provides discovered-sound group and per-sound volume controls; `CWModOptionsSearch` adds search-and-jump navigation to the Build 42 Mod Options page. `CWViewpointPatch` contains optional Viewpoint menu-width and world right-click patches, and requires Viewpoint and ZombieBuddy only when enabled. Viewpoint x A-LIFE owns A-Life NPC interactions. See [CW Audio Mixer](docs/audio-mixer.md), [CW Mod Options Search](docs/mod-options-search.md), and [Viewpoint patch work](docs/viewpoint-patch.md).
 
 ## Player guide and server mod sync
 
@@ -14,6 +14,8 @@ It also contains optional client-only submods. `CWAudioMixer` provides discovere
 ## Workshop copy
 
 - [Current Workshop description](docs/workshop-description.md)
+- [Steam-formatted version 1.2.1 changelog](docs/steam-changelog-1.2.1.txt)
+- [Version 1.2.1 changelog](docs/workshop-changelog-1.2.1.md)
 - [Steam-formatted version 1.2.0 changelog](docs/steam-changelog-1.2.0.txt)
 - [Version 1.2.0 changelog](docs/workshop-changelog-1.2.0.md)
 
