@@ -8,9 +8,7 @@ It also contains optional client-only submods. `CWAudioMixer` provides discovere
 
 ## Player guide and server mod sync
 
-- [Major gameplay systems guide (controls, progression, linked official wikis and bug checks)](docs/major-mods-feature-guide.md). Focuses on substantial systems, including Viewpoint; excludes simple item/cosmetic mods.
-- [Workshop-backed saved-profile mod list (October 19, 2026)](docs/active-server-mods-2026-10-19.csv). Exported from the local `CWViewpointMP` saved mod profile: **357 distinct in-game mod IDs across 314 Workshop items**. This is a saved-profile snapshot, not a live read of a loaded session or `server.ini`. Multiple mod IDs can map to one Workshop item; only unique numeric Workshop IDs belong in `WorkshopItems=`, while individual module IDs belong in `Mods=`. Preserve dependency-aware server load order from the saved profile; the CSV is sorted by name.
-- [October 9 loaded-session player guide](docs/active-mods-player-guide.md). Older diagnostic snapshot that may include local development IDs; **do not use it to synchronize clients**.
+- [Main mod list for SP-to-MP server sync](docs/active-server-mods.csv). This undated CSV is the main copy for synchronizing mods from the local `CWViewpointMP` single-player saved profile to multiplayer servers and clients. Refresh it whenever that profile changes. It currently contains **362 distinct in-game mod IDs**. See [mod list sync instructions](docs/mod-list-sync.md) for the source, mapping rules, and limits.
 - "Yeah, It's Water, Bitch" remains excluded from the active CSV because it is currently malfunctioning.
 
 ## Workshop copy
@@ -18,20 +16,12 @@ It also contains optional client-only submods. `CWAudioMixer` provides discovere
 - [Current Workshop description](docs/workshop-description.md)
 - [Steam-formatted version 1.2.0 changelog](docs/steam-changelog-1.2.0.txt)
 - [Version 1.2.0 changelog](docs/workshop-changelog-1.2.0.md)
-- [Steam-formatted version 1.1.16 changelog](docs/steam-changelog-1.1.16.txt)
-- [Version 1.1.16 changelog](docs/workshop-changelog-1.1.16.md)
-- [Steam-formatted version 1.1.15 changelog](docs/steam-changelog-1.1.15.txt)
-- [Version 1.1.15 changelog](docs/workshop-changelog-1.1.15.md)
-- [Steam-formatted version 1.1.14 changelog](docs/steam-changelog-1.1.14.txt)
-- [Version 1.1.14 changelog](docs/workshop-changelog-1.1.14.md)
-- [Version 1.1.13 changelog](docs/workshop-changelog-1.1.13.md)
 
 Steam Workshop descriptions may use Steam BBCode such as `[b]`, `[h2]`,
 `[list]`, and `[url]`. The CW Steam changelog `.txt` inputs are plain text:
 avoid Markdown and BBCode in those entries. Keep readable Markdown release
 notes separately.
 - [Lifestyle feature ownership](docs/lifestyle-feature-ownership.md)
-- [October 11 mod update audit](docs/mod-update-audit-2026-10-11.md)
 
 ## Version bumps
 

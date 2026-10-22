@@ -23,6 +23,19 @@ disposable save before using this build in a new playthrough. In particular,
 an interaction target being selected does not by itself prove its mesh outline
 renders correctly.
 
+When Viewpoint targets an A-Life NPC, the Lua bridge now keeps Talk entries for
+that shell and drops entries whose callbacks point at other A-Life shells. It
+offers Jimmy's Trade (including visiting traders and gifts), Medical Check,
+and eligible crew recruitment for that specific NPC using Jimmy's public
+client and server paths. Talk opens A-Life's own conversation panel, which
+supplies the NPC's available dialogue and visitor choices. Medical Check opens
+Jimmy's wound view and treatment actions. Downed-survivor interrogation and
+first aid, and A-Life's separate wound/body menus, remain tied to their native
+body targets. The bridge uses the upstream availability checks and can change
+when those mods update. This NPC menu change has not yet been exercised in game;
+check two nearby NPCs with different identities and conditions before relying
+on it in a live playthrough.
+
 Earlier builds included a right-click trace that raised on a Java field access
 and a collision trace. Both have been removed from the 0.2.0 play build.
 Collision work is deferred.

@@ -1,6 +1,0 @@
-# Version 1.1.16
-
-Use official ZombieBuddy Workshop item and refresh mod update guidance.
-
-- Remove the temporary CW ZombieBuddy setup package now that the official Workshop item is public again.
-- Document Viewpoint 0.1.6, obsolete Car Fix, and the native DLL difference on affected Windows clients.
