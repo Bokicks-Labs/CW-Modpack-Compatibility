@@ -4,7 +4,7 @@ Source repository for the Chaosworld Project Zomboid Build 42 compatibility mod.
 
 The Workshop payloads are kept under `Contents/mods`. The core `CWModpackCompatibility` mod contains targeted compatibility fixes for the Chaosworld modpack, including the Lifestyle hidden-skill display bridge and automatic feature ownership for Nature's Call and Brush Your Damn Teeth.
 
-It also contains optional client-only submods. `CWAudioMixer` provides discovered-sound group and per-sound volume controls; `CWModOptionsSearch` adds search-and-jump navigation to the Build 42 Mod Options page. `CWViewpointPatch` contains optional Viewpoint menu-width and world right-click patches, and requires Viewpoint and ZombieBuddy only when enabled. Viewpoint x A-LIFE owns A-Life NPC interactions. See [CW Audio Mixer](docs/audio-mixer.md), [CW Mod Options Search](docs/mod-options-search.md), and [Viewpoint patch work](docs/viewpoint-patch.md).
+It also contains optional client-only submods. `CWAudioMixer` provides discovered-sound group and per-sound volume controls; `CWModOptionsSearch` adds search-and-jump navigation to the Build 42 Mod Options page. `CWViewpointPatch` contains optional Viewpoint menu-width and world right-click patches, and requires Viewpoint and ZombieBuddy only when enabled. `CWModdedUILayout` adjusts Casualties Undead windows at readable text sizes and requires Casualties Undead only when enabled. Viewpoint x A-LIFE owns A-Life NPC interactions. See [CW Audio Mixer](docs/audio-mixer.md), [CW Mod Options Search](docs/mod-options-search.md), [Viewpoint patch work](docs/viewpoint-patch.md), and [Modded UI layout](docs/modded-ui-layout.md).
 
 ## Player guide and server mod sync
 
@@ -59,9 +59,9 @@ This creates:
     -> <repository>\LocalTest\CWModpackCompatibility_dev_<timestamp>
 ```
 
-The copied payload has ID `CWModpackCompatibility_dev` and a `(Dev)` name; release source and Workshop staging keep `CWModpackCompatibility`. The command discovers submods under `Contents/mods` whose `42/mod.info` lists `CWModpackCompatibility` in `require=`, plus the independent `CWViewpointPatch` submod. It creates a `_dev` copy of each, changing only dependencies on `CWModpackCompatibility` to `CWModpackCompatibility_dev`; the Viewpoint patch retains its Viewpoint and ZombieBuddy requirements. Enable the dev core and whichever dev submods you want in the test mod list; disable their release IDs for that test. Each activation builds fresh copies, so rerun the command to remove the junctions before testing new edits. Old copies under `LocalTest` may be removed after testing. The script refuses to replace real folders or unmanaged junctions. If the older `CWModpackCompatibility` junction is installed, remove that junction before activating this one.
+The copied payload has ID `CWModpackCompatibility_dev` and a `(Dev)` name; release source and Workshop staging keep `CWModpackCompatibility`. The command discovers submods under `Contents/mods` whose `42/mod.info` lists `CWModpackCompatibility` in `require=`, plus the independent `CWViewpointPatch` and `CWModdedUILayout` submods. It creates a `_dev` copy of each, changing only dependencies on `CWModpackCompatibility` to `CWModpackCompatibility_dev`; independent submods retain their own requirements. Enable the dev core and whichever dev submods you want in the test mod list; disable their release IDs for that test. Each activation builds fresh copies, so rerun the command to remove the junctions before testing new edits. Old copies under `LocalTest` may be removed after testing. The script refuses to replace real folders or unmanaged junctions. If the older `CWModpackCompatibility` junction is installed, remove that junction before activating this one.
 
-The main dev-junction command above can stage all supported dev submods, including Audio Mixer, Mod Options Search and Viewpoint Patch. To toggle only Viewpoint Patch, use `Scripts/toggle-pz-viewpoint-patch-junction.ps1`.
+The main dev-junction command above can stage all supported dev submods, including Audio Mixer, Mod Options Search, Viewpoint Patch, and Modded UI Layout. To toggle only Viewpoint Patch, use `Scripts/toggle-pz-viewpoint-patch-junction.ps1`.
 
 ## Workshop staging
 
@@ -71,7 +71,7 @@ After testing a commit, update the local PZ Workshop staging folder with:
 .\Scripts\publish-to-pz-workshop.ps1
 ```
 
-This mirrors the core compatibility mod, all three optional client submods, and Workshop metadata to `%UserProfile%\Zomboid\Workshop\CW-Modpack-Compatibility`, removes destination-only files inside each managed staging mod, and verifies each staged file set and SHA-256 hashes. It does not edit the Steam installation, base-game media, launchers, DLLs, saves, or the live Steam Workshop cache.
+This mirrors the core compatibility mod, all four optional client submods, and Workshop metadata to `%UserProfile%\Zomboid\Workshop\CW-Modpack-Compatibility`, removes destination-only files inside each managed staging mod, and verifies each staged file set and SHA-256 hashes. It does not edit the Steam installation, base-game media, launchers, DLLs, saves, or the live Steam Workshop cache.
 
 ## Repository boundaries
 

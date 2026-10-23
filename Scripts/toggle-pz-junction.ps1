@@ -9,7 +9,7 @@ $devRoot = Join-Path $repoRoot ('LocalTest\CWModpackCompatibility_dev_' + (Get-D
 $devId = 'CWModpackCompatibility_dev'
 $coreId = 'CWModpackCompatibility'
 $manifestName = 'dev-submods.txt'
-$independentSubmodIds = @('CWViewpointPatch')
+$independentSubmodIds = @('CWViewpointPatch', 'CWModdedUILayout')
 
 if (Get-Process -Name 'ProjectZomboid64', 'ProjectZomboid32', 'ProjectZomboid' -ErrorAction SilentlyContinue) {
     throw 'Project Zomboid is running. Close it before changing dev junctions.'

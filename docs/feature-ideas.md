@@ -1,5 +1,14 @@
 # Feature and integration ideas
 
+## Planned: shared keybinds and conflict resolution
+
+Build an optional client submod that inventories bindings across game and mod
+menus, lets players resolve supported conflicts in an in-game menu, and adds
+modifier, tap, long-hold, and radial-menu choices for supported actions. The
+full scope, compatibility limits, implementation phases, and effort estimates
+are in [the keybind compatibility plan](keybind-compatibility-plan.md). This is
+planned work; no part of the submod is implemented yet.
+
 Ideas are separate from bug occurrences. The normal-play tracker's
 `IDEAS.md` is the current idea index; its append-only `events.jsonl` preserves
 original reports and corrections. This repo file also preserves the older

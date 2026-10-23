@@ -1,0 +1,10 @@
+name=Chaosworld Modded UI Layout
+id=CWModdedUILayout
+author=chaosworld
+description=[b]Optional client-side layout fixes for modded UI windows.[/b] Currently adjusts Casualties Undead health vitals, debug controls, and minigame vitals at larger readable text sizes.
+versionMin=42.20.0
+modversion=0.1.0
+require=CasualtiesUndead
+category=interface
+poster=poster.png
+icon=icon.png
