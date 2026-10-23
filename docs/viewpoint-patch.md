@@ -129,11 +129,11 @@ compare its behavior against current Viewpoint in a disposable save first.
 
 ## Development and rollback
 
-Run `Scripts/toggle-pz-junction.ps1` to include a copied `CWViewpointPatch_dev`
+Run `Scripts/deploy-pz-dev-mods.ps1` to include a copied `CWViewpointPatch_dev`
 junction alongside the CW dev mods, or run
-`Scripts/toggle-pz-viewpoint-patch-junction.ps1` to manage that junction alone.
-Do not use both toggles for the same active junction. Disable the release ID
-when testing the dev ID; rerun the same script to remove its junction. Restart PZ after changing
+`Scripts/deploy-pz-viewpoint-patch.ps1` to manage that junction alone.
+Use one deploy command to manage the active junction. The dev copy declares the release ID incompatible.
+Rerun the same command to refresh its copy. Restart PZ after changing
 the mod list. To roll back, disable `CWViewpointPatch` or its dev ID and restart.
 The patch does not write save data. The Workshop staging script copies the
 optional mod and JAR but does not upload it. First verify the JAR load, menu

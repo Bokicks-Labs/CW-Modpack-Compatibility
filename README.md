@@ -49,7 +49,7 @@ For a separate Project RV bus-interior backup/import helper, see [Project RV Int
 Run PowerShell from the repository root:
 
 ```powershell
-.\Scripts\toggle-pz-junction.ps1
+.\Scripts\deploy-pz-dev-mods.ps1
 ```
 
 This creates:
@@ -59,9 +59,9 @@ This creates:
     -> <repository>\LocalTest\CWModpackCompatibility_dev_<timestamp>
 ```
 
-The copied payload has ID `CWModpackCompatibility_dev` and a `(Dev)` name; release source and Workshop staging keep `CWModpackCompatibility`. The command discovers submods under `Contents/mods` whose `42/mod.info` lists `CWModpackCompatibility` in `require=`, plus the independent `CWViewpointPatch` and `CWModdedUILayout` submods. It creates a `_dev` copy of each, changing only dependencies on `CWModpackCompatibility` to `CWModpackCompatibility_dev`; independent submods retain their own requirements. Enable the dev core and whichever dev submods you want in the test mod list; disable their release IDs for that test. Each activation builds fresh copies, so rerun the command to remove the junctions before testing new edits. Old copies under `LocalTest` may be removed after testing. The script refuses to replace real folders or unmanaged junctions. If the older `CWModpackCompatibility` junction is installed, remove that junction before activating this one.
+The copied payload has ID `CWModpackCompatibility_dev` and a `(Dev)` name; release source and Workshop staging keep `CWModpackCompatibility`. The command discovers every submod under `Contents/mods` with a `42/mod.info`, including dev-only submods, and creates a `_dev` copy of each. Dependencies on `CWModpackCompatibility` point to its dev ID. Each dev copy declares its source ID incompatible, so the released counterpart cannot be enabled alongside it. Run the command once per deployment: it replaces managed junctions with fresh copies of current source. Old copies under `LocalTest` may be removed after testing. The script refuses to replace real folders or unmanaged junctions. If the older `CWModpackCompatibility` junction is installed, remove that junction before deploying.
 
-The main dev-junction command above can stage all supported dev submods, including Audio Mixer, Mod Options Search, Viewpoint Patch, and Modded UI Layout. To toggle only Viewpoint Patch, use `Scripts/toggle-pz-viewpoint-patch-junction.ps1`.
+To deploy only Viewpoint Patch, use `Scripts/deploy-pz-viewpoint-patch.ps1`.
 
 ## Workshop staging
 

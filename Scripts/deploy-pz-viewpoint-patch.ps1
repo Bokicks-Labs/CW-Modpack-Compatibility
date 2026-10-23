@@ -19,7 +19,7 @@ if (Test-Path -LiteralPath $junction) {
         $manifest = Join-Path $coreItem.Target 'dev-submods.txt'
         if ($coreItem.LinkType -eq 'Junction' -and (Test-Path -LiteralPath $manifest -PathType Leaf) -and
             (Get-Content -LiteralPath $manifest) -contains $modId) {
-            throw 'The main CW toggle manages this Viewpoint junction. Use toggle-pz-junction.ps1 to remove it.'
+            throw 'The main CW deploy manages this Viewpoint junction. Use deploy-pz-dev-mods.ps1 to refresh it.'
         }
     }
     $item = Get-Item -LiteralPath $junction -Force
@@ -27,8 +27,6 @@ if (Test-Path -LiteralPath $junction) {
         throw "Refusing to remove an unmanaged path: $junction"
     }
     Remove-Item -LiteralPath $junction
-    Write-Output "DEV OFF: $junction"
-    return
 }
 
 $info = Join-Path $source '42\mod.info'
@@ -42,6 +40,7 @@ if (([regex]::Matches($content, '(?m)^id=CWViewpointPatch\r?$')).Count -ne 1) {
 }
 $content = [regex]::Replace($content, '(?m)^id=CWViewpointPatch\r?$', 'id=CWViewpointPatch_dev')
 $content = [regex]::Replace($content, '(?m)^name=(.+)\r?$', 'name=$1 (Dev)')
+$content += "`nincompatible=$modId`n"
 [IO.File]::WriteAllText($devInfo, $content, [Text.UTF8Encoding]::new($false))
 New-Item -ItemType Junction -Path $junction -Target $devRoot | Out-Null
-Write-Output "DEV ON: $junction -> $devRoot"
+Write-Output "DEPLOYED: $junction -> $devRoot"

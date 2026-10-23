@@ -9,7 +9,6 @@ $devRoot = Join-Path $repoRoot ('LocalTest\CWModpackCompatibility_dev_' + (Get-D
 $devId = 'CWModpackCompatibility_dev'
 $coreId = 'CWModpackCompatibility'
 $manifestName = 'dev-submods.txt'
-$independentSubmodIds = @('CWViewpointPatch', 'CWModdedUILayout')
 
 if (Get-Process -Name 'ProjectZomboid64', 'ProjectZomboid32', 'ProjectZomboid' -ErrorAction SilentlyContinue) {
     throw 'Project Zomboid is running. Close it before changing dev junctions.'
@@ -23,11 +22,9 @@ function Get-ManagedSubmods {
         $content = [IO.File]::ReadAllText($modInfo)
         $idMatch = [regex]::Match($content, '(?m)^id=([^\r\n]+)\r?$')
         $requireMatch = [regex]::Match($content, '(?m)^require=([^\r\n]+)\r?$')
-        if (-not $idMatch.Success -or -not $requireMatch.Success) { continue }
-        $requirements = @($requireMatch.Groups[1].Value -split ',' | ForEach-Object { $_.Trim().TrimStart('\') })
+        if (-not $idMatch.Success) { throw "Missing submod ID in $modInfo" }
         $id = $idMatch.Groups[1].Value.Trim()
         if ($id -notmatch '^[A-Za-z0-9_]+$') { throw "Unsafe submod ID in $modInfo`: $id" }
-        if ($requirements -notcontains $coreId -and $independentSubmodIds -notcontains $id) { continue }
         [pscustomobject]@{ Id = $id; Source = $directory.FullName }
     }
 }
@@ -60,8 +57,6 @@ if (Test-Path -LiteralPath $junction) {
         Remove-ManagedDevJunction (Join-Path $env:USERPROFILE "Zomboid\mods\${submodId}_dev") $submodId
     }
     Remove-Item -LiteralPath $junction
-    Write-Output "DEV OFF: $junction and managed dev submods"
-    return
 }
 
 $legacy = Join-Path $env:USERPROFILE 'Zomboid\mods\CWModpackCompatibility'
@@ -89,9 +84,10 @@ if (([regex]::Matches($content, '(?m)^id=CWModpackCompatibility\r?$')).Count -ne
 }
 $content = [regex]::Replace($content, '(?m)^id=CWModpackCompatibility\r?$', "id=$devId")
 $content = [regex]::Replace($content, '(?m)^name=(.+)\r?$', 'name=$1 (Dev)')
+$content += "`nincompatible=$coreId`n"
 [IO.File]::WriteAllText($info, $content, [Text.UTF8Encoding]::new($false))
 New-Item -ItemType Junction -Path $junction -Target $devRoot | Out-Null
-Write-Output "DEV ON: $junction -> $devRoot (ID $devId)"
+Write-Output "DEPLOYED: $junction -> $devRoot (ID $devId)"
 [IO.File]::WriteAllLines((Join-Path $devRoot $manifestName), [string[]]@($submods | ForEach-Object Id), [Text.UTF8Encoding]::new($false))
 foreach ($submod in $submods) {
     $submodRoot = Join-Path $repoRoot ('LocalTest\' + $submod.Id + '_dev_' + (Get-Date -Format 'yyyyMMdd-HHmmss-fffffff'))
@@ -109,8 +105,9 @@ foreach ($submod in $submods) {
         'require=' + ($parts -join ',')
     })
     $submodContent = [regex]::Replace($submodContent, '(?m)^name=(.+)\r?$', 'name=$1 (Dev)')
+    $submodContent += "`nincompatible=$($submod.Id)`n"
     [IO.File]::WriteAllText($submodInfo, $submodContent, [Text.UTF8Encoding]::new($false))
     $submodJunction = Join-Path $env:USERPROFILE "Zomboid\mods\$($submod.Id)_dev"
     New-Item -ItemType Junction -Path $submodJunction -Target $submodRoot | Out-Null
-    Write-Output "DEV ON: $submodJunction -> $submodRoot (ID $($submod.Id)_dev)"
+    Write-Output "DEPLOYED: $submodJunction -> $submodRoot (ID $($submod.Id)_dev)"
 }
