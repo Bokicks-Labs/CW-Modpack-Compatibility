@@ -8,7 +8,7 @@ It also contains optional client-only submods. `CWAudioMixer` provides discovere
 
 ## Player guide and server mod sync
 
-- [Main mod list for SP-to-MP server sync](docs/active-server-mods.csv). This undated CSV is the main copy for synchronizing mods from the local `CWViewpointMP` single-player saved profile to multiplayer servers and clients. Refresh it whenever that profile changes. It currently contains **362 distinct in-game mod IDs**. See [mod list sync instructions](docs/mod-list-sync.md) for the source, mapping rules, and limits.
+- [Main mod list for SP-to-MP server sync](docs/active-server-mods.csv). This undated CSV is the main copy for synchronizing mods from the local `CWViewpointMP` single-player saved profile to multiplayer servers and clients. Refresh it whenever that profile changes. It currently contains **373 distinct in-game mod IDs**. See [mod list sync instructions](docs/mod-list-sync.md) for the source, mapping rules, and limits.
 - "Yeah, It's Water, Bitch" remains excluded from the active CSV because it is currently malfunctioning.
 
 ## Workshop copy
