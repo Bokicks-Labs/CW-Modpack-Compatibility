@@ -13,7 +13,7 @@ For Lifestyle:
 [*]LifestyleHobbiesFix (only if installed)
 [*]CWModpackCompatibility
 [/olist]
-Bandits2, BanditsWeekOne, DynamicTradingCommon, DynamicTradingV2, ETO_B and other patched mods should also load before the CW core. Enable optional submods separately. CWAudioMixer and CWModOptionsSearch should load after the core; CWViewpointPatch should load after Viewpoint.
+Bandits2, BanditsWeekOne, DynamicTradingCommon, DynamicTradingV2, ETO_B and other patched mods should also load before the CW core. Enable optional submods separately. CWAudioMixer and CWModOptionsSearch should load after the core; CWViewpointPatch should load after Viewpoint; CWModdedUILayout should load after Casualties Undead.
 
 For multiplayer, keep server/client versions and mod lists aligned and restart after changing order or ownership settings. Back up saves before removing mods.
 
@@ -37,6 +37,7 @@ For multiplayer, keep server/client versions and mod lists aligned and restart a
 [*][b]CW Audio Mixer (0.2.0):[/b] Client-only group and individual sound sliders. Find its group controls under Options > Audio > CW Audio Mixer; Advanced sound mixer handles individual sounds and assignments. Categories include UI, death music, TV, radio, music, ambience, vehicles and combat. Settings are local. The title-screen video audio cannot reliably be controlled by this Lua mixer; vanilla rain is part of a shared ambience event, not an isolated rain slider.
 [*][b]CW Mod Options Search (0.1.2):[/b] Client-only search inside Options > Mods for registered mod settings, labels and tooltips. Select a result to jump to an available option; search never edits setting values.
 [*][b]CW Viewpoint Patch (0.2.1, experimental):[/b] Client-only Build 42.21+ patch for wider Viewpoint interaction labels and a guarded right-click fallback. Requires [b]Viewpoint and ZombieBuddy[/b]. Enable separately after Viewpoint. Configure label width under Options > Mods > CW Viewpoint Patch and restart. The included Java JAR requires explicit approval via ZombieBuddy. For Project A-Life NPC targeting and menus, install Viewpoint x A-LIFE separately. Test world interactions in a disposable save.
+[*][b]CW Modded UI Layout (0.1.0):[/b] Client-only Casualties Undead window spacing for readable text sizes. Adjusts the Health panel Vitals report, debug controls, and treatment-minigame Vitals and case sidebar. Requires [b]Casualties Undead[/b] and should be enabled separately after it. Treatments and debug commands are unchanged.
 [/list]
 
 [h2]Project Viewpoint and ZombieBuddy[/h2]
@@ -50,8 +51,8 @@ This is a compatibility collection for an actively changing Build 42 modpack. No
 [h2]Credits[/h2]
 Original mods and assets belong to their creators. This is an unofficial compatibility project. Lifestyle: Hobbies by Angry; Every Texture Optimized by maceleet; Bandits/Week One by Slayer; Dynamic Trading by Psychopatz; GaelGunStore by Pen-Pen Pirulin; Nature's Call by RedChili; Brush Your Damn Teeth by Cam3; Take A Bath And Shower by si-cafe; Fast Forward by Maumau; Exact Minute Clock by PorrisV99; Quartermaster by deckard; Beyond Ten by Patryk (Workshop publication by Silver/Brek); ZombieBuddy by Andrey "Zed" Zaikin. Viewpoint, Project A-Life, Casualties Undead and all other supported third-party projects remain the property of their respective authors.
 
-CW 1.2.1 removes duplicate A-Life targeting and cleans up sandbox labels.
+CW 1.3.0 adds optional Casualties Undead UI layout fixes.
 
 CW maintains a mirrored set of Lifestyle animations for regression prevention. If any original author requests removal of their material or compatibility support, CW will honor that request.
 
-[i]Maintained with Codex for the Chaosworld modpack. Current compatibility release: 1.2.1. Optional modules may have independent versions.[/i]
+[i]Maintained with Codex for the Chaosworld modpack. Current compatibility release: 1.3.0. Optional modules may have independent versions.[/i]

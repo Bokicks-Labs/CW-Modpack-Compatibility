@@ -71,12 +71,12 @@ $updates[$workshopPath] = Replace-Once $updates[$workshopPath] "Current compatib
 $newLinks = "- [Steam-formatted version $next changelog]($steamPath)`n- [Version $next changelog]($markdownPath)`n"
 $updates[$readmePath] = Replace-Once $readme '(?m)^- \[Current Workshop description\]\(docs/workshop-description\.md\)\r?\n' "- [Current Workshop description](docs/workshop-description.md)`n$newLinks" 'README Workshop links'
 $updates[$markdownPath] = "# Version $next`n`n$summaryLine`n`n" + (($noteLines | ForEach-Object { "- $_" }) -join "`n") + "`n"
-$updates[$steamPath] = "[h1]Version $next[/h1]`n`n$summaryLine`n`n[list]`n" + (($noteLines | ForEach-Object { "[*]$_" }) -join "`n") + "`n[/list]`n"
+$updates[$steamPath] = "Chaosworld B42 Modpack Compatibility`nVersion $next - Workshop release notes`n`n$summaryLine`n`n" + (($noteLines | ForEach-Object { "- $_" }) -join "`n") + "`n"
 
 $workshopLines = $updates[$workshopPath] -split '\r?\n'
 $submitDescription = @($workshopLines | Where-Object { $_ -like 'description=*' } | ForEach-Object { $_.Substring(12) }) -join "`n"
 $workshopId = @($workshopLines | Where-Object { $_ -like 'id=*' } | Select-Object -First 1) -replace '^id=', ''
-$modIds = foreach ($modName in @('CWModpackCompatibility', 'CWAudioMixer', 'CWModOptionsSearch', 'CWViewpointPatch')) {
+$modIds = foreach ($modName in @('CWModpackCompatibility', 'CWAudioMixer', 'CWModOptionsSearch', 'CWViewpointPatch', 'CWModdedUILayout')) {
     $modInfo = Read-Source "Contents/mods/$modName/42/mod.info"
     $modId = @($modInfo -split '\r?\n' | Where-Object { $_ -like 'id=*' } | Select-Object -First 1) -replace '^id=', ''
     if (-not $modId) { throw "Missing mod ID for $modName." }

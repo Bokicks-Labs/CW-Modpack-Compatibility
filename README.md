@@ -15,6 +15,8 @@ It also contains optional client-only submods. `CWAudioMixer` provides discovere
 ## Workshop copy
 
 - [Current Workshop description](docs/workshop-description.md)
+- [Steam-formatted version 1.3.0 changelog](docs/steam-changelog-1.3.0.txt)
+- [Version 1.3.0 changelog](docs/workshop-changelog-1.3.0.md)
 - [Steam-formatted version 1.2.1 changelog](docs/steam-changelog-1.2.1.txt)
 - [Version 1.2.1 changelog](docs/workshop-changelog-1.2.1.md)
 - [Steam-formatted version 1.2.0 changelog](docs/steam-changelog-1.2.0.txt)
@@ -39,8 +41,8 @@ Remove `-WhatIf` to write the next version. The script updates the core
 `mod.info`, Lua runtime version, Workshop description and metadata, README
 links, and new Markdown/Steam changelog files. It refuses mismatched version
 markers or existing release-note files. Review and edit the generated notes
-before publishing. CW Audio Mixer and CW Mod Options Search have independent
-versions; this command does not change them.
+before publishing. Optional submods have independent versions; this command
+does not change them.
 
 ## Local testing
 

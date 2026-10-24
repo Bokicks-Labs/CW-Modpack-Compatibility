@@ -1,0 +1,12 @@
+Chaosworld B42 Modpack Compatibility
+Version 1.3.0 - Workshop release notes
+
+ADDED
+- CW Modded UI Layout 0.1.0, an optional client submod for Casualties Undead. Enable it after Casualties Undead. It does not require the CW core.
+
+IMPROVED
+- Give the Casualties Undead Health Vitals report and debug menu more room at readable text sizes.
+- Space out treatment-minigame headers, Vitals readings, SITE and injury tags, event timestamps, and the bottom progress and quality bars.
+- Keep treatment and debug behavior under Casualties Undead's existing handlers.
+
+The layout was refined using in-game 2560x1440 screenshots. Other resolutions, languages, and minigames have not all been checked in game.
