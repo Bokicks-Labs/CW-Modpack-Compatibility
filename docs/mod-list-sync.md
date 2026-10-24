@@ -6,7 +6,7 @@ The source profile is the `CWViewpointMP:` entry in `%UserProfile%\Zomboid\Lua\p
 
 When syncing a server, use the profile's ordered mod IDs for `Mods=` and the CSV's unique numeric Workshop IDs for `WorkshopItems=`. The CSV is sorted by display name, so its row order is not the server load order. Check dependencies and use the saved profile's order. Ensure clients use the same mod IDs and compatible versions.
 
-This list reflects the saved profile; it does not prove which mods are loaded in a running session or configured in a particular `server.ini`. Compare the target server configuration separately before applying changes. Last reconciled with the local profile: **2026-10-23** (373 distinct mod IDs).
+This list reflects the saved profile; it does not prove which mods are loaded in a running session or configured in a particular `server.ini`. Compare the target server configuration separately before applying changes. Last reconciled with the local profile: **2026-10-23** (374 distinct mod IDs).
 
 ## World sandbox settings
 
